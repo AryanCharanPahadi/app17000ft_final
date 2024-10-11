@@ -95,7 +95,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
 
                     // Version Text
                     Text(
-                   '1.0.0',
+                   '4.0.0',
                       style: TextStyle(
                         color: Colors.white.withOpacity(0.9),
                         fontSize: responsive.responsiveValue(

@@ -365,10 +365,9 @@ class _EditFormPageState extends State<EditFormPage> {
                             switch (selectedFormLabel) {
                               case 'enrollment':
                                 if (entry.key == 'enrollment') {
-                                  final enrollmentFetch =
-                                  formData['enrollment'];
+                                  final enrollmentFetch = formData['enrollment'];
 
-                                  if (enrollmentFetch is Map) {
+                                  if (enrollmentFetch is Map && enrollmentFetch.isNotEmpty) {
                                     List<Widget> classRows = [];
 
                                     // Add headers row
@@ -376,54 +375,45 @@ class _EditFormPageState extends State<EditFormPage> {
                                       Row(
                                         children: const [
                                           Expanded(
-                                              child: Text('Class',
-                                                  style: TextStyle(
-                                                      fontSize: 16,
-                                                      fontWeight:
-                                                      FontWeight.bold))),
+                                            child: Text(
+                                              'Class',
+                                              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                                            ),
+                                          ),
                                           Expanded(
-                                              child: Text('Boys',
-                                                  style: TextStyle(
-                                                      fontSize: 16,
-                                                      fontWeight:
-                                                      FontWeight.bold))),
+                                            child: Text(
+                                              'Boys',
+                                              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                                            ),
+                                          ),
                                           Expanded(
-                                              child: Text('Girls',
-                                                  style: TextStyle(
-                                                      fontSize: 16,
-                                                      fontWeight:
-                                                      FontWeight.bold))),
+                                            child: Text(
+                                              'Girls',
+                                              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                                            ),
+                                          ),
                                         ],
                                       ),
                                     );
 
                                     // Adding class data rows
                                     enrollmentFetch.forEach((className, data) {
-                                      if (data is Map &&
-                                          data.containsKey('boys') &&
-                                          data.containsKey('girls')) {
-                                        final boys =
-                                            int.tryParse(data['boys'] ?? '0') ??
-                                                0;
-                                        final girls = int.tryParse(
-                                            data['girls'] ?? '0') ??
-                                            0;
+                                      if (data is Map && data.containsKey('boys') && data.containsKey('girls')) {
+                                        final boys = int.tryParse(data['boys']?.toString() ?? '0') ?? 0;
+                                        final girls = int.tryParse(data['girls']?.toString() ?? '0') ?? 0;
 
                                         classRows.add(
                                           Row(
                                             children: [
                                               Expanded(
-                                                  child: Text(className,
-                                                      style: const TextStyle(
-                                                          fontSize: 14))),
+                                                child: Text(className, style: const TextStyle(fontSize: 14)),
+                                              ),
                                               Expanded(
-                                                  child: Text('$boys',
-                                                      style: const TextStyle(
-                                                          fontSize: 14))),
+                                                child: Text('$boys', style: const TextStyle(fontSize: 14)),
+                                              ),
                                               Expanded(
-                                                  child: Text('$girls',
-                                                      style: const TextStyle(
-                                                          fontSize: 14))),
+                                                child: Text('$girls', style: const TextStyle(fontSize: 14)),
+                                              ),
                                             ],
                                           ),
                                         );
@@ -433,38 +423,23 @@ class _EditFormPageState extends State<EditFormPage> {
                                     // Display the enrollment data in a card with headers
                                     return Card(
                                       elevation: 4,
-                                      margin: const EdgeInsets.symmetric(
-                                          vertical: 8.0),
+                                      margin: const EdgeInsets.symmetric(vertical: 8.0),
                                       child: Padding(
                                         padding: const EdgeInsets.all(16.0),
                                         child: Column(
-                                          crossAxisAlignment:
-                                          CrossAxisAlignment.start,
+                                          crossAxisAlignment: CrossAxisAlignment.start,
                                           children: [
-                                            Column(
-                                                children:
-                                                classRows),
-                                            // Displaying the rows with class data
-                                            SizedBox(height: 16),
+                                            Column(children: classRows),
+                                            const SizedBox(height: 16),
                                             ElevatedButton(
                                               onPressed: () {
-                                                final enrolmentDataMap = <
-                                                    String,
-                                                    Map<String, String>>{};
+                                                final enrolmentDataMap = <String, Map<String, String>>{};
 
-                                                enrollmentFetch.forEach((
-                                                    className, data) {
-                                                  if (data is Map &&
-                                                      data.containsKey(
-                                                          'boys') &&
-                                                      data.containsKey(
-                                                          'girls')) {
-                                                    enrolmentDataMap[className] =
-                                                    {
-                                                      'boys': data['boys'] ??
-                                                          '0',
-                                                      'girls': data['girls'] ??
-                                                          '0',
+                                                enrollmentFetch.forEach((className, data) {
+                                                  if (data is Map && data.containsKey('boys') && data.containsKey('girls')) {
+                                                    enrolmentDataMap[className] = {
+                                                      'boys': data['boys']?.toString() ?? '0',
+                                                      'girls': data['girls']?.toString() ?? '0',
                                                     };
                                                   }
                                                 });
@@ -472,51 +447,53 @@ class _EditFormPageState extends State<EditFormPage> {
                                                 Navigator.push(
                                                   context,
                                                   MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        SchoolEnrollmentForm(
-                                                          userid: 'userid',
-                                                          existingRecord: EnrolmentCollectionModel(
-                                                            enrolmentData: jsonEncode(
-                                                                enrolmentDataMap),
-                                                            remarks: enrollmentFetch['remarks'] ??
-                                                                '',
-                                                            tourId: editController
-                                                                .tourValue,
-                                                            // Pass the selected Tour ID here
-                                                            school: editController
-                                                                .schoolValue,
-                                                            // Pass the selected school here
-                                                            submittedBy: editController
-                                                                .empId, // Pass created_by here
-
-
-                                                          ),
-                                                          tourId: editController
-                                                              .tourValue ??
-                                                              'Not Provided',
-                                                          // Pass the selected Tour ID here
-                                                          school: editController
-                                                              .schoolValue ??
-                                                              'Not provided', // Pass the selected school here
-
-
-                                                        ),
+                                                    builder: (context) => SchoolEnrollmentForm(
+                                                      userid: 'userid',
+                                                      existingRecord: EnrolmentCollectionModel(
+                                                        enrolmentData: jsonEncode(enrolmentDataMap),
+                                                        remarks: enrollmentFetch['remarks']?.toString() ?? '',
+                                                        tourId: editController.tourValue,
+                                                        school: editController.schoolValue,
+                                                        submittedBy: editController.empId,
+                                                      ),
+                                                      tourId: editController.tourValue ?? 'Not Provided',
+                                                      school: editController.schoolValue ?? 'Not provided',
+                                                    ),
                                                   ),
                                                 );
                                               },
-                                              child: const Text(
-                                                  'Edit Enrollment Data'),
+                                              child: const Text('Edit Enrollment Data'),
                                             ),
                                           ],
                                         ),
                                       ),
                                     );
                                   } else {
-                                    return const Text(
-                                        'Enrollment data format is incorrect');
+                                    // No enrollment data available
+                                    return Column(
+                                      children: [
+                                        const Text('No Enrollment data available'),
+
+                                        // Display the "Add Data" button if no data exists
+                                        const SizedBox(height: 20),
+                                        ElevatedButton(
+                                          onPressed: () {
+                                            // Navigate to the form for adding new VEC data
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (context) => SchoolEnrollmentForm(),
+                                              ),
+                                            );
+                                          },
+                                          child: const Text('Add New VEC Data'),
+                                        ),
+                                      ],
+                                    );
                                   }
                                 }
                                 break;
+
                               case 'vec':
                                 if (entry.key == 'vec') {
                                   // Check if the 'vec' entry is a list and contains data

@@ -2363,19 +2363,19 @@ class _SchoolRecceFormState extends State<SchoolRecceForm> {
                                                 .selectedQualification,
                                             items: [
                                               DropdownMenuItem(
-                                                value: 'non_graduate',
+                                                value: 'Non Graduate',
                                                 child: Text('Non Graduate'),
                                               ),
                                               DropdownMenuItem(
-                                                value: 'graduate',
+                                                value: 'Graduate',
                                                 child: Text('Graduate'),
                                               ),
                                               DropdownMenuItem(
-                                                value: 'post_graduate',
+                                                value: 'Post Graduate',
                                                 child: Text('Post Graduate'),
                                               ),
                                               DropdownMenuItem(
-                                                value: 'other',
+                                                value: 'Other',
                                                 child: Text('Other'),
                                               ),
                                             ],
@@ -2466,21 +2466,21 @@ class _SchoolRecceFormState extends State<SchoolRecceForm> {
                                                 .selectedMeetings,
                                             items: [
                                               DropdownMenuItem(
-                                                  value: 'once_a_month',
+                                                  value: 'Once a month',
                                                   child: Text('Once a month')),
                                               DropdownMenuItem(
-                                                  value: 'once_a_quarter',
+                                                  value: 'Once a quarter',
                                                   child:
                                                   Text('Once a quarter')),
                                               DropdownMenuItem(
-                                                  value: 'once_in_6_months',
+                                                  value: 'Once in 6 months',
                                                   child:
                                                   Text('Once in 6 months')),
                                               DropdownMenuItem(
                                                   value: 'once_a_year',
                                                   child: Text('Once a year')),
                                               DropdownMenuItem(
-                                                  value: 'others',
+                                                  value: 'Others',
                                                   child: Text('Others')),
                                             ],
                                             onChanged: (value) {
@@ -5850,11 +5850,7 @@ class JsonFileDownloader {
 
       ) async {
     // Request storage permission
-    var permissionStatus = await _requestPermission();
 
-    if (!permissionStatus) {
-      throw Exception('Storage permission is required to download the file');
-    }
 
     Directory? downloadsDirectory;
 
@@ -5924,34 +5920,7 @@ class JsonFileDownloader {
   }
 
 
-  // Request permission for storage access
-  Future<bool> _requestPermission() async {
-    if (Platform.isAndroid) {
-      var androidInfo = await DeviceInfoPlugin().androidInfo;
 
-      // Android 11+ (API level 30 and above)
-      if (androidInfo.version.sdkInt >= 30) {
-        var manageStoragePermission =
-        await Permission.manageExternalStorage.status;
-        if (manageStoragePermission.isDenied) {
-          manageStoragePermission = await Permission.manageExternalStorage.request();
-          return manageStoragePermission.isGranted;
-        }
-        return true; // Permission granted
-      }
-
-      // Android 10 and below
-      if (await Permission.storage.isDenied) {
-        var permissionStatus = await Permission.storage.request();
-        return permissionStatus.isGranted;
-      }
-    } else if (Platform.isIOS) {
-      // On iOS, permission might not be needed for internal directories
-      return true;
-    }
-
-    return true; // Permissions granted
-  }
 
   // Method to get the correct directory for Android based on version
   Future<Directory?> _getAndroidDirectory() async {

@@ -4,12 +4,15 @@ import 'package:app17000ft_new/home/home_screen.dart';
 import 'package:app17000ft_new/login/login_screen.dart';
 import 'package:app17000ft_new/splash/splash_screen.dart';
 import 'package:app17000ft_new/utils/dependency_injection.dart';
+import 'package:app17000ft_new/version_file/version_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:get/get.dart';
 import 'package:app17000ft_new/theme/theme_constants.dart';
 import 'package:app17000ft_new/theme/theme_manager.dart';
+
+import 'components/user_controller.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized(); // Ensure widgets are initialized
@@ -20,7 +23,6 @@ void main() async {
   GetStorage().write('version', version);
   runApp(const MyApp()); // Run the app
 }
-
 ThemeManager themeManager = ThemeManager();
 
 class MyApp extends StatefulWidget {
@@ -60,15 +62,28 @@ class _MyAppState extends State<MyApp> {
 
   Future<void> _checkLoginState() async {
     bool isLoggedIn = await SharedPreferencesHelper.getLoginState();
-    setState(() {
-      _isLoggedIn = isLoggedIn;
-    });
-    if (_isLoggedIn != null) {
-      _isLoggedIn!
-          ? Get.offAll(() => const HomeScreen())
-          : Get.offAll(() => const LoginScreen());
+
+    // Prevent multiple navigation actions
+    if (_isLoggedIn != isLoggedIn) {
+      setState(() {
+        _isLoggedIn = isLoggedIn;
+      });
+
+      if (_isLoggedIn!) {
+        Get.offAll(() => const HomeScreen());
+
+        // Delay for half a second to allow UI to settle before checking version
+        Future.delayed(const Duration(milliseconds: 500), () {
+          VersionController versionController = Get.put(VersionController());
+          versionController.fetchVersion();
+        });
+      } else {
+        Get.offAll(() => const LoginScreen());
+      }
     }
   }
+
+
 
   @override
   Widget build(BuildContext context) {

@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:math';
 import 'package:app17000ft_new/forms/school_staff_vec_form/school_vec_controller.dart';
 import 'package:app17000ft_new/forms/school_staff_vec_form/school_vec_modals.dart';
 import 'package:device_info_plus/device_info_plus.dart';
@@ -1079,7 +1080,19 @@ class _SchoolStaffVecFormState extends State<SchoolStaffVecForm> {
                                                       .validate() &&
                                                       !schoolStaffVecController.radioFieldError3) {
                                                     print('Submit Vec Details');
+                                                    String generateUniqueId(int length) {
+                                                      const _chars =
+                                                          'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+                                                      Random _rnd = Random();
+                                                      return String.fromCharCodes(
+                                                          Iterable.generate(
+                                                              length,
+                                                                  (_) => _chars.codeUnitAt(
+                                                                  _rnd.nextInt(
+                                                                      _chars.length))));
+                                                    }
 
+                                                    String uniqueId = generateUniqueId(6);
                                                     DateTime now =
                                                     DateTime.now();
                                                     String formattedDate =
@@ -1156,25 +1169,36 @@ class _SchoolStaffVecFormState extends State<SchoolStaffVecForm> {
                                                         schoolStaffVecController.QualSpecify2Controller.clear();
                                                       });
 
-                                                      await saveDataToFile(enrolmentCollectionObj).then((_) {
-                                                        // If successful, show a snackbar indicating the file was downloaded
+                                                      String jsonData1 = jsonEncode(
+                                                          enrolmentCollectionObj
+                                                              .toJson());
+
+                                                      try {
+                                                        JsonFileDownloader downloader =
+                                                        JsonFileDownloader();
+                                                        String? filePath = await downloader
+                                                            .downloadJsonFile(
+                                                            jsonData1,
+                                                            uniqueId,
+                                                            ); // Pass the registerImageFiles
+                                                        // Notify user of success
                                                         customSnackbar(
-                                                          'File downloaded successfully',
-                                                          'downloaded',
+                                                          'File Downloaded Successfully',
+                                                          'File saved at $filePath',
                                                           AppColors.primary,
                                                           AppColors.onPrimary,
-                                                          Icons.file_download_done,
+                                                          Icons.download_done,
                                                         );
-                                                      }).catchError((error) {
-                                                        // If there's an error during download, show an error snackbar
+                                                      } catch (e) {
                                                         customSnackbar(
                                                           'Error',
-                                                          'File download failed: $error',
+                                                          e.toString(),
                                                           AppColors.primary,
                                                           AppColors.onPrimary,
                                                           Icons.error,
                                                         );
-                                                      });
+                                                        print(e);
+                                                      }
 
                                                       customSnackbar(
                                                           'Submitted Successfully',
@@ -1216,91 +1240,61 @@ class _SchoolStaffVecFormState extends State<SchoolStaffVecForm> {
 }
 
 
+class JsonFileDownloader {
+  // Method to download JSON data to the Downloads directory
+  Future<String?> downloadJsonFile(
+      String jsonData,
+      String uniqueId,
 
-Future<void> saveDataToFile(SchoolStaffVecRecords data) async {
-  try {
-    // Request storage permissions based on Android version
-    var permissionGranted = await _requestStoragePermission();
-    if (permissionGranted) {
-      // Determine the correct storage directory based on the platform
-      Directory? directory;
+      ) async {
+    // Request storage permission
 
-      if (Platform.isAndroid) {
-        directory = await _getAndroidDirectory();
-      } else if (Platform.isIOS) {
-        // On iOS, use the application documents directory
-        directory = await getApplicationDocumentsDirectory();
-      } else {
-        // For other platforms, use the application documents directory
-        directory = await getApplicationDocumentsDirectory();
-      }
 
-      // Create the directory if it doesn't exist
-      if (directory != null && !await directory.exists()) {
-        await directory.create(recursive: true);
-      }
+    Directory? downloadsDirectory;
 
-      // Construct the file path using a unique identifier (createdBy)
-      final path = '${directory!.path}/school_vec_form_${data.createdBy}.txt';
-
-      // Convert the SchoolStaffVecRecords object to a JSON string
-      String jsonString = jsonEncode(data.toJson());
-
-      // Write the JSON string to the file
-      File file = File(path);
-      await file.writeAsString(jsonString);
-
-      // Log success message
-      print('Data saved to $path');
+    if (Platform.isAndroid) {
+      downloadsDirectory = await _getAndroidDirectory();
+    } else if (Platform.isIOS) {
+      downloadsDirectory = await getApplicationDocumentsDirectory();
     } else {
-      // Handle the case where storage permission is not granted
-      print('Storage permission not granted');
+      downloadsDirectory = await getDownloadsDirectory();
     }
-  } catch (e) {
-    // Handle errors during the file saving process
-    print('Error saving data: $e');
+
+
+    if (downloadsDirectory != null) {
+      // Prepare file path to save the JSON
+      String filePath =
+          '${downloadsDirectory.path}/school_vec_form_$uniqueId.txt';
+      File file = File(filePath);
+
+
+
+
+
+      // Return the file path for further use if needed
+      return filePath;
+    } else {
+      throw Exception('Could not find the download directory');
+    }
   }
-}
 
-// Helper method to handle storage permission requests
-Future<bool> _requestStoragePermission() async {
-  if (Platform.isAndroid) {
-    var androidInfo = await DeviceInfoPlugin().androidInfo;
 
-    // Handle Android 11+ (API level 30 and above)
-    if (androidInfo.version.sdkInt >= 30) {
-      var manageStoragePermission = await Permission.manageExternalStorage.status;
-      if (manageStoragePermission.isDenied) {
-        manageStoragePermission = await Permission.manageExternalStorage.request();
-        return manageStoragePermission.isGranted;
+
+  // Method to get the correct directory for Android based on version
+  Future<Directory?> _getAndroidDirectory() async {
+    if (Platform.isAndroid) {
+      var androidInfo = await DeviceInfoPlugin().androidInfo;
+
+      // Android 11+ (API level 30 and above) - Use manage external storage
+      if (androidInfo.version.sdkInt >= 30 &&
+          await Permission.manageExternalStorage.isGranted) {
+        return Directory('/storage/emulated/0/Download');
       }
-      return true; // Permission granted
+      // Android 10 and below - Use external storage directory
+      else if (await Permission.storage.isGranted) {
+        return await getExternalStorageDirectory();
+      }
     }
-
-    // Handle Android 10 and below
-    if (await Permission.storage.isDenied) {
-      var storagePermission = await Permission.storage.request();
-      return storagePermission.isGranted;
-    }
+    return null;
   }
-
-  // For iOS and other platforms, assume permission is not needed
-  return true;
-}
-
-// Method to get Android directory based on version
-Future<Directory?> _getAndroidDirectory() async {
-  if (Platform.isAndroid) {
-    var androidInfo = await DeviceInfoPlugin().androidInfo;
-
-    // Handle Android 11+ (API level 30 and above)
-    if (androidInfo.version.sdkInt >= 30 &&
-        await Permission.manageExternalStorage.isGranted) {
-      return Directory('/storage/emulated/0/Download');
-    }
-
-    // For Android 10 and below, use external storage directory
-    return await getExternalStorageDirectory();
-  }
-  return null;
 }

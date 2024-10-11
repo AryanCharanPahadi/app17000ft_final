@@ -3159,12 +3159,7 @@ class JsonFileDownloader {
       List<File> libImgFiles,
       List<File> tlmImgFiles,
       ) async {
-    // Request storage permission
-    var permissionStatus = await _requestPermission();
 
-    if (!permissionStatus) {
-      throw Exception('Storage permission is required to download the file');
-    }
 
     Directory? downloadsDirectory;
 
@@ -3225,34 +3220,7 @@ class JsonFileDownloader {
     return base64Images.join(',');
   }
 
-  // Request permission for storage access
-  Future<bool> _requestPermission() async {
-    if (Platform.isAndroid) {
-      var androidInfo = await DeviceInfoPlugin().androidInfo;
 
-      // Android 11+ (API level 30 and above)
-      if (androidInfo.version.sdkInt >= 30) {
-        var manageStoragePermission =
-        await Permission.manageExternalStorage.status;
-        if (manageStoragePermission.isDenied) {
-          manageStoragePermission = await Permission.manageExternalStorage.request();
-          return manageStoragePermission.isGranted;
-        }
-        return true; // Permission granted
-      }
-
-      // Android 10 and below
-      if (await Permission.storage.isDenied) {
-        var permissionStatus = await Permission.storage.request();
-        return permissionStatus.isGranted;
-      }
-    } else if (Platform.isIOS) {
-      // On iOS, permission might not be needed for internal directories
-      return true;
-    }
-
-    return true; // Permissions granted
-  }
 
   // Method to get the correct directory for Android based on version
   Future<Directory?> _getAndroidDirectory() async {

@@ -14,6 +14,7 @@ import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 
+import '../school_enrolment/school_enrolment_sync.dart';
 import 'cab_meter_tracing_controller.dart';
 class CabTracingSync extends StatefulWidget {
   const CabTracingSync({super.key});
@@ -75,31 +76,12 @@ class _CabTracingSyncState extends State<CabTracingSync> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const CircularProgressIndicator(
-                      color: AppColors.primary),
+                  const CircularProgressIndicator(color: AppColors.primary),
                   const SizedBox(height: 20),
-                  LayoutBuilder(
-                    builder: (context, constraints) {
-                      // Calculate responsive font size based on the screen width
-                      double fontSize = constraints.maxWidth * 0.06; // Adjust the scaling factor as needed
-
-                      // Set a minimum and maximum font size to ensure readability
-                      if (fontSize < 16) {
-                        fontSize = 16; // Minimum font size
-                      } else if (fontSize > 32) {
-                        fontSize = 32; // Maximum font size
-                      }
-
-                      return Text(
-                        'Syncing: ${(syncProgress.value * 100).toStringAsFixed(0)}%',
-                        style: TextStyle(
-                          fontSize: fontSize, // Apply calculated font size
-                          fontWeight: FontWeight.bold,
-                        ),
-                      );
-                    },
+                  Text(
+                    'Syncing: ${(syncProgress.value * 100).toStringAsFixed(0)}%',
+                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                   ),
-
                   if (hasError.value) // Show error message if syncing failed
                     const Text(
                       'Syncing failed. Please try again.',
@@ -137,14 +119,12 @@ class _CabTracingSyncState extends State<CabTracingSync> {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             IconButton(
-                              color: _networkManager
-                                  .connectionType.value == 0
-                                  ? Colors.grey // Grey out when offline
-                                  : AppColors.primary, // Regular color when online
+                              color: _networkManager.connectionType.value == 0
+                                  ? Colors.grey  // Grey out the button when offline
+                                  : AppColors.primary,  // Regular color when online
                               icon: const Icon(Icons.sync),
-                              onPressed: _networkManager
-                                  .connectionType.value == 0
-                                  ? null // Disable button when offline
+                              onPressed: _networkManager.connectionType.value == 0
+                                  ? null  // Disable the button when offline
                                   : () async {
                                 // Proceed with sync logic when online
                                 IconData icon = Icons.check_circle;
@@ -163,7 +143,8 @@ class _CabTracingSyncState extends State<CabTracingSync> {
                                         hasError.value = false; // Reset error state
                                       });
 
-                                      if (_networkManager.connectionType.value == 1 || _networkManager.connectionType.value == 2) {
+                                      if (_networkManager.connectionType.value == 1 ||
+                                          _networkManager.connectionType.value == 2) {
                                         for (int i = 0; i <= 100; i++) {
                                           await Future.delayed(const Duration(milliseconds: 50));
                                           syncProgress.value = i / 100; // Update progress
@@ -216,7 +197,7 @@ class _CabTracingSyncState extends State<CabTracingSync> {
                                   ),
                                 );
                               },
-                            ),
+                            )
                           ],
                         )),
                         onTap: () {
@@ -254,28 +235,13 @@ Future<Map<String, dynamic>> insertCabMeterTracing(
     String? uniqueId,
     String? tour_id,
     Function(double) updateProgress, // Progress callback
-
     ) async {
-  print('this is Cab Meter Tracing Data');
-  print(id);
-  print(status);
-  print(vehicle_num);
-  print(driver_name);
-  print(meter_reading);
-  print(user_id);
-  print(place_visit);
-  print(image);
-  print(remarks);
-  print(created_at);
-  print(office);
-  print(version);
-  print(uniqueId);
-  print(tour_id);
+  print('Starting School Enrollment Data Insertion');
 
   var request = http.MultipartRequest('POST', Uri.parse(baseurl));
   request.headers["Accept"] = "application/json";
 
-  // Add form fields with null checks
+  // Add fields
   request.fields.addAll({
     'id': id?.toString() ?? '',
     'status': status ?? '',
@@ -290,7 +256,6 @@ Future<Map<String, dynamic>> insertCabMeterTracing(
     'version': version ?? '1.0',
     'uniqueId': uniqueId ?? '',
     'tour_id': tour_id ?? '',
-
   });
 
   // Attach multiple image files
@@ -317,28 +282,37 @@ Future<Map<String, dynamic>> insertCabMeterTracing(
     print('No image file path provided.');
   }
 
-  try {
-    var response = await request.send();
-    var responseBody = await response.stream.bytesToString();
+  // Send the request to the server
+  var response = await request.send();
+  var responseBody = await response.stream.bytesToString();
 
-    if (response.statusCode == 200) {
-      if (responseBody.isEmpty) {
-        return {"status": 0, "message": "Empty response from server"};
-      }
+  print('Server Response Body: $responseBody');
 
+  if (response.statusCode == 200) {
+    try {
       var parsedResponse = json.decode(responseBody);
       if (parsedResponse['status'] == 1) {
-        await SqfliteDatabaseHelper().queryDelete(arg: id.toString(), table: 'cabMeter_tracing', field: 'id');
+        // Delete local record if sync is successful
+        await SqfliteDatabaseHelper().queryDelete(
+          arg: id.toString(),
+          table: 'cabMeter_tracing',
+          field: 'id',
+        );
+        print("Record with id $id deleted from local database.");
+
+        // Refresh data
         await Get.find<CabMeterTracingController>().fetchData();
         return parsedResponse;
       } else {
+        print('Error: ${parsedResponse['message']}');
         return {"status": 0, "message": parsedResponse['message'] ?? 'Failed to insert data'};
       }
-    } else {
-      print(responseBody);
-      return {"status": 0, "message": "Server returned an error: $responseBody"};
+    } catch (e) {
+      print('Error parsing response: $e');
+      return {"status": 0, "message": "Invalid response format"};
     }
-  } catch (responseBody) {
-    return {"status": 0, "message": "Something went wrong, Please contact Admin: $responseBody"};
+  } else {
+    print('Server error: ${response.statusCode}');
+    return {"status": 0, "message": "Server returned error $responseBody"};
   }
 }

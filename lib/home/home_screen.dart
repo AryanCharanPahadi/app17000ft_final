@@ -105,7 +105,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 IconButton(
                   icon: const Icon(Icons.logout, color: Colors.white),
                   onPressed: () async {
-                    final UserController userController = Get.find<UserController>();
+                    final UserController userController = Get.put(UserController());
 
                     // Clear user data from memory
                     userController.clearUserData();
