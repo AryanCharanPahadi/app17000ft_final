@@ -17,10 +17,7 @@ import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 
-
 import 'alfa_observation_controller.dart';
-
-
 
 class AlfaObservationSync extends StatefulWidget {
   const AlfaObservationSync({super.key});
@@ -30,7 +27,8 @@ class AlfaObservationSync extends StatefulWidget {
 }
 
 class _AlfaObservationSync extends State<AlfaObservationSync> {
-  final AlfaObservationController _alfaObservationController = Get.put(AlfaObservationController());
+  final AlfaObservationController _alfaObservationController =
+      Get.put(AlfaObservationController());
   final NetworkManager _networkManager = Get.put(NetworkManager());
   var isLoading = false.obs;
   var syncProgress = 0.0.obs; // Progress variable for syncing
@@ -44,7 +42,7 @@ class _AlfaObservationSync extends State<AlfaObservationSync> {
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
-      onWillPop:  () async {
+      onWillPop: () async {
         IconData icon = Icons.check_circle;
         bool shouldExit = await showDialog(
             context: context,
@@ -77,168 +75,182 @@ class _AlfaObservationSync extends State<AlfaObservationSync> {
 
             return Obx(() => isLoading.value
                 ? Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const CircularProgressIndicator(color: AppColors.primary),
-                  const SizedBox(height: 20),
-                  Text(
-                    'Syncing: ${(syncProgress.value * 100).toStringAsFixed(0)}%',
-                    style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                  ),
-                ],
-              ),
-            )
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const CircularProgressIndicator(
+                            color: AppColors.primary),
+                        const SizedBox(height: 20),
+                        Text(
+                          'Syncing: ${(syncProgress.value * 100).toStringAsFixed(0)}%',
+                          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                        ),
+                      ],
+                    ),
+                  )
                 : Column(
-              children: [
-                Expanded(
-                  child: ListView.separated(
-                    separatorBuilder: (BuildContext context, int index) => const Divider(),
-                    itemCount: alfaObservationController.alfaObservationList.length,
-                    itemBuilder: (context, index) {
-                      final item = alfaObservationController.alfaObservationList[index];
-                      return ListTile(
-                        title: Text(
-                          "${index + 1}. Tour ID: ${item.tourId!}\nSchool: ${item.school!}",
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: MediaQuery.of(context).size.width * 0.04, // Dynamic font size based on screen width
-                          ),
-                        ),
-                        trailing: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
+                    children: [
+                      Expanded(
+                        child: ListView.separated(
+                          separatorBuilder: (BuildContext context, int index) =>
+                              const Divider(),
+                          itemCount: alfaObservationController
+                              .alfaObservationList.length,
+                          itemBuilder: (context, index) {
+                            final item = alfaObservationController
+                                .alfaObservationList[index];
+                            return ListTile(
+                              title: Text(
+                                "${index + 1}. Tour ID: ${item.tourId}\n"
+                                    "School.: ${item.school}\n",
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.bold),
+                                textAlign: TextAlign
+                                    .left, // Adjust text alignment if needed
+                                maxLines:
+                                2, // Limit the lines, or remove this if you don't want a limit
+                                overflow: TextOverflow
+                                    .ellipsis, // Handles overflow gracefully
+                              ),
+                              trailing: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Obx(() => IconButton(
+                                        color: _networkManager
+                                                    .connectionType.value ==
+                                                0
+                                            ? Colors.grey
+                                            : AppColors.primary,
+                                        icon: const Icon(Icons.sync),
+                                        onPressed: _networkManager
+                                                    .connectionType.value ==
+                                                0
+                                            ? null
+                                            : () async {
+                                                // Proceed with sync logic when online
+                                                IconData icon =
+                                                    Icons.check_circle;
+                                                showDialog(
+                                                  context: context,
+                                                  builder: (_) => Confirmation(
+                                                    iconname: icon,
+                                                    title: 'Confirm',
+                                                    yes: 'Confirm',
+                                                    no: 'Cancel',
+                                                    desc:
+                                                        'Are you sure you want to Sync?',
+                                                    onPressed: () async {
+                                                      setState(() {
+                                                        isLoading.value =
+                                                            true; // Show loading spinner
+                                                        syncProgress.value =
+                                                            0.0; // Reset progress
+                                                        hasError.value =
+                                                            false; // Reset error state
+                                                      });
 
-                            Obx(() => IconButton(
-                              color: _networkManager
-                                  .connectionType.value ==
-                                  0
-                                  ? Colors.grey
-                                  : AppColors.primary,
-                              icon: const Icon(Icons.sync),
-                              onPressed: _networkManager
-                                  .connectionType.value ==
-                                  0
-                                  ? null
-                                  : () async {
-                                // Proceed with sync logic when online
-                                IconData icon =
-                                    Icons.check_circle;
-                                showDialog(
-                                  context: context,
-                                  builder: (_) =>
-                                      Confirmation(
-                                        iconname: icon,
-                                        title: 'Confirm',
-                                        yes: 'Confirm',
-                                        no: 'Cancel',
-                                        desc:
-                                        'Are you sure you want to Sync?',
-                                        onPressed: () async {
-                                          setState(() {
-                                            isLoading.value =
-                                            true; // Show loading spinner
-                                            syncProgress.value =
-                                            0.0; // Reset progress
-                                            hasError.value =
-                                            false; // Reset error state
-                                          });
+                                                      if (_networkManager
+                                                                  .connectionType
+                                                                  .value ==
+                                                              1 ||
+                                                          _networkManager
+                                                                  .connectionType
+                                                                  .value ==
+                                                              2) {
+                                                        for (int i = 0;
+                                                            i <= 100;
+                                                            i++) {
+                                                          await Future.delayed(
+                                                              const Duration(
+                                                                  milliseconds:
+                                                                      50));
+                                                          syncProgress.value = i /
+                                                              100; // Update progress
+                                                        }
 
-                                          if (_networkManager.connectionType.value == 1 ||
-                                              _networkManager.connectionType.value == 2) {
-                                            for (int i = 0;
-                                            i <= 100;
-                                            i++) {
-                                              await Future.delayed(
-                                                  const Duration(
-                                                      milliseconds:
-                                                      50));
-                                              syncProgress.value =
-                                                  i / 100; // Update progress
-                                            }
+                                                        // Call the insert function
+                                                        var rsp =
+                                                            await insertAlfaObservation(
+                                                          item.tourId,
+                                                          item.school,
+                                                          item.udiseValue,
+                                                          item.correctUdise,
+                                                          item.noStaffTrained,
+                                                          item.imgNurTimeTable,
+                                                          item.imgLKGTimeTable,
+                                                          item.imgUKGTimeTable,
+                                                          item.bookletValue,
+                                                          item.moduleValue,
+                                                          item.numeracyBooklet,
+                                                          item.numeracyValue,
+                                                          item.pairValue,
+                                                          item.alfaActivityValue,
+                                                          item.alfaGradeReport,
+                                                          item.imgAlfa,
+                                                          item.refresherTrainingValue,
+                                                          item.noTrainedTeacher,
+                                                          item.imgTraining,
+                                                          item.readingValue,
+                                                          item.libGradeReport,
+                                                          item.imgLibrary,
+                                                          item.tlmKitValue,
+                                                          item.imgTlm,
+                                                          item.classObservation,
+                                                          item.createdAt,
+                                                          item.submittedAt,
+                                                          item.createdBy,
+                                                          item.id,
+                                                          (progress) {
+                                                            syncProgress.value =
+                                                                progress; // Update sync progress
+                                                          },
+                                                        );
 
-                                            // Call the insert function
-                                            var rsp = await insertAlfaObservation(
-                                              item.tourId,
-                                              item.school,
-                                              item.udiseValue,
-                                              item.correctUdise,
-                                              item.noStaffTrained,
-                                              item.imgNurTimeTable,
-                                              item.imgLKGTimeTable,
-                                              item.imgUKGTimeTable,
-                                              item.bookletValue,
-                                              item.moduleValue,
-                                              item.numeracyBooklet,
-                                              item.numeracyValue,
-                                              item.pairValue,
-                                              item.alfaActivityValue,
-                                              item.alfaGradeReport,
-                                              item.imgAlfa,
-                                              item.refresherTrainingValue,
-                                              item.noTrainedTeacher,
-                                              item.imgTraining,
-                                              item.readingValue,
-                                              item.libGradeReport,
-                                              item.imgLibrary,
-                                              item.tlmKitValue,
-                                              item.imgTlm,
-                                              item.classObservation,
-                                              item.createdAt,
-                                              item.submittedAt,
-                                              item.createdBy,
-                                              item.id,
+                                                        if (rsp['status'] ==
+                                                            1) {
+                                                          _alfaObservationController.removeRecordFromList(item.id!);
 
-                                                  (progress) {
-                                                syncProgress
-                                                    .value =
-                                                    progress; // Update sync progress
+                                                          customSnackbar(
+                                                            'Successfully',
+                                                            "${rsp['message']}",
+                                                            AppColors.secondary,
+                                                            AppColors
+                                                                .onSecondary,
+                                                            Icons.check,
+                                                          );
+                                                        } else {
+                                                          hasError.value =
+                                                              true; // Set error state if sync fails
+                                                          customSnackbar(
+                                                            "Error",
+                                                            "${rsp['message']}",
+                                                            AppColors.error,
+                                                            AppColors.onError,
+                                                            Icons.warning,
+                                                          );
+                                                        }
+                                                        setState(() {
+                                                          isLoading.value =
+                                                              false; // Hide loading spinner
+                                                        });
+                                                      }
+                                                    },
+                                                  ),
+                                                );
                                               },
-                                            );
-
-                                            if (rsp['status'] ==
-                                                1) {
-                                              customSnackbar(
-                                                'Successfully',
-                                                "${rsp['message']}",
-                                                AppColors
-                                                    .secondary,
-                                                AppColors
-                                                    .onSecondary,
-                                                Icons.check,
-                                              );
-                                            } else {
-                                              hasError.value =
-                                              true; // Set error state if sync fails
-                                              customSnackbar(
-                                                "Error",
-                                                "${rsp['message']}",
-                                                AppColors.error,
-                                                AppColors.onError,
-                                                Icons.warning,
-                                              );
-                                            }
-                                            setState(() {
-                                              isLoading.value =
-                                              false; // Hide loading spinner
-                                            });
-                                          }
-                                        },
-                                      ),
-                                );
+                                      )),
+                                ],
+                              ),
+                              onTap: () {
+                                alfaObservationController
+                                    .alfaObservationList[index].tourId;
                               },
-                            )),
-                          ],
+                            );
+                          },
                         ),
-                        onTap: () {
-                          alfaObservationController.alfaObservationList[index].tourId;
-                        },
-                      );
-                    },
-                  ),
-                ),
-              ],
-            ));
+                      ),
+                    ],
+                  ));
           },
         ),
       ),
@@ -246,42 +258,41 @@ class _AlfaObservationSync extends State<AlfaObservationSync> {
   }
 }
 
-
-var baseurl = "https://mis.17000ft.org/17000ft_apis/alfaObservation/insert_alfa.php";
-
+var baseurl =
+    "https://mis.17000ft.org/17000ft_apis/alfaObservation/insert_alfa.php";
 
 Future<Map<String, dynamic>> insertAlfaObservation(
-    String? tourId,
-    String? school,
-    String? udiseValue,
-    String? correctUdise,
-    String? noStaffTrained,
-    String? imgNurTimeTable,
-    String? imgLKGTimeTable,
-    String? imgUKGTimeTable,
-    String? bookletValue,
-    String? moduleValue,
-    String? numeracyBooklet,
-    String? numeracyValue,
-    String? pairValue,
-    String? alfaActivityValue,
-    String? alfaGradeReport,
-    String? imgAlfa,
-    String? refresherTrainingValue,
-    String? noTrainedTeacher,
-    String? imgTraining,
-    String? readingValue,
-    String? libGradeReport,
-    String? imgLibrary,
-    String? tlmKitValue,
-    String? imgTLM,
-    String? classObservation,
-    String? createdAt,
-    String? submittedAt,
-    String? createdBy,
-    int? id,
-    Function(double) updateProgress, // Progress callback
-    ) async {
+  String? tourId,
+  String? school,
+  String? udiseValue,
+  String? correctUdise,
+  String? noStaffTrained,
+  String? imgNurTimeTable,
+  String? imgLKGTimeTable,
+  String? imgUKGTimeTable,
+  String? bookletValue,
+  String? moduleValue,
+  String? numeracyBooklet,
+  String? numeracyValue,
+  String? pairValue,
+  String? alfaActivityValue,
+  String? alfaGradeReport,
+  String? imgAlfa,
+  String? refresherTrainingValue,
+  String? noTrainedTeacher,
+  String? imgTraining,
+  String? readingValue,
+  String? libGradeReport,
+  String? imgLibrary,
+  String? tlmKitValue,
+  String? imgTLM,
+  String? classObservation,
+  String? createdAt,
+  String? submittedAt,
+  String? createdBy,
+  int? id,
+  Function(double) updateProgress, // Progress callback
+) async {
   if (kDebugMode) {
     print('Inserting Alfa Observation Data');
     print('tourId: $tourId');
@@ -313,7 +324,6 @@ Future<Map<String, dynamic>> insertAlfaObservation(
     print('createdAt: $createdAt');
     print('submittedAt: $submittedAt');
     print('createdBy: $createdBy');
-
   }
 
   var request = http.MultipartRequest(
@@ -322,14 +332,12 @@ Future<Map<String, dynamic>> insertAlfaObservation(
   );
   request.headers["Accept"] = "Application/json";
 
-
   // Ensure enrolmentData is a valid JSON string
   final String alfaGradeReportJsonData = alfaGradeReport ?? '';
   final String libGradeReportJsonData = libGradeReport ?? '';
 
   // Add text fields
   request.fields.addAll({
-
     'tourId': tourId ?? '',
     'school': school ?? '',
     'udiseValue': udiseValue ?? '',
@@ -352,220 +360,75 @@ Future<Map<String, dynamic>> insertAlfaObservation(
     'submittedAt': submittedAt ?? '',
     'createdBy': createdBy ?? '',
     'id': id?.toString() ?? '',
-
   });
 
+  Future<void> _attachImages(String? imagePaths, String fieldName) async {
+    if (imagePaths != null && imagePaths.isNotEmpty) {
+      List<String> images = imagePaths.split(',');
+      for (String path in images) {
+        print('Processing image for field $fieldName: $path'); // Debug log
+
+        File imageFile = File(path.trim());
+        if (imageFile.existsSync()) {
+          request.files.add(
+            await http.MultipartFile.fromPath(
+              '$fieldName[]', // Use array-like name for multiple images
+              imageFile.path,
+              contentType: MediaType('image', 'jpeg'),
+            ),
+          );
+          print("Image file $path attached successfully for $fieldName.");
+        } else {
+          print('Image file does not exist at the path: $path for $fieldName');
+          throw Exception("Image file not found at $path for $fieldName.");
+        }
+      }
+    } else {
+      print('No image file path provided for $fieldName');
+    }
+  }
+
+  // Attach all image files and handle missing ones
   try {
-    if ( imgNurTimeTable!= null && imgNurTimeTable.isNotEmpty) {
-      List<String> imagePaths = imgNurTimeTable.split(',');
+    await _attachImages(imgNurTimeTable, 'imgNurTimeTable');
+    await _attachImages(imgLKGTimeTable, 'imgLKGTimeTable');
+    await _attachImages(imgUKGTimeTable, 'imgUKGTimeTable');
+    await _attachImages(imgAlfa, 'imgAlfa');
+    await _attachImages(
+        imgTraining, 'imgTraining'); // Ensure this is attached properly
+    await _attachImages(imgLibrary, 'imgLibrary');
+    await _attachImages(imgTLM, 'imgTLM');
+  } catch (e) {
+    return {"status": 0, "message": e.toString()};
+  }
 
-      for (String path in imagePaths) {
-        File imageFile = File(path.trim());
-        if (imageFile.existsSync()) {
-          request.files.add(
-            await http.MultipartFile.fromPath(
-              'imgNurTimeTable[]', // Use array-like name for multiple images
-              imageFile.path,
-              contentType: MediaType('image', 'jpeg'),
-            ),
-          );
-          print("Image file $path attached successfully.");
-        } else {
-          print('Image file does not exist at the path: $path');
-          return {"status": 0, "message": "Image file not found at $path."};
-        }
-      }
-    } else {
-      print('No image file path provided.');
-    }
-
-    if ( imgLKGTimeTable!= null && imgLKGTimeTable.isNotEmpty) {
-      List<String> imagePaths = imgLKGTimeTable.split(',');
-
-      for (String path in imagePaths) {
-        File imageFile = File(path.trim());
-        if (imageFile.existsSync()) {
-          request.files.add(
-            await http.MultipartFile.fromPath(
-              'imgLKGTimeTable[]', // Use array-like name for multiple images
-              imageFile.path,
-              contentType: MediaType('image', 'jpeg'),
-            ),
-          );
-          print("Image file $path attached successfully.");
-        } else {
-          print('Image file does not exist at the path: $path');
-          return {"status": 0, "message": "Image file not found at $path."};
-        }
-      }
-    } else {
-      print('No image file path provided.');
-    }
-
-
-    if ( imgUKGTimeTable!= null && imgUKGTimeTable.isNotEmpty) {
-      List<String> imagePaths = imgUKGTimeTable.split(',');
-
-      for (String path in imagePaths) {
-        File imageFile = File(path.trim());
-        if (imageFile.existsSync()) {
-          request.files.add(
-            await http.MultipartFile.fromPath(
-              'imgUKGTimeTable[]', // Use array-like name for multiple images
-              imageFile.path,
-              contentType: MediaType('image', 'jpeg'),
-            ),
-          );
-          print("Image file $path attached successfully.");
-        } else {
-          print('Image file does not exist at the path: $path');
-          return {"status": 0, "message": "Image file not found at $path."};
-        }
-      }
-    } else {
-      print('No image file path provided.');
-    }
-
-
-
-    if ( imgAlfa!= null && imgAlfa.isNotEmpty) {
-      List<String> imagePaths = imgAlfa.split(',');
-
-      for (String path in imagePaths) {
-        File imageFile = File(path.trim());
-        if (imageFile.existsSync()) {
-          request.files.add(
-            await http.MultipartFile.fromPath(
-              'imgAlfa[]', // Use array-like name for multiple images
-              imageFile.path,
-              contentType: MediaType('image', 'jpeg'),
-            ),
-          );
-          print("Image file $path attached successfully.");
-        } else {
-          print('Image file does not exist at the path: $path');
-          return {"status": 0, "message": "Image file not found at $path."};
-        }
-      }
-    } else {
-      print('No image file path provided.');
-    }
-
-
-    if ( imgTraining!= null && imgTraining.isNotEmpty) {
-      List<String> imagePaths = imgTraining.split(',');
-
-      for (String path in imagePaths) {
-        File imageFile = File(path.trim());
-        if (imageFile.existsSync()) {
-          request.files.add(
-            await http.MultipartFile.fromPath(
-              'imgTraining[]', // Use array-like name for multiple images
-              imageFile.path,
-              contentType: MediaType('image', 'jpeg'),
-            ),
-          );
-          print("Image file $path attached successfully.");
-        } else {
-          print('Image file does not exist at the path: $path');
-          return {"status": 0, "message": "Image file not found at $path."};
-        }
-      }
-    } else {
-      print('No image file path provided.');
-    }
-
-
-
-    if ( imgLibrary!= null && imgLibrary.isNotEmpty) {
-      List<String> imagePaths = imgLibrary.split(',');
-
-      for (String path in imagePaths) {
-        File imageFile = File(path.trim());
-        if (imageFile.existsSync()) {
-          request.files.add(
-            await http.MultipartFile.fromPath(
-              'imgLibrary[]', // Use array-like name for multiple images
-              imageFile.path,
-              contentType: MediaType('image', 'jpeg'),
-            ),
-          );
-          print("Image file $path attached successfully.");
-        } else {
-          print('Image file does not exist at the path: $path');
-          return {"status": 0, "message": "Image file not found at $path."};
-        }
-      }
-    } else {
-      print('No image file path provided.');
-    }
-
-    if ( imgTLM!= null && imgTLM.isNotEmpty) {
-      List<String> imagePaths = imgTLM.split(',');
-
-      for (String path in imagePaths) {
-        File imageFile = File(path.trim());
-        if (imageFile.existsSync()) {
-          request.files.add(
-            await http.MultipartFile.fromPath(
-              'imgTLM[]', // Use array-like name for multiple images
-              imageFile.path,
-              contentType: MediaType('image', 'jpeg'),
-            ),
-          );
-          print("Image file $path attached successfully.");
-        } else {
-          print('Image file does not exist at the path: $path');
-          return {"status": 0, "message": "Image file not found at $path."};
-        }
-      }
-    } else {
-      print('No image file path provided.');
-    }
-
-
-    // Send the request to the server
+  // Sending the request
+  try {
     var response = await request.send();
     var responseBody = await response.stream.bytesToString();
+    print('Raw response body: $responseBody');
 
-    print('Server Response Body: $responseBody'); // Print the raw response
 
-    if (response.statusCode == 200) {
-      if (responseBody.isEmpty) {
-        return {"status": 0, "message": "Empty response from server"};
-      }
+    // Try parsing the response as JSON
+    var parsedResponse = json.decode(responseBody);
 
-      try {
-        var parsedResponse = json.decode(responseBody);
-
-        if (parsedResponse['status'] == 1) {
-          // Remove record from local database
-          await SqfliteDatabaseHelper().queryDelete(
-            arg: id.toString(),
-            table: 'alfaObservation',
-            field: 'id',
-          );
-          print("Record with id $id deleted from local database.");
-
-          // Refresh data
-          await Get.find<AlfaObservationController>().fetchData();
-
-          return parsedResponse;
-        } else {
-          print('Server Response Error: ${parsedResponse['message']}');
-          return {"status": 0, "message": parsedResponse['message'] ?? 'Failed to insert data'};
-        }
-      } catch (e) {
-        print('Error decoding JSON: $e');
-        return {"status": 0, "message": "Invalid response format $e"};
-      }
-    } else {
-      print('Server Error Response Code: ${response.statusCode}');
-      print('Server Error Response Body: $responseBody');
-      return {"status": 0, "message": "Server returned an error $responseBody"};
+    if (parsedResponse['status'] == 1) {
+      // If successfully inserted, delete from local database
+      await SqfliteDatabaseHelper().queryDelete(
+        arg: id.toString(),
+        table: 'alfaObservation',
+        field: 'id',
+      );
+      print("Record with id $id deleted from local database.");
+      await Get.put(AlfaObservationController()).fetchData();
     }
-  } catch (error) {
-    print("Error: $error");
-    return {"status": 0, "message": "Something went wrong, Please contact Admin $error"};
+
+    return parsedResponse;
+  } catch (responseBody) {
+    print("Error: $responseBody");
+    return {
+      "status": 0,
+      "message": "Something went wrong, Please contact Admin $responseBody"
+    };
   }
 }

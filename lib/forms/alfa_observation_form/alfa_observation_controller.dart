@@ -294,10 +294,13 @@ class AlfaObservationController extends GetxController with BaseController{
 
     _alfaObservationList = [];
     _alfaObservationList = await LocalDbController().fetchLocalAlfaObservationModel();
-
+    isLoading = false;
     update();
   }
-
+  void removeRecordFromList(int id) {
+    _alfaObservationList.removeWhere((record) => record.id == id); // Remove synced record
+    update();  // Refresh the UI
+  }
 //
 
 //Update the UI

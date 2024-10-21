@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 import 'package:app17000ft_new/forms/edit_form/edit%20controller.dart';
+import 'package:app17000ft_new/forms/school_enrolment/school_enrolment_sync.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/services.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -31,7 +32,7 @@ import 'package:app17000ft_new/home/home_screen.dart';
 
 import '../../components/custom_confirmation.dart';
 
-class SchoolEnrollmentForm extends StatefulWidget {
+  class SchoolEnrollmentForm extends StatefulWidget {
   String? userid;
   final EnrolmentCollectionModel? existingRecord;
   String? tourId; // Add this line
@@ -361,82 +362,7 @@ class _SchoolEnrollmentFormState extends State<SchoolEnrollmentForm> {
                                       value: 20,
                                       side: 'height',
                                     ),
-                                    CustomDropdownFormField(
-                                      focusNode: schoolEnrolmentController
-                                          .tourIdFocusNode,
-                                      options: tourController.getLocalTourList
-                                          .map((e) => e
-                                              .tourId!) // Ensure tourId is non-nullable
-                                          .toList(),
-                                      selectedOption:
-                                          schoolEnrolmentController.tourValue,
-                                      onChanged: (value) {
-                                        // Safely handle the school list splitting by commas
-                                        splitSchoolLists = tourController
-                                            .getLocalTourList
-                                            .where((e) => e.tourId == value)
-                                            .map((e) => e.allSchool!
-                                                .split(',')
-                                                .map((s) => s.trim())
-                                                .toList())
-                                            .expand((x) => x)
-                                            .toList();
 
-                                        // Single setState call for efficiency
-                                        setState(() {
-                                          schoolEnrolmentController
-                                              .setSchool(null);
-                                          schoolEnrolmentController
-                                              .setTour(value);
-                                        });
-                                      },
-                                      labelText: "Select Tour ID",
-                                    ),
-                                    CustomSizedBox(
-                                      value: 20,
-                                      side: 'height',
-                                    ),
-                                    LabelText(
-                                      label: 'School',
-                                      astrick: true,
-                                    ),
-                                    CustomSizedBox(
-                                      value: 20,
-                                      side: 'height',
-                                    ),
-                                    DropdownSearch<String>(
-                                      validator: (value) {
-                                        if (value == null || value.isEmpty) {
-                                          return "Please Select School";
-                                        }
-                                        return null;
-                                      },
-                                      popupProps: PopupProps.menu(
-                                        showSelectedItems: true,
-                                        showSearchBox: true,
-                                        disabledItemFn: (String s) => s.startsWith(
-                                            'I'), // Disable based on condition
-                                      ),
-                                      items:
-                                          splitSchoolLists, // Split school list as strings
-                                      dropdownDecoratorProps:
-                                          const DropDownDecoratorProps(
-                                        dropdownSearchDecoration:
-                                            InputDecoration(
-                                          labelText: "Select School",
-                                          hintText: "Select School",
-                                        ),
-                                      ),
-                                      onChanged: (value) {
-                                        // Set the selected school
-                                        setState(() {
-                                          schoolEnrolmentController
-                                              .setSchool(value);
-                                        });
-                                      },
-                                      selectedItem:
-                                          schoolEnrolmentController.schoolValue,
-                                    ),
                                     CustomSizedBox(
                                       value: 20,
                                       side: 'height',
@@ -942,7 +868,7 @@ class _SchoolEnrollmentFormState extends State<SchoolEnrollmentForm> {
                                               context,
                                               MaterialPageRoute(
                                                 builder: (context) =>
-                                                    HomeScreen(),
+                                                    EnrolmentSync(),
                                               ),
                                             );
                                           } else {

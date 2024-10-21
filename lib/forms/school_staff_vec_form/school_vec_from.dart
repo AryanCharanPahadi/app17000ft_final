@@ -3,6 +3,7 @@ import 'dart:io';
 import 'dart:math';
 import 'package:app17000ft_new/forms/school_staff_vec_form/school_vec_controller.dart';
 import 'package:app17000ft_new/forms/school_staff_vec_form/school_vec_modals.dart';
+import 'package:app17000ft_new/forms/school_staff_vec_form/school_vec_sync.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -10,11 +11,8 @@ import 'package:get/get.dart';
 
 import 'package:app17000ft_new/components/custom_appBar.dart';
 import 'package:app17000ft_new/components/custom_button.dart';
-import 'package:app17000ft_new/components/custom_imagepreview.dart';
 import 'package:app17000ft_new/components/custom_textField.dart';
-import 'package:app17000ft_new/components/error_text.dart';
 import 'package:app17000ft_new/constants/color_const.dart';
-import 'package:app17000ft_new/forms/cab_meter_tracking_form/cab_meter_tracing_controller.dart';
 import 'package:app17000ft_new/helper/responsive_helper.dart';
 import 'package:app17000ft_new/tourDetails/tour_controller.dart';
 import 'package:app17000ft_new/components/custom_dropdown.dart';
@@ -22,9 +20,9 @@ import 'package:app17000ft_new/components/custom_labeltext.dart';
 import 'package:app17000ft_new/components/custom_sizedBox.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:intl/intl.dart';
+
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
-import '../../base_client/base_client.dart';
 import '../../components/custom_confirmation.dart';
 import '../../components/custom_snackbar.dart';
 import '../../helper/database_helper.dart';
@@ -42,7 +40,8 @@ class SchoolStaffVecForm extends StatefulWidget {
     this.userid,
     String? office,
     this.existingRecord,
-    this.school,   this.tourId,
+    this.school,
+    this.tourId,
   });
   @override
   State<SchoolStaffVecForm> createState() => _SchoolStaffVecFormState();
@@ -51,8 +50,7 @@ class SchoolStaffVecForm extends StatefulWidget {
 class _SchoolStaffVecFormState extends State<SchoolStaffVecForm> {
   final ScrollController _scrollController = ScrollController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  final EditController editController =
-  Get.put(EditController());
+  final EditController editController = Get.put(EditController());
   @override
   void initState() {
     super.initState();
@@ -91,18 +89,21 @@ class _SchoolStaffVecFormState extends State<SchoolStaffVecForm> {
       schoolStaffVecController.chairPhoneNumberController.text =
           existingRecord.vecMobile ?? '';
       schoolStaffVecController.totalTeachingStaffController.text =
-      (existingRecord.totalTeachingStaff ?? '');
+          (existingRecord.totalTeachingStaff ?? '');
       schoolStaffVecController.totalNonTeachingStaffController.text =
-      (existingRecord.totalNonTeachingStaff ?? '');
+          (existingRecord.totalNonTeachingStaff ?? '');
       schoolStaffVecController.totalStaffController.text =
-      (existingRecord.totalStaff ?? '');
+          (existingRecord.totalStaff ?? '');
       // Set other dropdown values
       schoolStaffVecController.selectedValue = existingRecord.udiseValue;
       schoolStaffVecController.selectedValue2 = existingRecord.headGender;
       schoolStaffVecController.selectedValue3 = existingRecord.genderVec;
-      schoolStaffVecController.selectedDesignation = existingRecord.headDesignation;
-      schoolStaffVecController.selected2Designation = existingRecord.vecQualification;
-      schoolStaffVecController.selected3Designation = existingRecord.meetingDuration;
+      schoolStaffVecController.selectedDesignation =
+          existingRecord.headDesignation;
+      schoolStaffVecController.selected2Designation =
+          existingRecord.vecQualification;
+      schoolStaffVecController.selected3Designation =
+          existingRecord.meetingDuration;
       widget.userid = existingRecord.createdBy;
 
       // Set other fields related to tour and school
@@ -111,23 +112,20 @@ class _SchoolStaffVecFormState extends State<SchoolStaffVecForm> {
     }
   }
 
-
   final SchoolStaffVecController schoolStaffVecController =
-  Get.put(SchoolStaffVecController());
+      Get.put(SchoolStaffVecController());
 
   void updateTotalStaff() {
     final totalTeachingStaff = int.tryParse(
-        schoolStaffVecController.totalTeachingStaffController.text) ??
+            schoolStaffVecController.totalTeachingStaffController.text) ??
         0;
     final totalNonTeachingStaff = int.tryParse(
-        schoolStaffVecController.totalNonTeachingStaffController.text) ??
+            schoolStaffVecController.totalNonTeachingStaffController.text) ??
         0;
     final totalStaff = totalTeachingStaff + totalNonTeachingStaff;
 
     schoolStaffVecController.totalStaffController.text = totalStaff.toString();
   }
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -163,16 +161,18 @@ class _SchoolStaffVecFormState extends State<SchoolStaffVecForm> {
                         builder: (schoolStaffVecController) {
                           return Form(
                               key: _formKey,
-                              child:GetBuilder<TourController>(
+                              child: GetBuilder<TourController>(
                                   init: TourController(),
                                   builder: (tourController) {
                                     // Fetch tour details once, not on every rebuild.
-                                    if (tourController.getLocalTourList.isEmpty) {
+                                    if (tourController
+                                        .getLocalTourList.isEmpty) {
                                       tourController.fetchTourDetails();
                                     }
 
                                     return Column(children: [
-                                      if (schoolStaffVecController.showBasicDetails) ...[
+                                      if (schoolStaffVecController
+                                          .showBasicDetails) ...[
                                         LabelText(
                                           label: 'Basic Details',
                                         ),
@@ -189,24 +189,36 @@ class _SchoolStaffVecFormState extends State<SchoolStaffVecForm> {
                                           side: 'height',
                                         ),
                                         CustomDropdownFormField(
-                                          focusNode: schoolStaffVecController.tourIdFocusNode,
-                                          options: tourController.getLocalTourList
-                                              .map((e) => e.tourId!) // Ensure tourId is non-nullable
+                                          focusNode: schoolStaffVecController
+                                              .tourIdFocusNode,
+                                          options: tourController
+                                              .getLocalTourList
+                                              .map((e) => e
+                                                  .tourId!) // Ensure tourId is non-nullable
                                               .toList(),
-                                          selectedOption: schoolStaffVecController.tourValue,
+                                          selectedOption:
+                                              schoolStaffVecController
+                                                  .tourValue,
                                           onChanged: (value) {
                                             // Safely handle the school list splitting by commas
-                                            schoolStaffVecController.splitSchoolLists = tourController
-                                                .getLocalTourList
-                                                .where((e) => e.tourId == value)
-                                                .map((e) => e.allSchool!.split(',').map((s) => s.trim()).toList())
-                                                .expand((x) => x)
-                                                .toList();
+                                            schoolStaffVecController
+                                                    .splitSchoolLists =
+                                                tourController.getLocalTourList
+                                                    .where((e) =>
+                                                        e.tourId == value)
+                                                    .map((e) => e.allSchool!
+                                                        .split(',')
+                                                        .map((s) => s.trim())
+                                                        .toList())
+                                                    .expand((x) => x)
+                                                    .toList();
 
                                             // Single setState call for efficiency
                                             setState(() {
-                                              schoolStaffVecController.setSchool(null);
-                                              schoolStaffVecController.setTour(value);
+                                              schoolStaffVecController
+                                                  .setSchool(null);
+                                              schoolStaffVecController
+                                                  .setTour(value);
                                             });
                                           },
                                           labelText: "Select Tour ID",
@@ -226,7 +238,8 @@ class _SchoolStaffVecFormState extends State<SchoolStaffVecForm> {
                                         // DropdownSearch for selecting a single school
                                         DropdownSearch<String>(
                                           validator: (value) {
-                                            if (value == null || value.isEmpty) {
+                                            if (value == null ||
+                                                value.isEmpty) {
                                               return "Please Select School";
                                             }
                                             return null;
@@ -234,11 +247,16 @@ class _SchoolStaffVecFormState extends State<SchoolStaffVecForm> {
                                           popupProps: PopupProps.menu(
                                             showSelectedItems: true,
                                             showSearchBox: true,
-                                            disabledItemFn: (String s) => s.startsWith('I'), // Disable based on condition
+                                            disabledItemFn: (String s) =>
+                                                s.startsWith(
+                                                    'I'), // Disable based on condition
                                           ),
-                                          items: schoolStaffVecController.splitSchoolLists, // Split school list as strings
-                                          dropdownDecoratorProps: const DropDownDecoratorProps(
-                                            dropdownSearchDecoration: InputDecoration(
+                                          items: schoolStaffVecController
+                                              .splitSchoolLists, // Split school list as strings
+                                          dropdownDecoratorProps:
+                                              const DropDownDecoratorProps(
+                                            dropdownSearchDecoration:
+                                                InputDecoration(
                                               labelText: "Select School",
                                               hintText: "Select School",
                                             ),
@@ -246,10 +264,12 @@ class _SchoolStaffVecFormState extends State<SchoolStaffVecForm> {
                                           onChanged: (value) {
                                             // Set the selected school
                                             setState(() {
-                                              schoolStaffVecController.setSchool(value);
+                                              schoolStaffVecController
+                                                  .setSchool(value);
                                             });
                                           },
-                                          selectedItem: schoolStaffVecController.schoolValue,
+                                          selectedItem: schoolStaffVecController
+                                              .schoolValue,
                                         ),
                                         CustomSizedBox(
                                           value: 20,
@@ -257,25 +277,29 @@ class _SchoolStaffVecFormState extends State<SchoolStaffVecForm> {
                                         ),
                                         LabelText(
                                           label:
-                                          'Is this UDISE code is correct?',
+                                              'Is this UDISE code is correct?',
                                           astrick: true,
                                         ),
                                         Padding(
                                           padding:
-                                          const EdgeInsets.only(right: 300),
+                                              const EdgeInsets.only(right: 300),
                                           child: Row(
                                             children: [
                                               Radio(
                                                 value: 'Yes',
-                                                groupValue: schoolStaffVecController.selectedValue,
+                                                groupValue:
+                                                    schoolStaffVecController
+                                                        .selectedValue,
                                                 onChanged: (value) {
                                                   setState(() {
-                                                    schoolStaffVecController.selectedValue =
-                                                    value as String?;
+                                                    schoolStaffVecController
+                                                            .selectedValue =
+                                                        value as String?;
                                                   });
                                                   if (value == 'Yes') {
-                                                    schoolStaffVecController.correctUdiseCodeController.clear();
-
+                                                    schoolStaffVecController
+                                                        .correctUdiseCodeController
+                                                        .clear();
                                                   }
                                                 },
                                               ),
@@ -290,16 +314,19 @@ class _SchoolStaffVecFormState extends State<SchoolStaffVecForm> {
                                         // make it that user can also edit the tourId and school
                                         Padding(
                                           padding:
-                                          const EdgeInsets.only(right: 300),
+                                              const EdgeInsets.only(right: 300),
                                           child: Row(
                                             children: [
                                               Radio(
                                                 value: 'No',
-                                                groupValue: schoolStaffVecController.selectedValue,
+                                                groupValue:
+                                                    schoolStaffVecController
+                                                        .selectedValue,
                                                 onChanged: (value) {
                                                   setState(() {
-                                                    schoolStaffVecController.selectedValue =
-                                                    value as String?;
+                                                    schoolStaffVecController
+                                                            .selectedValue =
+                                                        value as String?;
                                                   });
                                                 },
                                               ),
@@ -307,10 +334,11 @@ class _SchoolStaffVecFormState extends State<SchoolStaffVecForm> {
                                             ],
                                           ),
                                         ),
-                                        if (schoolStaffVecController.radioFieldError)
+                                        if (schoolStaffVecController
+                                            .radioFieldError)
                                           const Padding(
                                             padding:
-                                            EdgeInsets.only(left: 16.0),
+                                                EdgeInsets.only(left: 16.0),
                                             child: Align(
                                               alignment: Alignment.centerLeft,
                                               child: Text(
@@ -324,10 +352,12 @@ class _SchoolStaffVecFormState extends State<SchoolStaffVecForm> {
                                           value: 20,
                                           side: 'height',
                                         ),
-                                        if (schoolStaffVecController.selectedValue == 'No') ...[
+                                        if (schoolStaffVecController
+                                                .selectedValue ==
+                                            'No') ...[
                                           LabelText(
                                             label:
-                                            'Write Correct UDISE school code',
+                                                'Write Correct UDISE school code',
                                             astrick: true,
                                           ),
                                           CustomSizedBox(
@@ -336,16 +366,17 @@ class _SchoolStaffVecFormState extends State<SchoolStaffVecForm> {
                                           ),
                                           CustomTextFormField(
                                             textController:
-                                            schoolStaffVecController
-                                                .correctUdiseCodeController,
+                                                schoolStaffVecController
+                                                    .correctUdiseCodeController,
                                             textInputType: TextInputType.number,
                                             inputFormatters: [
                                               LengthLimitingTextInputFormatter(
                                                   13),
                                               FilteringTextInputFormatter
                                                   .digitsOnly,
-                                            ],                                            labelText:
-                                            'Enter correct UDISE code',
+                                            ],
+                                            labelText:
+                                                'Enter correct UDISE code',
                                             validator: (value) {
                                               if (value == null ||
                                                   value.isEmpty) {
@@ -369,17 +400,25 @@ class _SchoolStaffVecFormState extends State<SchoolStaffVecForm> {
                                           onPressedButton: () {
                                             print('submit Basic Details');
                                             setState(() {
-                                              schoolStaffVecController.radioFieldError =
-                                                  schoolStaffVecController.selectedValue == null ||
-                                                      schoolStaffVecController.selectedValue!.isEmpty;
+                                              schoolStaffVecController
+                                                      .radioFieldError =
+                                                  schoolStaffVecController
+                                                              .selectedValue ==
+                                                          null ||
+                                                      schoolStaffVecController
+                                                          .selectedValue!
+                                                          .isEmpty;
                                             });
 
                                             if (_formKey.currentState!
-                                                .validate() &&
-                                                !schoolStaffVecController.radioFieldError) {
+                                                    .validate() &&
+                                                !schoolStaffVecController
+                                                    .radioFieldError) {
                                               setState(() {
-                                                schoolStaffVecController.showBasicDetails = false;
-                                                schoolStaffVecController.showStaffDetails = true;
+                                                schoolStaffVecController
+                                                    .showBasicDetails = false;
+                                                schoolStaffVecController
+                                                    .showStaffDetails = true;
                                               });
                                             }
                                           },
@@ -393,7 +432,8 @@ class _SchoolStaffVecFormState extends State<SchoolStaffVecForm> {
                                       // End of Basic Details
 
                                       //start of staff Details
-                                      if (schoolStaffVecController.showStaffDetails) ...[
+                                      if (schoolStaffVecController
+                                          .showStaffDetails) ...[
                                         LabelText(
                                           label: 'Staff Details',
                                         ),
@@ -409,8 +449,8 @@ class _SchoolStaffVecFormState extends State<SchoolStaffVecForm> {
                                             value: 20, side: 'height'),
                                         CustomTextFormField(
                                           textController:
-                                          schoolStaffVecController
-                                              .nameOfHoiController,
+                                              schoolStaffVecController
+                                                  .nameOfHoiController,
                                           labelText: 'Enter Name',
                                           validator: (value) {
                                             if (value!.isEmpty) {
@@ -434,20 +474,23 @@ class _SchoolStaffVecFormState extends State<SchoolStaffVecForm> {
                                           builder: (context, constraints) {
                                             return Row(
                                               mainAxisAlignment:
-                                              MainAxisAlignment.start,
+                                                  MainAxisAlignment.start,
                                               children: [
                                                 Row(
                                                   children: [
                                                     Radio(
                                                       value: 'Male',
                                                       groupValue:
-                                                      schoolStaffVecController.selectedValue2,
+                                                          schoolStaffVecController
+                                                              .selectedValue2,
                                                       onChanged: (value) {
                                                         setState(() {
-                                                          schoolStaffVecController.selectedValue2 =
-                                                          value as String?;
-                                                          schoolStaffVecController.radioFieldError2 =
-                                                          false; // Reset error state
+                                                          schoolStaffVecController
+                                                                  .selectedValue2 =
+                                                              value as String?;
+                                                          schoolStaffVecController
+                                                                  .radioFieldError2 =
+                                                              false; // Reset error state
                                                         });
                                                       },
                                                     ),
@@ -462,13 +505,16 @@ class _SchoolStaffVecFormState extends State<SchoolStaffVecForm> {
                                                     Radio(
                                                       value: 'Female',
                                                       groupValue:
-                                                      schoolStaffVecController.selectedValue2,
+                                                          schoolStaffVecController
+                                                              .selectedValue2,
                                                       onChanged: (value) {
                                                         setState(() {
-                                                          schoolStaffVecController.selectedValue2 =
-                                                          value as String?;
-                                                          schoolStaffVecController.radioFieldError2 =
-                                                          false; // Reset error state
+                                                          schoolStaffVecController
+                                                                  .selectedValue2 =
+                                                              value as String?;
+                                                          schoolStaffVecController
+                                                                  .radioFieldError2 =
+                                                              false; // Reset error state
                                                         });
                                                       },
                                                     ),
@@ -480,14 +526,14 @@ class _SchoolStaffVecFormState extends State<SchoolStaffVecForm> {
                                           },
                                         ),
 
-                                        if (schoolStaffVecController.radioFieldError2)
+                                        if (schoolStaffVecController
+                                            .radioFieldError2)
                                           const Padding(
-                                            padding:
-                                            EdgeInsets.only(top: 8.0),
+                                            padding: EdgeInsets.only(top: 8.0),
                                             child: Text(
                                               'Please select an option',
                                               style:
-                                              TextStyle(color: Colors.red),
+                                                  TextStyle(color: Colors.red),
                                             ),
                                           ),
                                         CustomSizedBox(
@@ -503,8 +549,8 @@ class _SchoolStaffVecFormState extends State<SchoolStaffVecForm> {
                                         ),
                                         CustomTextFormField(
                                           textController:
-                                          schoolStaffVecController
-                                              .staffPhoneNumberController,
+                                              schoolStaffVecController
+                                                  .staffPhoneNumberController,
                                           labelText: 'Enter Mobile Number',
                                           textInputType: TextInputType.number,
                                           inputFormatters: [
@@ -544,11 +590,11 @@ class _SchoolStaffVecFormState extends State<SchoolStaffVecForm> {
                                         ),
                                         CustomTextFormField(
                                           textController:
-                                          schoolStaffVecController
-                                              .emailController,
+                                              schoolStaffVecController
+                                                  .emailController,
                                           labelText: 'Enter Email',
                                           textInputType:
-                                          TextInputType.emailAddress,
+                                              TextInputType.emailAddress,
                                           validator: (value) {
                                             if (value == null ||
                                                 value.isEmpty) {
@@ -583,11 +629,14 @@ class _SchoolStaffVecFormState extends State<SchoolStaffVecForm> {
                                             labelText: 'Select a designation',
                                             border: OutlineInputBorder(),
                                           ),
-                                          value: schoolStaffVecController.selectedDesignation,
+                                          value: schoolStaffVecController
+                                              .selectedDesignation,
                                           items: [
                                             DropdownMenuItem(
-                                                value: 'HeadMaster/ HeadMistress',
-                                                child: Text('HeadMaster/HeadMistress')),
+                                                value:
+                                                    'HeadMaster/ HeadMistress',
+                                                child: Text(
+                                                    'HeadMaster/HeadMistress')),
                                             DropdownMenuItem(
                                                 value: 'Principal',
                                                 child: Text('Principal')),
@@ -597,7 +646,8 @@ class _SchoolStaffVecFormState extends State<SchoolStaffVecForm> {
                                           ],
                                           onChanged: (value) {
                                             setState(() {
-                                              schoolStaffVecController.selectedDesignation = value;
+                                              schoolStaffVecController
+                                                  .selectedDesignation = value;
                                             });
                                           },
                                           validator: (value) {
@@ -611,13 +661,15 @@ class _SchoolStaffVecFormState extends State<SchoolStaffVecForm> {
                                             value: 20, side: 'height'),
                                         LabelText(
                                           label:
-                                          'Total Teaching Staff (Including Head Of Institute)',
+                                              'Total Teaching Staff (Including Head Of Institute)',
                                           astrick: true,
                                         ),
-                                        CustomSizedBox(value: 20, side: 'height'),
+                                        CustomSizedBox(
+                                            value: 20, side: 'height'),
                                         CustomTextFormField(
-                                          textController: schoolStaffVecController
-                                              .totalTeachingStaffController,
+                                          textController:
+                                              schoolStaffVecController
+                                                  .totalTeachingStaffController,
                                           labelText: 'Enter Teaching Staff',
                                           textInputType: TextInputType.number,
 
@@ -638,7 +690,8 @@ class _SchoolStaffVecFormState extends State<SchoolStaffVecForm> {
                                           label: 'Total Non Teaching Staff',
                                           astrick: true,
                                         ),
-                                        CustomSizedBox(value: 20, side: 'height'),
+                                        CustomSizedBox(
+                                            value: 20, side: 'height'),
                                         CustomTextFormField(
                                           textController: schoolStaffVecController
                                               .totalNonTeachingStaffController,
@@ -662,14 +715,17 @@ class _SchoolStaffVecFormState extends State<SchoolStaffVecForm> {
                                           label: 'Total Staff',
                                           astrick: true,
                                         ),
-                                        CustomSizedBox(value: 20, side: 'height'),
+                                        CustomSizedBox(
+                                            value: 20, side: 'height'),
                                         CustomTextFormField(
                                           textController:
-                                          schoolStaffVecController.totalStaffController,
+                                              schoolStaffVecController
+                                                  .totalStaffController,
                                           labelText: 'Enter Teaching Staff',
 
                                           showCharacterCount: true,
-                                          readOnly: true, // Make this field read-only
+                                          readOnly:
+                                              true, // Make this field read-only
                                         ),
 
                                         CustomSizedBox(
@@ -680,8 +736,12 @@ class _SchoolStaffVecFormState extends State<SchoolStaffVecForm> {
                                                 title: 'Back',
                                                 onPressedButton: () {
                                                   setState(() {
-                                                    schoolStaffVecController.showBasicDetails = true;
-                                                    schoolStaffVecController.showStaffDetails = false;
+                                                    schoolStaffVecController
+                                                            .showBasicDetails =
+                                                        true;
+                                                    schoolStaffVecController
+                                                            .showStaffDetails =
+                                                        false;
                                                     false;
                                                   });
                                                 }),
@@ -689,21 +749,29 @@ class _SchoolStaffVecFormState extends State<SchoolStaffVecForm> {
                                             CustomButton(
                                               title: 'Next',
                                               onPressedButton: () {
-
                                                 print('submit staff details');
                                                 setState(() {
-                                                  schoolStaffVecController.radioFieldError2 =
-                                                      schoolStaffVecController.selectedValue2 == null ||
-                                                          schoolStaffVecController.selectedValue2!
+                                                  schoolStaffVecController
+                                                          .radioFieldError2 =
+                                                      schoolStaffVecController
+                                                                  .selectedValue2 ==
+                                                              null ||
+                                                          schoolStaffVecController
+                                                              .selectedValue2!
                                                               .isEmpty;
                                                 });
 
                                                 if (_formKey.currentState!
-                                                    .validate() &&
-                                                    !schoolStaffVecController.radioFieldError2) {
+                                                        .validate() &&
+                                                    !schoolStaffVecController
+                                                        .radioFieldError2) {
                                                   setState(() {
-                                                    schoolStaffVecController.showStaffDetails = false;
-                                                    schoolStaffVecController.showSmcVecDetails = true;
+                                                    schoolStaffVecController
+                                                            .showStaffDetails =
+                                                        false;
+                                                    schoolStaffVecController
+                                                            .showSmcVecDetails =
+                                                        true;
                                                   });
                                                 }
                                               },
@@ -717,7 +785,8 @@ class _SchoolStaffVecFormState extends State<SchoolStaffVecForm> {
                                       ], //end of staff details
 
                                       // start of staff vec details
-                                      if (schoolStaffVecController.showSmcVecDetails) ...[
+                                      if (schoolStaffVecController
+                                          .showSmcVecDetails) ...[
                                         LabelText(
                                           label: 'SMC VEC Details',
                                         ),
@@ -733,8 +802,8 @@ class _SchoolStaffVecFormState extends State<SchoolStaffVecForm> {
                                             value: 20, side: 'height'),
                                         CustomTextFormField(
                                           textController:
-                                          schoolStaffVecController
-                                              .nameOfchairpersonController,
+                                              schoolStaffVecController
+                                                  .nameOfchairpersonController,
                                           labelText: 'Enter Name',
                                           validator: (value) {
                                             if (value!.isEmpty) {
@@ -750,39 +819,55 @@ class _SchoolStaffVecFormState extends State<SchoolStaffVecForm> {
                                           label: 'Gender',
                                           astrick: true,
                                         ),
-                                        CustomSizedBox(value: 20, side: 'height'),
+                                        CustomSizedBox(
+                                            value: 20, side: 'height'),
 
                                         // Wrapping in a LayoutBuilder to adjust based on available width
                                         LayoutBuilder(
                                           builder: (context, constraints) {
                                             return Row(
-                                              mainAxisAlignment: MainAxisAlignment.start,
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.start,
                                               children: [
                                                 Row(
                                                   children: [
                                                     Radio(
                                                       value: 'Male',
-                                                      groupValue: schoolStaffVecController.selectedValue3,
+                                                      groupValue:
+                                                          schoolStaffVecController
+                                                              .selectedValue3,
                                                       onChanged: (value) {
                                                         setState(() {
-                                                          schoolStaffVecController.selectedValue3 = value as String?;
-                                                          schoolStaffVecController.radioFieldError3 = false; // Reset error state
+                                                          schoolStaffVecController
+                                                                  .selectedValue3 =
+                                                              value as String?;
+                                                          schoolStaffVecController
+                                                                  .radioFieldError3 =
+                                                              false; // Reset error state
                                                         });
                                                       },
                                                     ),
                                                     const Text('Male'),
                                                   ],
                                                 ),
-                                                SizedBox(width: screenWidth * 0.1), // Adjust spacing based on screen width
+                                                SizedBox(
+                                                    width: screenWidth *
+                                                        0.1), // Adjust spacing based on screen width
                                                 Row(
                                                   children: [
                                                     Radio(
                                                       value: 'Female',
-                                                      groupValue: schoolStaffVecController.selectedValue3,
+                                                      groupValue:
+                                                          schoolStaffVecController
+                                                              .selectedValue3,
                                                       onChanged: (value) {
                                                         setState(() {
-                                                          schoolStaffVecController.selectedValue3 = value as String?;
-                                                          schoolStaffVecController.radioFieldError3 = false; // Reset error state
+                                                          schoolStaffVecController
+                                                                  .selectedValue3 =
+                                                              value as String?;
+                                                          schoolStaffVecController
+                                                                  .radioFieldError3 =
+                                                              false; // Reset error state
                                                         });
                                                       },
                                                     ),
@@ -794,15 +879,19 @@ class _SchoolStaffVecFormState extends State<SchoolStaffVecForm> {
                                           },
                                         ),
 
-                                        if (schoolStaffVecController.radioFieldError3)
+                                        if (schoolStaffVecController
+                                            .radioFieldError3)
                                           Padding(
-                                            padding: const EdgeInsets.only(top: 8.0),
+                                            padding:
+                                                const EdgeInsets.only(top: 8.0),
                                             child: const Text(
                                               'Please select an option',
-                                              style: TextStyle(color: Colors.red),
+                                              style:
+                                                  TextStyle(color: Colors.red),
                                             ),
                                           ),
-                                        CustomSizedBox(value: 20, side: 'height'),
+                                        CustomSizedBox(
+                                            value: 20, side: 'height'),
 
                                         CustomSizedBox(
                                           value: 20,
@@ -818,8 +907,8 @@ class _SchoolStaffVecFormState extends State<SchoolStaffVecForm> {
                                         ),
                                         CustomTextFormField(
                                           textController:
-                                          schoolStaffVecController
-                                              .chairPhoneNumberController,
+                                              schoolStaffVecController
+                                                  .chairPhoneNumberController,
                                           labelText: 'Enter Mobile Number',
                                           textInputType: TextInputType.number,
                                           inputFormatters: [
@@ -859,11 +948,11 @@ class _SchoolStaffVecFormState extends State<SchoolStaffVecForm> {
                                         ),
                                         CustomTextFormField(
                                           textController:
-                                          schoolStaffVecController
-                                              .email2Controller,
+                                              schoolStaffVecController
+                                                  .email2Controller,
                                           labelText: 'Enter Email',
                                           textInputType:
-                                          TextInputType.emailAddress,
+                                              TextInputType.emailAddress,
                                           validator: (value) {
                                             if (value == null ||
                                                 value.isEmpty) {
@@ -889,7 +978,7 @@ class _SchoolStaffVecFormState extends State<SchoolStaffVecForm> {
                                         ),
                                         LabelText(
                                           label:
-                                          'Highest Education Qualification',
+                                              'Highest Education Qualification',
                                           astrick: true,
                                         ),
                                         CustomSizedBox(
@@ -899,7 +988,8 @@ class _SchoolStaffVecFormState extends State<SchoolStaffVecForm> {
                                             labelText: 'Select qualification',
                                             border: OutlineInputBorder(),
                                           ),
-                                          value: schoolStaffVecController.selected2Designation,
+                                          value: schoolStaffVecController
+                                              .selected2Designation,
                                           items: [
                                             DropdownMenuItem(
                                                 value: 'Non Graduate',
@@ -916,7 +1006,8 @@ class _SchoolStaffVecFormState extends State<SchoolStaffVecForm> {
                                           ],
                                           onChanged: (value) {
                                             setState(() {
-                                              schoolStaffVecController.selected2Designation = value;
+                                              schoolStaffVecController
+                                                  .selected2Designation = value;
                                             });
                                           },
                                           validator: (value) {
@@ -929,32 +1020,33 @@ class _SchoolStaffVecFormState extends State<SchoolStaffVecForm> {
                                         CustomSizedBox(
                                             value: 20, side: 'height'),
 
-                                    if (schoolStaffVecController.selected2Designation ==
-                                    'Others') ...[
-                                    LabelText(
-                                    label: 'Please Specify Other',
-                                    astrick: true,
-                                    ),
-                                    CustomSizedBox(
-                                    value: 20, side: 'height'),
-                                    CustomTextFormField(
-                                    textController:
-                                    schoolStaffVecController
-                                        .QualSpecifyController,
-                                    labelText: 'Write here...',
-                                    maxlines: 2,
-                                    validator: (value) {
-                                    if (value!.isEmpty) {
-                                    return 'Please fill this field';
-                                    }
+                                        if (schoolStaffVecController
+                                                .selected2Designation ==
+                                            'Other') ...[
+                                          LabelText(
+                                            label: 'Please Specify Other',
+                                            astrick: true,
+                                          ),
+                                          CustomSizedBox(
+                                              value: 20, side: 'height'),
+                                          CustomTextFormField(
+                                            textController:
+                                                schoolStaffVecController
+                                                    .QualSpecifyController,
+                                            labelText: 'Write here...',
+                                            maxlines: 2,
+                                            validator: (value) {
+                                              if (value!.isEmpty) {
+                                                return 'Please fill this field';
+                                              }
 
-                                    if (value.length < 25) {
-                                    return 'Must be at least 25 characters long';
-                                    }
-                                    return null;
-                                    },
-                                    showCharacterCount: true,
-                                    ),
+                                              if (value.length < 25) {
+                                                return 'Must be at least 25 characters long';
+                                              }
+                                              return null;
+                                            },
+                                            showCharacterCount: true,
+                                          ),
                                         ],
                                         LabelText(
                                           label: 'Total SMC VEC Staff',
@@ -964,10 +1056,10 @@ class _SchoolStaffVecFormState extends State<SchoolStaffVecForm> {
                                             value: 20, side: 'height'),
                                         CustomTextFormField(
                                           textController:
-                                          schoolStaffVecController
-                                              .totalVecStaffController,
+                                              schoolStaffVecController
+                                                  .totalVecStaffController,
                                           labelText:
-                                          'Enter Total SMC VEC member',
+                                              'Enter Total SMC VEC member',
                                           textInputType: TextInputType.number,
                                           validator: (value) {
                                             if (value!.isEmpty) {
@@ -983,7 +1075,7 @@ class _SchoolStaffVecFormState extends State<SchoolStaffVecForm> {
                                         ),
                                         LabelText(
                                           label:
-                                          'How often does the school hold an SMC/VEC meeting',
+                                              'How often does the school hold an SMC/VEC meeting',
                                           astrick: true,
                                         ),
                                         CustomSizedBox(
@@ -993,7 +1085,8 @@ class _SchoolStaffVecFormState extends State<SchoolStaffVecForm> {
                                             labelText: 'Select frequency',
                                             border: OutlineInputBorder(),
                                           ),
-                                          value: schoolStaffVecController.selected3Designation,
+                                          value: schoolStaffVecController
+                                              .selected3Designation,
                                           items: [
                                             DropdownMenuItem(
                                                 value: 'Once a month',
@@ -1003,7 +1096,8 @@ class _SchoolStaffVecFormState extends State<SchoolStaffVecForm> {
                                                 child: Text('Once a quarter')),
                                             DropdownMenuItem(
                                                 value: 'Once in 6 months',
-                                                child: Text('Once in 6 months')),
+                                                child:
+                                                    Text('Once in 6 months')),
                                             DropdownMenuItem(
                                                 value: 'Once a year',
                                                 child: Text('Once a year')),
@@ -1013,10 +1107,9 @@ class _SchoolStaffVecFormState extends State<SchoolStaffVecForm> {
                                           ],
                                           onChanged: (value) {
                                             setState(() {
-                                              schoolStaffVecController.selected3Designation = value;
-
+                                              schoolStaffVecController
+                                                  .selected3Designation = value;
                                             });
-
                                           },
                                           validator: (value) {
                                             if (value == null) {
@@ -1027,7 +1120,8 @@ class _SchoolStaffVecFormState extends State<SchoolStaffVecForm> {
                                         ),
                                         CustomSizedBox(
                                             value: 20, side: 'height'),
-                                        if (schoolStaffVecController.selected3Designation ==
+                                        if (schoolStaffVecController
+                                                .selected3Designation ==
                                             'Other') ...[
                                           LabelText(
                                             label: 'Please Specify Other',
@@ -1037,8 +1131,8 @@ class _SchoolStaffVecFormState extends State<SchoolStaffVecForm> {
                                               value: 20, side: 'height'),
                                           CustomTextFormField(
                                             textController:
-                                            schoolStaffVecController
-                                                .QualSpecify2Controller,
+                                                schoolStaffVecController
+                                                    .QualSpecify2Controller,
                                             labelText: 'Write here...',
                                             maxlines: 2,
                                             validator: (value) {
@@ -1060,70 +1154,85 @@ class _SchoolStaffVecFormState extends State<SchoolStaffVecForm> {
                                                 title: 'Back',
                                                 onPressedButton: () {
                                                   setState(() {
-                                                    schoolStaffVecController.showStaffDetails = true;
-                                                    schoolStaffVecController.showSmcVecDetails = false;
+                                                    schoolStaffVecController
+                                                            .showStaffDetails =
+                                                        true;
+                                                    schoolStaffVecController
+                                                            .showSmcVecDetails =
+                                                        false;
                                                   });
                                                 }),
                                             const Spacer(),
                                             CustomButton(
                                                 title: 'Submit',
                                                 onPressedButton: () async {
-
                                                   setState(() {
-                                                    schoolStaffVecController.radioFieldError3 =
-                                                        schoolStaffVecController.selectedValue3 ==
-                                                            null ||
-                                                            schoolStaffVecController.selectedValue3!
+                                                    schoolStaffVecController
+                                                            .radioFieldError3 =
+                                                        schoolStaffVecController
+                                                                    .selectedValue3 ==
+                                                                null ||
+                                                            schoolStaffVecController
+                                                                .selectedValue3!
                                                                 .isEmpty;
                                                   });
                                                   if (_formKey.currentState!
-                                                      .validate() &&
-                                                      !schoolStaffVecController.radioFieldError3) {
+                                                          .validate() &&
+                                                      !schoolStaffVecController
+                                                          .radioFieldError3) {
                                                     print('Submit Vec Details');
-                                                    String generateUniqueId(int length) {
+                                                    String generateUniqueId(
+                                                        int length) {
                                                       const _chars =
                                                           'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
                                                       Random _rnd = Random();
                                                       return String.fromCharCodes(
                                                           Iterable.generate(
                                                               length,
-                                                                  (_) => _chars.codeUnitAt(
-                                                                  _rnd.nextInt(
-                                                                      _chars.length))));
+                                                              (_) => _chars
+                                                                  .codeUnitAt(_rnd
+                                                                      .nextInt(
+                                                                          _chars
+                                                                              .length))));
                                                     }
 
-                                                    String uniqueId = generateUniqueId(6);
+                                                    String uniqueId =
+                                                        generateUniqueId(6);
                                                     DateTime now =
-                                                    DateTime.now();
+                                                        DateTime.now();
                                                     String formattedDate =
-                                                    DateFormat('yyyy-MM-dd')
-                                                        .format(now);
+                                                        DateFormat('yyyy-MM-dd')
+                                                            .format(now);
                                                     SchoolStaffVecRecords enrolmentCollectionObj = SchoolStaffVecRecords(
                                                         tourId: schoolStaffVecController.tourValue ??
                                                             '',
                                                         school: schoolStaffVecController.schoolValue ??
                                                             '',
-                                                        udiseValue: schoolStaffVecController.selectedValue!,
+                                                        udiseValue: schoolStaffVecController
+                                                            .selectedValue!,
                                                         correctUdise: schoolStaffVecController
                                                             .correctUdiseCodeController
                                                             .text,
                                                         headName: schoolStaffVecController
-                                                            .nameOfHoiController.text,
+                                                            .nameOfHoiController
+                                                            .text,
                                                         headMobile: schoolStaffVecController
                                                             .staffPhoneNumberController
                                                             .text,
                                                         headEmail: schoolStaffVecController
-                                                            .emailController.text,
+                                                            .emailController
+                                                            .text,
                                                         totalTeachingStaff:
-                                                        schoolStaffVecController
-                                                            .totalTeachingStaffController
-                                                            .text,
+                                                            schoolStaffVecController
+                                                                .totalTeachingStaffController
+                                                                .text,
                                                         totalNonTeachingStaff:
-                                                        schoolStaffVecController
-                                                            .totalNonTeachingStaffController
-                                                            .text,
+                                                            schoolStaffVecController
+                                                                .totalNonTeachingStaffController
+                                                                .text,
                                                         totalStaff: schoolStaffVecController
-                                                            .totalStaffController.text,
+                                                            .totalStaffController
+                                                            .text,
                                                         vecMobile: schoolStaffVecController.chairPhoneNumberController.text,
                                                         vecEmail: schoolStaffVecController.email2Controller.text,
                                                         vecTotal: schoolStaffVecController.totalVecStaffController.text,
@@ -1138,35 +1247,63 @@ class _SchoolStaffVecFormState extends State<SchoolStaffVecForm> {
                                                         createdAt: formattedDate.toString(),
                                                         createdBy: widget.userid.toString());
 
-
-
                                                     int result =
-                                                    await LocalDbController()
-                                                        .addData(
-                                                        schoolStaffVecRecords:
-                                                        enrolmentCollectionObj);
+                                                        await LocalDbController()
+                                                            .addData(
+                                                                schoolStaffVecRecords:
+                                                                    enrolmentCollectionObj);
                                                     if (result > 0) {
                                                       schoolStaffVecController
                                                           .clearFields();
                                                       setState(() {
                                                         // Clear the image list
-                                                        editController.clearFields();
-                                                        schoolStaffVecController.selectedValue = '';
-                                                        schoolStaffVecController.selectedValue2 = '';
-                                                        schoolStaffVecController.selectedValue3 = '';
-                                                        schoolStaffVecController.correctUdiseCodeController.clear();
-                                                        schoolStaffVecController.nameOfHoiController.clear();
-                                                        schoolStaffVecController.staffPhoneNumberController.clear();
-                                                        schoolStaffVecController.emailController.clear();
-                                                        schoolStaffVecController.totalTeachingStaffController.clear();
-                                                        schoolStaffVecController.totalNonTeachingStaffController.clear();
-                                                        schoolStaffVecController.totalStaffController.clear();
-                                                        schoolStaffVecController.nameOfchairpersonController.clear();
-                                                        schoolStaffVecController.chairPhoneNumberController.clear();
-                                                        schoolStaffVecController.totalVecStaffController.clear();
-                                                        schoolStaffVecController.email2Controller.clear();
-                                                        schoolStaffVecController.QualSpecifyController.clear();
-                                                        schoolStaffVecController.QualSpecify2Controller.clear();
+                                                        editController
+                                                            .clearFields();
+                                                        schoolStaffVecController
+                                                            .selectedValue = '';
+                                                        schoolStaffVecController
+                                                            .selectedValue2 = '';
+                                                        schoolStaffVecController
+                                                            .selectedValue3 = '';
+                                                        schoolStaffVecController
+                                                            .correctUdiseCodeController
+                                                            .clear();
+                                                        schoolStaffVecController
+                                                            .nameOfHoiController
+                                                            .clear();
+                                                        schoolStaffVecController
+                                                            .staffPhoneNumberController
+                                                            .clear();
+                                                        schoolStaffVecController
+                                                            .emailController
+                                                            .clear();
+                                                        schoolStaffVecController
+                                                            .totalTeachingStaffController
+                                                            .clear();
+                                                        schoolStaffVecController
+                                                            .totalNonTeachingStaffController
+                                                            .clear();
+                                                        schoolStaffVecController
+                                                            .totalStaffController
+                                                            .clear();
+                                                        schoolStaffVecController
+                                                            .nameOfchairpersonController
+                                                            .clear();
+                                                        schoolStaffVecController
+                                                            .chairPhoneNumberController
+                                                            .clear();
+                                                        schoolStaffVecController
+                                                            .totalVecStaffController
+                                                            .clear();
+                                                        schoolStaffVecController
+                                                            .email2Controller
+                                                            .clear();
+                                                        schoolStaffVecController
+                                                                .QualSpecifyController
+                                                            .clear();
+                                                        schoolStaffVecController
+                                                                .QualSpecify2Controller
+                                                            .clear();
                                                       });
 
                                                       String jsonData1 = jsonEncode(
@@ -1174,13 +1311,15 @@ class _SchoolStaffVecFormState extends State<SchoolStaffVecForm> {
                                                               .toJson());
 
                                                       try {
-                                                        JsonFileDownloader downloader =
-                                                        JsonFileDownloader();
-                                                        String? filePath = await downloader
-                                                            .downloadJsonFile(
-                                                            jsonData1,
-                                                            uniqueId,
-                                                            ); // Pass the registerImageFiles
+                                                        JsonFileDownloader
+                                                            downloader =
+                                                            JsonFileDownloader();
+                                                        String? filePath =
+                                                            await downloader
+                                                                .downloadJsonFile(
+                                                          jsonData1,
+                                                          uniqueId,
+                                                        ); // Pass the registerImageFiles
                                                         // Notify user of success
                                                         customSnackbar(
                                                           'File Downloaded Successfully',
@@ -1212,7 +1351,7 @@ class _SchoolStaffVecFormState extends State<SchoolStaffVecForm> {
                                                         context,
                                                         MaterialPageRoute(
                                                             builder: (context) =>
-                                                            const HomeScreen()),
+                                                                const SchoolStaffVecSync()),
                                                       );
                                                     } else {
                                                       customSnackbar(
@@ -1225,7 +1364,7 @@ class _SchoolStaffVecFormState extends State<SchoolStaffVecForm> {
                                                   } else {
                                                     FocusScope.of(context)
                                                         .requestFocus(
-                                                        FocusNode());
+                                                            FocusNode());
                                                   }
                                                 }),
                                           ],
@@ -1239,16 +1378,13 @@ class _SchoolStaffVecFormState extends State<SchoolStaffVecForm> {
   }
 }
 
-
 class JsonFileDownloader {
   // Method to download JSON data to the Downloads directory
   Future<String?> downloadJsonFile(
-      String jsonData,
-      String uniqueId,
-
-      ) async {
+    String jsonData,
+    String uniqueId,
+  ) async {
     // Request storage permission
-
 
     Directory? downloadsDirectory;
 
@@ -1260,16 +1396,11 @@ class JsonFileDownloader {
       downloadsDirectory = await getDownloadsDirectory();
     }
 
-
     if (downloadsDirectory != null) {
       // Prepare file path to save the JSON
       String filePath =
           '${downloadsDirectory.path}/school_vec_form_$uniqueId.txt';
       File file = File(filePath);
-
-
-
-
 
       // Return the file path for further use if needed
       return filePath;
@@ -1277,8 +1408,6 @@ class JsonFileDownloader {
       throw Exception('Could not find the download directory');
     }
   }
-
-
 
   // Method to get the correct directory for Android based on version
   Future<Directory?> _getAndroidDirectory() async {

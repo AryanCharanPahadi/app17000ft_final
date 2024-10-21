@@ -1,14 +1,10 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:http_parser/http_parser.dart'; // for MediaType
-import 'package:app17000ft_new/base_client/base_client.dart';
 import 'package:app17000ft_new/components/custom_appBar.dart';
 import 'package:app17000ft_new/components/custom_dialog.dart';
 import 'package:app17000ft_new/components/custom_snackbar.dart';
 import 'package:app17000ft_new/constants/color_const.dart';
-import 'package:app17000ft_new/forms/fln_observation_form/fln_observation_controller.dart';
-import 'package:app17000ft_new/forms/in_person_quantitative/in_person_quantitative_controller.dart';
-import 'package:app17000ft_new/forms/school_enrolment/school_enrolment_controller.dart';
 import 'package:app17000ft_new/helper/database_helper.dart';
 import 'package:app17000ft_new/services/network_manager.dart';
 import 'package:flutter/cupertino.dart';
@@ -17,7 +13,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
-
 import 'inPerson_qualitative_controller.dart';
 
 class InpersonQualitativeSync extends StatefulWidget {
@@ -84,7 +79,7 @@ class _InpersonQualitativeSync extends State<InpersonQualitativeSync> {
                   const SizedBox(height: 20),
                   Text(
                     'Syncing: ${(syncProgress.value * 100).toStringAsFixed(0)}%',
-                    style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                   ),
                   if (hasError.value) // Show error message if syncing failed
                     const Text(
@@ -106,12 +101,17 @@ class _InpersonQualitativeSync extends State<InpersonQualitativeSync> {
                       final item = inpersonQualitativeController
                           .inPersonQualitativeList[index];
                       return ListTile(
-                        title: Text(
-                          "${index + 1}. Tour ID: ${item.tourId!}\nSchool: ${item.school!}",
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: MediaQuery.of(context).size.width * 0.04, // Dynamic font size based on screen width
-                          ),
+                        title:  Text(
+                          "${index + 1}. Tour ID: ${item.tourId}\n"
+                              "School.: ${item.school}\n",
+                          style: const TextStyle(
+                              fontWeight: FontWeight.bold),
+                          textAlign: TextAlign
+                              .left, // Adjust text alignment if needed
+                          maxLines:
+                          2, // Limit the lines, or remove this if you don't want a limit
+                          overflow: TextOverflow
+                              .ellipsis, // Handles overflow gracefully
                         ),
                         trailing: Row(
                           mainAxisSize: MainAxisSize.min,
@@ -245,6 +245,8 @@ class _InpersonQualitativeSync extends State<InpersonQualitativeSync> {
 
                                             if (rsp['status'] ==
                                                 1) {
+                                              _inpersonQualitativeController.removeRecordFromList(item.id!);
+
                                               customSnackbar(
                                                 'Successfully',
                                                 "${rsp['message']}",
@@ -566,7 +568,7 @@ Future insertInPersonQualitative(
         field: 'id',
       );
       print("Record with id $id deleted from local database.");
-      await Get.find<InpersonQualitativeController>().fetchData();
+      await Get.put(InpersonQualitativeController()).fetchData();
     }
 
     return parsedResponse;

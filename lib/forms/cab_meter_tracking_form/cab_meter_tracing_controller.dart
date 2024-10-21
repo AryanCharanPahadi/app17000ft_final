@@ -1,24 +1,20 @@
-
 import 'dart:convert';
 import 'dart:io';
 import 'package:image/image.dart' as img;
 import 'package:app17000ft_new/constants/color_const.dart';
-
 import 'package:app17000ft_new/helper/database_helper.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 
 import '../../base_client/baseClient_controller.dart';
 import 'cab_meter_tracing_modal.dart';
-class CabMeterTracingController extends GetxController with BaseController{
 
+class CabMeterTracingController extends GetxController with BaseController {
   String? _tourValue;
   String? get tourValue => _tourValue;
 
-  //school Value
   String? _schoolValue;
   String? get schoolValue => _schoolValue;
 
@@ -29,81 +25,57 @@ class CabMeterTracingController extends GetxController with BaseController{
   final TextEditingController meterReadingController = TextEditingController();
   final TextEditingController placeVisitedController = TextEditingController();
   final TextEditingController statusController = TextEditingController();
-  final TextEditingController VehicleNumberController = TextEditingController();
+  final TextEditingController vehicleNumberController = TextEditingController();
 
-
-
-  // Map to store selected values for radio buttons
   final Map<String, String?> _selectedValues = {};
   String? getSelectedValue(String key) => _selectedValues[key];
 
-  // Map to store error states for radio buttons
   final Map<String, bool> _radioFieldErrors = {};
   bool getRadioFieldError(String key) => _radioFieldErrors[key] ?? false;
 
-  // Method to set the selected value and clear any previous error
   void setRadioValue(String key, String? value) {
     _selectedValues[key] = value;
-    _radioFieldErrors[key] = false; // Clear error when a value is selected
-    update(); // Update the UI
+    _radioFieldErrors[key] = false;
+    update();
   }
 
-  // Convert the object to JSON
-
-  // Method to validate radio button selection
   bool validateRadioSelection(String key) {
     if (_selectedValues[key] == null) {
       _radioFieldErrors[key] = true;
-      update(); // Update the UI
+      update();
       return false;
     }
     _radioFieldErrors[key] = false;
-    update(); // Update the UI
     return true;
   }
 
-
-
-
-
-  //Focus nodes
+  // Focus nodes
   final FocusNode _tourIdFocusNode = FocusNode();
-  FocusNode get  tourIdFocusNode => _tourIdFocusNode;
-  final FocusNode _schoolFocusNode = FocusNode();
-  FocusNode get  schoolFocusNode => _schoolFocusNode;
+  FocusNode get tourIdFocusNode => _tourIdFocusNode;
 
-  List<CabMeterTracingRecords> _cabMeterTracingList =[];
+  final FocusNode _schoolFocusNode = FocusNode();
+  FocusNode get schoolFocusNode => _schoolFocusNode;
+
+  List<CabMeterTracingRecords> _cabMeterTracingList = [];
   List<CabMeterTracingRecords> get cabMeterTracingList => _cabMeterTracingList;
+
   List<XFile> _multipleImage = [];
   List<XFile> get multipleImage => _multipleImage;
+
   List<String> _imagePaths = [];
   List<String> get imagePaths => _imagePaths;
 
   Future<String> takePhoto(ImageSource source) async {
     final ImagePicker picker = ImagePicker();
-    XFile? pickedImage;
+    XFile? pickedImage = await picker.pickImage(source: source);
 
-    if (source == ImageSource.gallery) {
-      // Pick a single image from the gallery
-      pickedImage = await picker.pickImage(source: source);
-      if (pickedImage != null) {
-        // Compress the picked image
-        String compressedPath = await compressImage(pickedImage.path);
-        _multipleImage.clear(); // Clear previous selections
-        _multipleImage.add(XFile(compressedPath));
-        _imagePaths.clear(); // Clear previous paths
-        _imagePaths.add(compressedPath);
-      }
-    } else if (source == ImageSource.camera) {
-      pickedImage = await picker.pickImage(source: source);
-      if (pickedImage != null) {
-        // Compress the picked image
-        String compressedPath = await compressImage(pickedImage.path);
-        _multipleImage.clear(); // Clear previous selections
-        _multipleImage.add(XFile(compressedPath));
-        _imagePaths.clear(); // Clear previous paths
-        _imagePaths.add(compressedPath);
-      }
+    if (pickedImage != null) {
+      // Compress the picked image
+      String compressedPath = await compressImage(pickedImage.path);
+      _multipleImage.clear(); // Clear previous selections
+      _multipleImage.add(XFile(compressedPath));
+      _imagePaths.clear(); // Clear previous paths
+      _imagePaths.add(compressedPath);
     }
 
     update();
@@ -111,15 +83,14 @@ class CabMeterTracingController extends GetxController with BaseController{
   }
 
   Future<String> compressImage(String imagePath) async {
-    // Load the image
     final File imageFile = File(imagePath);
     final img.Image? originalImage = img.decodeImage(imageFile.readAsBytesSync());
 
-    if (originalImage == null) return imagePath; // Return original path if decoding fails
+    if (originalImage == null) return imagePath;
 
     // Resize the image (optional) and compress
-    final img.Image resizedImage = img.copyResize(originalImage, width: 800); // Change the width as needed
-    final List<int> compressedImage = img.encodeJpg(resizedImage, quality: 85); // Adjust quality (0-100)
+    final img.Image resizedImage = img.copyResize(originalImage, width: 800);
+    final List<int> compressedImage = img.encodeJpg(resizedImage, quality: 85);
 
     // Save the compressed image to a new file
     final Directory appDir = await getTemporaryDirectory();
@@ -127,23 +98,20 @@ class CabMeterTracingController extends GetxController with BaseController{
     final File compressedFile = File(compressedImagePath);
     await compressedFile.writeAsBytes(compressedImage);
 
-    return compressedImagePath; // Return the path of the compressed image
+    return compressedImagePath;
   }
 
-  setSchool(value) {
+  void setSchool(String? value) {
     _schoolValue = value;
     update();
   }
 
-  setTour(value) {
+  void setTour(String? value) {
     _tourValue = value;
     update();
   }
 
   Widget bottomSheet(BuildContext context) {
-    String? imagePicked;
-    final ImagePicker picker = ImagePicker();
-    XFile? image;
     return Container(
       color: AppColors.primary,
       height: 100,
@@ -162,7 +130,7 @@ class CabMeterTracingController extends GetxController with BaseController{
               ElevatedButton(
                 style: ElevatedButton.styleFrom(backgroundColor: Colors.white),
                 onPressed: () async {
-                  imagePicked = await takePhoto(ImageSource.camera);
+                  await takePhoto(ImageSource.camera);
                   Get.back();
                 },
                 child: const Text(
@@ -205,33 +173,40 @@ class CabMeterTracingController extends GetxController with BaseController{
     );
   }
 
-  //Clear fields
   void clearFields() {
     placeVisitedController.clear();
-    VehicleNumberController.clear();
+    vehicleNumberController.clear();
     driverNameController.clear();
     meterReadingController.clear();
     remarksController.clear();
     _tourValue = null;
-    imagePaths.clear();
-
-
-
+    _multipleImage.clear();
+    _imagePaths.clear();
     update();
   }
 
-  fetchData() async {
+  Future<void> fetchData() async {
     isLoading = true;
-
-    _cabMeterTracingList = [];
     _cabMeterTracingList = await LocalDbController().fetchLocalCabMeterTracingRecord();
-
-    update();
+    isLoading = false;
+    update(); // Refresh the UI
   }
 
-//
+  void removeRecordFromList(int id) {
+    _cabMeterTracingList.removeWhere((record) => record.id == id);
+    update(); // Refresh the UI
+  }
 
-//Update the UI
-
-
+  @override
+  void onClose() {
+    remarksController.dispose();
+    driverNameController.dispose();
+    meterReadingController.dispose();
+    placeVisitedController.dispose();
+    statusController.dispose();
+    vehicleNumberController.dispose();
+    _tourIdFocusNode.dispose();
+    _schoolFocusNode.dispose();
+    super.onClose();
+  }
 }

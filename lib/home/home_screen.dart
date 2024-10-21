@@ -13,6 +13,7 @@ import 'package:get/get.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 
 import '../components/custom_confirmation.dart';
+import '../components/custom_snackbar.dart';
 import '../components/user_controller.dart';
 import '../forms/alfa_observation_form/alfa_observation_form.dart';
 import '../forms/cab_meter_tracking_form/cab_meter.dart';
@@ -107,14 +108,23 @@ class _HomeScreenState extends State<HomeScreen> {
                   onPressed: () async {
                     final UserController userController = Get.put(UserController());
 
-                    // Clear user data from memory
+                    // Step 1: Clear user data from memory (controller)
                     userController.clearUserData();
 
-                    // Clear user data from SharedPreferences
+                    // Step 2: Clear user data from SharedPreferences
                     await SharedPreferencesHelper.logout();
 
-                    // Navigate to the login screen
+                    // Step 3: Clear previous navigation stack and go to LoginScreen
                     Get.offAll(() => const LoginScreen());
+
+                    // Optional: Display confirmation snackbar
+                    customSnackbar(
+                      'Success',
+                      'You have been logged out successfully.',
+                      AppColors.secondary,
+                      AppColors.onSecondary,
+                      Icons.verified,
+                    );
                   },
                 ),
               ],

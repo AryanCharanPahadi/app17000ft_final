@@ -32,6 +32,7 @@ import 'package:app17000ft_new/home/home_screen.dart';
 import '../../components/custom_confirmation.dart';
 import 'in_person_quantitative_controller.dart';
 import 'in_person_quantitative_modal.dart';
+import 'in_person_quantitative_sync.dart';
 
 class InPersonQuantitative extends StatefulWidget {
   String? userid;
@@ -3777,7 +3778,7 @@ class _InPersonQuantitativeState extends State<InPersonQuantitative> {
                                                       context,
                                                       MaterialPageRoute(
                                                           builder: (context) =>
-                                                              HomeScreen()),
+                                                              InPersonQuantitativeSync()),
                                                     );
                                                   } else {
                                                     customSnackbar(

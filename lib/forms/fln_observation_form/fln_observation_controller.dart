@@ -314,9 +314,14 @@ class FlnObservationController extends GetxController with BaseController{
 
     _flnObservationList = [];
     _flnObservationList = await LocalDbController().fetchLocalFlnObservationModel();
+    isLoading = false;
 
     update();
   }
 
-
+  void removeRecordFromList(int id) {
+    _flnObservationList.removeWhere((record) => record.id == id); // Remove synced record
+    update();  // Refresh the UI
+  }
+//
 }

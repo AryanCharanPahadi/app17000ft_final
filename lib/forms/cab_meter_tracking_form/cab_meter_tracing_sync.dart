@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:http_parser/http_parser.dart'; // for MediaType
-import 'package:app17000ft_new/base_client/base_client.dart';
 import 'package:app17000ft_new/components/custom_appBar.dart';
 import 'package:app17000ft_new/components/custom_dialog.dart';
 import 'package:app17000ft_new/components/custom_snackbar.dart';
@@ -172,6 +171,7 @@ class _CabTracingSyncState extends State<CabTracingSync> {
                                         );
 
                                         if (rsp['status'] == 1) {
+                                          _cabMeterTracingController.removeRecordFromList(item.id!);
                                           customSnackbar(
                                             'Successfully',
                                             "${rsp['message']}",
@@ -209,7 +209,8 @@ class _CabTracingSyncState extends State<CabTracingSync> {
                   ),
                 ),
               ],
-            ));
+            )
+            );
           },
         ),
       ),
@@ -218,7 +219,6 @@ class _CabTracingSyncState extends State<CabTracingSync> {
 }
 
 var baseurl = "https://mis.17000ft.org/apis/fast_apis/insert_cabMeter.php";
-
 Future<Map<String, dynamic>> insertCabMeterTracing(
     int? id,
     String? status,
@@ -236,7 +236,7 @@ Future<Map<String, dynamic>> insertCabMeterTracing(
     String? tour_id,
     Function(double) updateProgress, // Progress callback
     ) async {
-  print('Starting School Enrollment Data Insertion');
+  print('Starting Cab Meter Data Insertion');
 
   var request = http.MultipartRequest('POST', Uri.parse(baseurl));
   request.headers["Accept"] = "application/json";
@@ -258,7 +258,7 @@ Future<Map<String, dynamic>> insertCabMeterTracing(
     'tour_id': tour_id ?? '',
   });
 
-  // Attach multiple image files
+  // Attach image files
   if (image != null && image.isNotEmpty) {
     List<String> imagePaths = image.split(',');
 
@@ -282,7 +282,7 @@ Future<Map<String, dynamic>> insertCabMeterTracing(
     print('No image file path provided.');
   }
 
-  // Send the request to the server
+  // Send the request
   var response = await request.send();
   var responseBody = await response.stream.bytesToString();
 
@@ -300,8 +300,9 @@ Future<Map<String, dynamic>> insertCabMeterTracing(
         );
         print("Record with id $id deleted from local database.");
 
-        // Refresh data
-        await Get.find<CabMeterTracingController>().fetchData();
+        // Refresh data in controller
+        await Get.put(CabMeterTracingController()).fetchData(); // Ensure the list updates immediately
+
         return parsedResponse;
       } else {
         print('Error: ${parsedResponse['message']}');

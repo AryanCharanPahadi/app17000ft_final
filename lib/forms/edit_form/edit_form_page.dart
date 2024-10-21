@@ -44,6 +44,7 @@ class _EditFormPageState extends State<EditFormPage> {
 
   @override
   void initState() {
+    super.initState();
     editController = Get.put(EditController());
     _checkConnectivityAndShowPopup(); // Check connectivity and show pop-up if online
     setState(() {

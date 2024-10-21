@@ -25,8 +25,8 @@ import 'package:app17000ft_new/components/custom_sizedBox.dart';
 
 import '../../components/custom_snackbar.dart';
 import '../../helper/database_helper.dart';
-import '../../home/home_screen.dart';
 import 'cab_meter_tracing_modal.dart';
+import 'cab_meter_tracing_sync.dart';
 
 class CabMeterTracingForm extends StatefulWidget {
   String? userid;
@@ -145,7 +145,7 @@ class _CabMeterTracingFormState extends State<CabMeterTracingForm> {
                           ),
                           CustomTextFormField(
                             textController:
-                                cabMeterController.VehicleNumberController,
+                                cabMeterController.vehicleNumberController,
                             labelText: 'Vehicle Number',
                             textCapitalization: TextCapitalization
                                 .characters, // Keyboard will show capital letters
@@ -492,7 +492,7 @@ class _CabMeterTracingFormState extends State<CabMeterTracingForm> {
                                   remarks:
                                       cabMeterController.remarksController.text,
                                   vehicle_num: cabMeterController
-                                      .VehicleNumberController.text,
+                                      .vehicleNumberController.text,
                                   driver_name: cabMeterController
                                       .driverNameController.text,
                                   meter_reading: cabMeterController
@@ -550,7 +550,7 @@ class _CabMeterTracingFormState extends State<CabMeterTracingForm> {
                                   Navigator.pushReplacement(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (context) => HomeScreen(),
+                                      builder: (context) => CabTracingSync(),
                                     ),
                                   );
                                   customSnackbar(

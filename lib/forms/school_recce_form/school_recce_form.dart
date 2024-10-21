@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
+import 'package:app17000ft_new/forms/school_recce_form/school_recce_sync.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/services.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -120,11 +121,11 @@ class _SchoolRecceFormState extends State<SchoolRecceForm> {
                           grandTotalNonTeachingStaff,
                           grandTotalStaff,
                         ),
-                      ErrorText(
-                        isVisible: validateStaffData,
-                        message:
-                        'Atleast one enrolment record is required',
-                      ),
+                      // ErrorText(
+                      //   isVisible: validateStaffData,
+                      //   message:
+                      //   'Atleast one enrolment record is required',
+                      // ),
 
                     ],
                     if (!submittedData.containsKey('Two years previously')) ...[
@@ -2399,7 +2400,7 @@ class _SchoolRecceFormState extends State<SchoolRecceForm> {
                                               value: 20, side: 'height'),
                                           if (schoolRecceController
                                               .selectedQualification ==
-                                              'other') ...[
+                                              'Other') ...[
                                             LabelText(
                                               label: 'Please Specify Other',
                                               astrick: true,
@@ -2500,7 +2501,7 @@ class _SchoolRecceFormState extends State<SchoolRecceForm> {
                                               value: 20, side: 'height'),
                                           if (schoolRecceController
                                               .selectedMeetings ==
-                                              'others') ...[
+                                              'Others') ...[
                                             LabelText(
                                               label: 'Please Specify Other',
                                               astrick: true,
@@ -4346,41 +4347,46 @@ class _SchoolRecceFormState extends State<SchoolRecceForm> {
                                           const SizedBox(height: 16),
                                           // ListTile to show filled academic years
                                           Column(
-                                            children:
-                                            submittedData.keys.map((year) {
+                                            children: submittedData.isNotEmpty
+                                                ? submittedData.keys.map((year) {
                                               return Padding(
-                                                padding: const EdgeInsets.only(
-                                                    bottom: 12.0),
+                                                padding: const EdgeInsets.only(bottom: 12.0),
                                                 child: ListTile(
                                                   shape: RoundedRectangleBorder(
-                                                    borderRadius:
-                                                    BorderRadius.circular(
-                                                        8.0),
+                                                    borderRadius: BorderRadius.circular(8.0),
                                                   ),
                                                   tileColor: Colors.white,
-                                                  contentPadding:
-                                                  EdgeInsets.symmetric(
-                                                      horizontal: 16.0),
-                                                  leading: Icon(Icons.school,
-                                                      color: Colors.green),
-                                                  title:Text(
+                                                  contentPadding: EdgeInsets.symmetric(horizontal: 16.0),
+                                                  leading: Icon(Icons.school, color: Colors.green),
+                                                  title: Text(
                                                     '$year: Boys: ${submittedData[year]!['boys']}, Girls: ${submittedData[year]!['girls']}, Total: ${submittedData[year]!['total']}',
                                                     style: TextStyle(
-                                                      fontSize: MediaQuery.of(context).size.width * 0.04, // Adjust the multiplier based on screen size
+                                                      fontSize: MediaQuery.of(context).size.width * 0.04,
                                                       fontWeight: FontWeight.w500,
                                                     ),
                                                   ),
-
                                                   trailing: IconButton(
-                                                    icon: Icon(Icons.delete,
-                                                        color: Colors.red),
+                                                    icon: Icon(Icons.delete, color: Colors.red),
                                                     onPressed: () {
                                                       _deleteAcademicYear(year);
                                                     },
                                                   ),
                                                 ),
                                               );
-                                            }).toList(),
+                                            }).toList()
+                                                : [
+                                              Padding(
+                                                padding: const EdgeInsets.symmetric(vertical: 16.0),
+                                                child: Text(
+                                                  'No enrollment data available.',
+                                                  style: TextStyle(
+                                                    color: Colors.red,
+                                                    fontSize: 16.0,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
                                           ),
 
                                           CustomSizedBox(
@@ -4633,14 +4639,25 @@ class _SchoolRecceFormState extends State<SchoolRecceForm> {
                                               CustomButton(
                                                 title: 'Next',
                                                 onPressedButton: () {
+                                                  // Check if submittedData is empty
+                                                  if (submittedData.isEmpty) {
+                                                    // Show snackbar error if there is no enrollment data
+                                                    customSnackbar(
+                                                      'Error',
+                                                      'No enrollment data available.',
+                                                      AppColors.error,
+                                                      Colors.white,
+                                                      Icons.error,
+                                                    );
+                                                    return; // Exit the function early
+                                                  }
+
                                                   validateEnrolmentRecords = jsonData.isEmpty;
-                                                  validateStaffData = staffJsonData.isEmpty;
 
                                                   schoolRecceController.validateEnrollement = schoolRecceController.multipleImage9.isEmpty;
                                                   schoolRecceController.validateDlInstallation = schoolRecceController.multipleImage10.isEmpty;
                                                   schoolRecceController.validateLibrarySetup = schoolRecceController.multipleImage11.isEmpty;
 
-                                                  // Check all validations
                                                   if (_formKey.currentState!.validate() &&
                                                       !schoolRecceController.validateDlInstallation &&
                                                       !schoolRecceController.validateLibrarySetup &&
@@ -4667,6 +4684,7 @@ class _SchoolRecceFormState extends State<SchoolRecceForm> {
                                                   }
                                                 },
                                               ),
+
 
                                             ],
                                           ),
@@ -5803,7 +5821,7 @@ class _SchoolRecceFormState extends State<SchoolRecceForm> {
                                                         context,
                                                         MaterialPageRoute(
                                                             builder: (context) =>
-                                                                HomeScreen()),
+                                                                SchoolRecceSync()),
                                                       );
                                                     } else {
                                                       customSnackbar(

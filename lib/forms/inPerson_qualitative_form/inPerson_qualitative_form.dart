@@ -33,6 +33,7 @@ import '../../components/custom_confirmation.dart';
 import '../../helper/database_helper.dart';
 import 'inPerson_qualitative_controller.dart';
 import 'inPerson_qualitative_modal.dart';
+import 'inPerson_qualitative_sync.dart';
 
 class InPersonQualitativeForm extends StatefulWidget {
   String? userid;
@@ -4087,7 +4088,7 @@ class _InPersonQualitativeFormState extends State<InPersonQualitativeForm> {
                                                           context,
                                                           MaterialPageRoute(
                                                               builder: (context) =>
-                                                                  HomeScreen()),
+                                                                  InpersonQualitativeSync()),
                                                         );
                                                       } else {
                                                         customSnackbar(

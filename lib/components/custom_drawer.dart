@@ -14,11 +14,13 @@ import '../forms/school_enrolment/school_enrolment_sync.dart';
 import '../forms/school_facilities_&_mapping_form/school_facilities_sync.dart';
 import '../forms/school_recce_form/school_recce_sync.dart';
 import '../forms/school_staff_vec_form/school_vec_sync.dart';
+import '../forms/select_tour_id/select_from.dart';
 import '../helper/responsive_helper.dart';
 import '../helper/shared_prefernce.dart';
 import '../home/home_screen.dart';
 import '../home/tour_data.dart';
 import '../login/login_screen.dart';
+import 'custom_snackbar.dart';
 
 class CustomDrawer extends StatefulWidget {
   const CustomDrawer({super.key});
@@ -130,10 +132,19 @@ class _CustomDrawerState extends State<CustomDrawer> {
             },
           ),
 
+          DrawerMenu(
+            title: 'Select Tour Id',
+            icons: const FaIcon(FontAwesomeIcons.penToSquare),
+            onPressed: () {
+              Navigator.pop(context);
+              Get.to(() => SelectForm()); // Navigate to the Edit Form Screen
+            },
+          ),
+
 
 
           DrawerMenu(
-            title: 'Enrolment Sync',
+            title: 'Enrollment Sync',
             icons: const FaIcon(FontAwesomeIcons.database),
             onPressed: () async {
               await SharedPreferencesHelper.logout();
@@ -182,7 +193,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
             icons: const FaIcon(FontAwesomeIcons.database),
             onPressed: () async {
               await SharedPreferencesHelper.logout();
-              await Get.to(() => const FinalIssueTrackerSync());
+              await Get.to(() =>  const FinalIssueTrackerSync());
             },
           ),
 
@@ -222,24 +233,34 @@ class _CustomDrawerState extends State<CustomDrawer> {
             },
           ),
 
-          DrawerMenu(
-            title: 'Logout',
-            icons: const FaIcon(FontAwesomeIcons.signOut),
-            onPressed: () async {
-              final UserController userController = Get.find<UserController>();
+      DrawerMenu(
+        title: 'Logout',
+        icons: const FaIcon(FontAwesomeIcons.arrowRightFromBracket),
+        onPressed: () async {
+          final UserController userController = Get.find<UserController>();
 
-              // Clear user data from memory
-              userController.clearUserData();
+          // Step 1: Clear user data from memory (controller)
+          userController.clearUserData();
 
-              // Clear user data from SharedPreferences
-              await SharedPreferencesHelper.logout();
+          // Step 2: Clear user data from SharedPreferences
+          await SharedPreferencesHelper.logout();
 
-              // Navigate to the login screen
-              Get.offAll(() => const LoginScreen());
-            },
-          ),
+          // Step 3: Clear previous navigation stack and go to LoginScreen
+          Get.offAll(() => const LoginScreen());
 
-        ],
+          // Optional: Display confirmation snackbar
+          customSnackbar(
+            'Success',
+            'You have been logged out successfully.',
+            AppColors.secondary,
+            AppColors.onSecondary,
+            Icons.verified,
+          );
+        },
+      )
+
+
+      ],
       ),
     );
   }

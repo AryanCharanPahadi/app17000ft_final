@@ -31,6 +31,7 @@ import 'package:app17000ft_new/home/home_screen.dart';
 
 import '../../components/custom_confirmation.dart';
 import 'alfa_observation_controller.dart';
+import 'alfa_observation_sync.dart';
 
 class AlfaObservationForm extends StatefulWidget {
   String? userid;
@@ -3119,7 +3120,7 @@ class _AlfaObservationFormState extends State<AlfaObservationForm> {
                                                           context,
                                                           MaterialPageRoute(
                                                               builder: (context) =>
-                                                                  HomeScreen()),
+                                                                  AlfaObservationSync()),
                                                         );
                                                       } else {
                                                         customSnackbar(

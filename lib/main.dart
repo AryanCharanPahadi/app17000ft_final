@@ -17,12 +17,14 @@ import 'components/user_controller.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized(); // Ensure widgets are initialized
   await GetStorage.init(); // Initialize GetStorage
-  DependencyInjection.init();
+  DependencyInjection.init(); // Initialize any dependencies
   PackageInfo packageInfo = await PackageInfo.fromPlatform();
   String version = packageInfo.version;
   GetStorage().write('version', version);
+
   runApp(const MyApp()); // Run the app
 }
+
 ThemeManager themeManager = ThemeManager();
 
 class MyApp extends StatefulWidget {
@@ -33,13 +35,13 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  bool? _isLoggedIn;
+  bool? _isLoggedIn; // Track the login state
 
   @override
   void initState() {
     super.initState();
     themeManager.addListener(_themeListener);
-    _initializeApp();
+    _initializeApp(); // Initialize app on start
   }
 
   @override
@@ -50,40 +52,38 @@ class _MyAppState extends State<MyApp> {
 
   void _themeListener() {
     if (mounted) {
-      setState(() {});
+      setState(() {}); // Update theme when it changes
     }
   }
 
+  // Initialize app and check login state
   Future<void> _initializeApp() async {
-    await GetStorage.init();
-    await Future.delayed(const Duration(seconds: 3));
-    _checkLoginState();
+    await Future.delayed(const Duration(seconds: 3)); // Delay for splash screen
+    _checkLoginState(); // Check if the user is logged in
   }
 
+  // Check the login state and navigate accordingly
   Future<void> _checkLoginState() async {
     bool isLoggedIn = await SharedPreferencesHelper.getLoginState();
 
-    // Prevent multiple navigation actions
     if (_isLoggedIn != isLoggedIn) {
-      setState(() {
-        _isLoggedIn = isLoggedIn;
-      });
+      _isLoggedIn = isLoggedIn; // Update the login state only once
 
       if (_isLoggedIn!) {
+        // Navigate to HomeScreen if logged in
         Get.offAll(() => const HomeScreen());
 
-        // Delay for half a second to allow UI to settle before checking version
+        // Fetch version after half a second delay
         Future.delayed(const Duration(milliseconds: 500), () {
           VersionController versionController = Get.put(VersionController());
           versionController.fetchVersion();
         });
       } else {
+        // Navigate to LoginScreen if not logged in
         Get.offAll(() => const LoginScreen());
       }
     }
   }
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -91,8 +91,8 @@ class _MyAppState extends State<MyApp> {
       title: 'Flutter Demo',
       theme: lightTheme,
       darkTheme: darkTheme,
-      themeMode: themeManager.themeMode,
-      home: const SplashScreen(),
+      themeMode: themeManager.themeMode, // Handle dark/light mode
+      home: const SplashScreen(), // Show splash screen initially
       debugShowCheckedModeBanner: false,
     );
   }

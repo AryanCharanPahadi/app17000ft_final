@@ -103,11 +103,16 @@ class _SchoolFacilitiesSyncState extends State<SchoolFacilitiesSync> {
                           .schoolFacilitiesList[index];
                       return ListTile(
                         title: Text(
-                          "${index + 1}. Tour ID: ${item.tourId!}\nSchool: ${item.school!}",
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: MediaQuery.of(context).size.width * 0.04,
-                          ),
+                          "${index + 1}. Tour ID: ${item.tourId}\n"
+                              "School.: ${item.school}\n",
+                          style: const TextStyle(
+                              fontWeight: FontWeight.bold),
+                          textAlign: TextAlign
+                              .left, // Adjust text alignment if needed
+                          maxLines:
+                          2, // Limit the lines, or remove this if you don't want a limit
+                          overflow: TextOverflow
+                              .ellipsis, // Handles overflow gracefully
                         ),
                         trailing: Obx(() => IconButton(
                           color: _networkManager.connectionType.value == 0

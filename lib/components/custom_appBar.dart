@@ -8,8 +8,12 @@ class CustomAppbar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Get the screen width to make responsive adjustments
     final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+
+    // Define breakpoints for different screen sizes (optional, based on testing)
+    final isSmallScreen = screenWidth < 360; // e.g., small phones
+    final isLargeScreen = screenWidth > 600; // e.g., tablets or larger devices
 
     return AppBar(
       title: Text(
@@ -18,16 +22,25 @@ class CustomAppbar extends StatelessWidget implements PreferredSizeWidget {
           context,
           AppColors.onPrimary,
         ).copyWith(
-          fontSize: screenWidth * 0.05, // Adjust font size based on screen width
+          fontSize: isSmallScreen
+              ? 16 // Fixed smaller font size for small devices
+              : isLargeScreen
+              ? 24 // Larger font size for larger screens
+              : screenWidth * 0.05, // Default for mid-range screens
         ),
       ),
       backgroundColor: AppColors.primary,
       iconTheme: const IconThemeData(
         color: AppColors.onPrimary,
       ),
-      // You can also adjust padding or other properties if needed
-      toolbarHeight: screenWidth * 0.15, // Example of adjusting toolbar height
-      // If you have any other widgets in the app bar, you can adjust their sizes similarly
+      // Dynamically adjust the toolbar height
+      toolbarHeight: isSmallScreen
+          ? kToolbarHeight * 1.2 // Slightly smaller toolbar for small devices
+          : isLargeScreen
+          ? kToolbarHeight * 1.5 // Larger toolbar for larger devices
+          : screenHeight * 0.1, // Default responsive height
+      // You can also adjust padding based on screen size
+      titleSpacing: isSmallScreen ? 8.0 : 16.0, // Example of responsive padding
     );
   }
 

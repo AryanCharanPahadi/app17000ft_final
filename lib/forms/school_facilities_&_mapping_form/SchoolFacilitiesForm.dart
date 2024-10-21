@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
+import 'package:app17000ft_new/forms/school_facilities_&_mapping_form/school_facilities_sync.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:permission_handler/permission_handler.dart';
 
@@ -31,7 +32,6 @@ import '../../helper/database_helper.dart';
 import '../../home/home_screen.dart';
 import '../edit_form/edit controller.dart';
 
-
 class SchoolFacilitiesForm extends StatefulWidget {
   String? userid;
   String? office;
@@ -41,8 +41,10 @@ class SchoolFacilitiesForm extends StatefulWidget {
   SchoolFacilitiesForm({
     super.key,
     this.userid,
-    String? office, this.existingRecord,
-    this.school,   this.tourId,
+    String? office,
+    this.existingRecord,
+    this.school,
+    this.tourId,
   });
 
   @override
@@ -52,11 +54,10 @@ class SchoolFacilitiesForm extends StatefulWidget {
 class _SchoolFacilitiesFormState extends State<SchoolFacilitiesForm> {
   final ScrollController _scrollController = ScrollController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  final EditController editController =
-  Get.put(EditController());
+  final SchoolFacilitiesController editController =
+      Get.put(SchoolFacilitiesController());
 
-
-    @override
+  @override
   void initState() {
     super.initState();
 
@@ -64,41 +65,42 @@ class _SchoolFacilitiesFormState extends State<SchoolFacilitiesForm> {
       Get.put(SchoolFacilitiesController());
     }
 
-    final schoolFacilitiesController =
-        Get.find<SchoolFacilitiesController>();
+    final schoolFacilitiesController = Get.find<SchoolFacilitiesController>();
 
     if (widget.existingRecord != null) {
       final existingRecord = widget.existingRecord!;
 
-      schoolFacilitiesController.correctUdiseCodeController
-          .text = existingRecord.correctUdise ?? '';
+      schoolFacilitiesController.correctUdiseCodeController.text =
+          existingRecord.correctUdise ?? '';
       schoolFacilitiesController.nameOfLibrarianController.text =
           existingRecord.librarianName ?? '';
       schoolFacilitiesController.noOfFunctionalClassroomController.text =
           existingRecord.numFunctionalClass ?? '';
       schoolFacilitiesController.setTour(existingRecord.tourId);
-   schoolFacilitiesController.setSchool(existingRecord.school);
-
+      schoolFacilitiesController.setSchool(existingRecord.school);
 
 // make this code that user can also edit the participant string
       schoolFacilitiesController.selectedValue = existingRecord.udiseCode;
-      schoolFacilitiesController.selectedValue2 = existingRecord.residentialValue;
-      schoolFacilitiesController.selectedValue3 = existingRecord.electricityValue;
+      schoolFacilitiesController.selectedValue2 =
+          existingRecord.residentialValue;
+      schoolFacilitiesController.selectedValue3 =
+          existingRecord.electricityValue;
       schoolFacilitiesController.selectedValue4 = existingRecord.internetValue;
       schoolFacilitiesController.selectedValue5 = existingRecord.projectorValue;
-      schoolFacilitiesController.selectedValue6 = existingRecord.smartClassValue;
-      schoolFacilitiesController.selectedValue7 = existingRecord.playgroundValue;
+      schoolFacilitiesController.selectedValue6 =
+          existingRecord.smartClassValue;
+      schoolFacilitiesController.selectedValue7 =
+          existingRecord.playgroundValue;
       schoolFacilitiesController.selectedValue8 = existingRecord.libValue;
-      schoolFacilitiesController.selectedValue9 = existingRecord.librarianTraining;
-      schoolFacilitiesController.selectedValue10 = existingRecord.libRegisterValue;
-      schoolFacilitiesController.selectedDesignation = existingRecord.libLocation;
+      schoolFacilitiesController.selectedValue9 =
+          existingRecord.librarianTraining;
+      schoolFacilitiesController.selectedValue10 =
+          existingRecord.libRegisterValue;
+      schoolFacilitiesController.selectedDesignation =
+          existingRecord.libLocation;
       widget.userid = existingRecord.created_by;
-
     }
   }
-
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -137,90 +139,117 @@ class _SchoolFacilitiesFormState extends State<SchoolFacilitiesForm> {
                                     init: TourController(),
                                     builder: (tourController) {
                                       // Fetch tour details once, not on every rebuild.
-                                      if (tourController.getLocalTourList.isEmpty) {
+                                      if (tourController
+                                          .getLocalTourList.isEmpty) {
                                         tourController.fetchTourDetails();
                                       }
 
-                                      return Column(children: [
-                                        if (schoolFacilitiesController.showBasicDetails) ...[
-                                          LabelText(
-                                            label: 'Basic Details',
-                                          ),
-                                          CustomSizedBox(
-                                            value: 20,
-                                            side: 'height',
-                                          ),
-                                          LabelText(
-                                            label: 'Tour ID',
-                                            astrick: true,
-                                          ),
-                                          CustomSizedBox(
-                                            value: 20,
-                                            side: 'height',
-                                          ),
-                                          CustomDropdownFormField(
-                                            focusNode: schoolFacilitiesController.tourIdFocusNode,
-                                            options: tourController.getLocalTourList
-                                                .map((e) => e.tourId!) // Ensure tourId is non-nullable
-                                                .toList(),
-                                            selectedOption: schoolFacilitiesController.tourValue,
-                                            onChanged: (value) {
-                                              // Safely handle the school list splitting by commas
-                                              schoolFacilitiesController.splitSchoolLists = tourController
+                                      return Column(
+                                        children: [
+                                          if (schoolFacilitiesController
+                                              .showBasicDetails) ...[
+                                            LabelText(
+                                              label: 'Basic Details',
+                                            ),
+                                            CustomSizedBox(
+                                              value: 20,
+                                              side: 'height',
+                                            ),
+                                            LabelText(
+                                              label: 'Tour ID',
+                                              astrick: true,
+                                            ),
+                                            CustomSizedBox(
+                                              value: 20,
+                                              side: 'height',
+                                            ),
+                                            CustomDropdownFormField(
+                                              focusNode:
+                                                  schoolFacilitiesController
+                                                      .tourIdFocusNode,
+                                              options: tourController
                                                   .getLocalTourList
-                                                  .where((e) => e.tourId == value)
-                                                  .map((e) => e.allSchool!.split(',').map((s) => s.trim()).toList())
-                                                  .expand((x) => x)
-                                                  .toList();
+                                                  .map((e) => e
+                                                      .tourId!) // Ensure tourId is non-nullable
+                                                  .toList(),
+                                              selectedOption:
+                                                  schoolFacilitiesController
+                                                      .tourValue,
+                                              onChanged: (value) {
+                                                // Safely handle the school list splitting by commas
+                                                schoolFacilitiesController
+                                                        .splitSchoolLists =
+                                                    tourController
+                                                        .getLocalTourList
+                                                        .where((e) =>
+                                                            e.tourId == value)
+                                                        .map((e) => e.allSchool!
+                                                            .split(',')
+                                                            .map(
+                                                                (s) => s.trim())
+                                                            .toList())
+                                                        .expand((x) => x)
+                                                        .toList();
 
-                                              // Single setState call for efficiency
-                                              setState(() {
-                                                schoolFacilitiesController.setSchool(null);
-                                                schoolFacilitiesController.setTour(value);
-                                              });
-                                            },
-                                            labelText: "Select Tour ID",
-                                          ),
-                                          CustomSizedBox(
-                                            value: 20,
-                                            side: 'height',
-                                          ),
-                                          LabelText(
-                                            label: 'School',
-                                            astrick: true,
-                                          ),
-                                          CustomSizedBox(
-                                            value: 20,
-                                            side: 'height',
-                                          ),
-                                          // DropdownSearch for selecting a single school
-                                          DropdownSearch<String>(
-                                            validator: (value) {
-                                              if (value == null || value.isEmpty) {
-                                                return "Please Select School";
-                                              }
-                                              return null;
-                                            },
-                                            popupProps: PopupProps.menu(
-                                              showSelectedItems: true,
-                                              showSearchBox: true,
-                                              disabledItemFn: (String s) => s.startsWith('I'), // Disable based on condition
+                                                // Single setState call for efficiency
+                                                setState(() {
+                                                  schoolFacilitiesController
+                                                      .setSchool(null);
+                                                  schoolFacilitiesController
+                                                      .setTour(value);
+                                                });
+                                              },
+                                              labelText: "Select Tour ID",
                                             ),
-                                            items: schoolFacilitiesController.splitSchoolLists, // Split school list as strings
-                                            dropdownDecoratorProps: const DropDownDecoratorProps(
-                                              dropdownSearchDecoration: InputDecoration(
-                                                labelText: "Select School",
-                                                hintText: "Select School",
+                                            CustomSizedBox(
+                                              value: 20,
+                                              side: 'height',
+                                            ),
+                                            LabelText(
+                                              label: 'School',
+                                              astrick: true,
+                                            ),
+                                            CustomSizedBox(
+                                              value: 20,
+                                              side: 'height',
+                                            ),
+                                            // DropdownSearch for selecting a single school
+                                            DropdownSearch<String>(
+                                              validator: (value) {
+                                                if (value == null ||
+                                                    value.isEmpty) {
+                                                  return "Please Select School";
+                                                }
+                                                return null;
+                                              },
+                                              popupProps: PopupProps.menu(
+                                                showSelectedItems: true,
+                                                showSearchBox: true,
+                                                disabledItemFn: (String s) =>
+                                                    s.startsWith(
+                                                        'I'), // Disable based on condition
                                               ),
+                                              items: schoolFacilitiesController
+                                                  .splitSchoolLists, // Split school list as strings
+                                              dropdownDecoratorProps:
+                                                  const DropDownDecoratorProps(
+                                                dropdownSearchDecoration:
+                                                    InputDecoration(
+                                                  labelText: "Select School",
+                                                  hintText: "Select School",
+                                                ),
+                                              ),
+                                              onChanged: (value) {
+                                                // Set the selected school
+                                                setState(() {
+                                                  schoolFacilitiesController
+                                                      .setSchool(value);
+                                                });
+                                              },
+                                              selectedItem:
+                                                  schoolFacilitiesController
+                                                      .schoolValue,
                                             ),
-                                            onChanged: (value) {
-                                              // Set the selected school
-                                              setState(() {
-                                                schoolFacilitiesController.setSchool(value);
-                                              });
-                                            },
-                                            selectedItem: schoolFacilitiesController.schoolValue,
-                                          ),
                                             CustomSizedBox(
                                               value: 20,
                                               side: 'height',
@@ -237,18 +266,19 @@ class _SchoolFacilitiesFormState extends State<SchoolFacilitiesForm> {
                                                 children: [
                                                   Radio(
                                                     value: 'Yes',
-                                                    groupValue: schoolFacilitiesController.selectedValue,
+                                                    groupValue:
+                                                        schoolFacilitiesController
+                                                            .selectedValue,
                                                     onChanged: (value) {
                                                       setState(() {
-                                                        schoolFacilitiesController.selectedValue =
+                                                        schoolFacilitiesController
+                                                                .selectedValue =
                                                             value as String?;
                                                         if (value == 'Yes') {
-
-                                                          schoolFacilitiesController.correctUdiseCodeController.clear();
-
-
+                                                          schoolFacilitiesController
+                                                              .correctUdiseCodeController
+                                                              .clear();
                                                         }
-
                                                       });
                                                     },
                                                   ),
@@ -268,10 +298,13 @@ class _SchoolFacilitiesFormState extends State<SchoolFacilitiesForm> {
                                                 children: [
                                                   Radio(
                                                     value: 'No',
-                                                    groupValue: schoolFacilitiesController.selectedValue,
+                                                    groupValue:
+                                                        schoolFacilitiesController
+                                                            .selectedValue,
                                                     onChanged: (value) {
                                                       setState(() {
-                                                        schoolFacilitiesController.selectedValue =
+                                                        schoolFacilitiesController
+                                                                .selectedValue =
                                                             value as String?;
                                                       });
                                                     },
@@ -280,7 +313,8 @@ class _SchoolFacilitiesFormState extends State<SchoolFacilitiesForm> {
                                                 ],
                                               ),
                                             ),
-                                            if (schoolFacilitiesController.radioFieldError)
+                                            if (schoolFacilitiesController
+                                                .radioFieldError)
                                               const Padding(
                                                 padding:
                                                     EdgeInsets.only(left: 16.0),
@@ -298,7 +332,9 @@ class _SchoolFacilitiesFormState extends State<SchoolFacilitiesForm> {
                                               value: 20,
                                               side: 'height',
                                             ),
-                                            if (schoolFacilitiesController.selectedValue == 'No') ...[
+                                            if (schoolFacilitiesController
+                                                    .selectedValue ==
+                                                'No') ...[
                                               LabelText(
                                                 label:
                                                     'Write Correct UDISE school code',
@@ -343,18 +379,27 @@ class _SchoolFacilitiesFormState extends State<SchoolFacilitiesForm> {
                                               title: 'Next',
                                               onPressedButton: () {
                                                 setState(() {
-                                                  schoolFacilitiesController.radioFieldError =
-                                                      schoolFacilitiesController.selectedValue == null ||
-                                                          schoolFacilitiesController.selectedValue!
+                                                  schoolFacilitiesController
+                                                          .radioFieldError =
+                                                      schoolFacilitiesController
+                                                                  .selectedValue ==
+                                                              null ||
+                                                          schoolFacilitiesController
+                                                              .selectedValue!
                                                               .isEmpty;
                                                 });
 
                                                 if (_formKey.currentState!
                                                         .validate() &&
-                                                    !schoolFacilitiesController.radioFieldError) {
+                                                    !schoolFacilitiesController
+                                                        .radioFieldError) {
                                                   setState(() {
-                                                    schoolFacilitiesController.showBasicDetails = false;
-                                                    schoolFacilitiesController.showSchoolFacilities = true;
+                                                    schoolFacilitiesController
+                                                            .showBasicDetails =
+                                                        false;
+                                                    schoolFacilitiesController
+                                                            .showSchoolFacilities =
+                                                        true;
                                                   });
                                                 }
                                               },
@@ -363,7 +408,8 @@ class _SchoolFacilitiesFormState extends State<SchoolFacilitiesForm> {
                                           // End of Basic Details
 
                                           // Start of School Facilities
-                                          if (schoolFacilitiesController.showSchoolFacilities) ...[
+                                          if (schoolFacilitiesController
+                                              .showSchoolFacilities) ...[
                                             LabelText(
                                               label: 'School Facilities',
                                               astrick: true,
@@ -383,10 +429,13 @@ class _SchoolFacilitiesFormState extends State<SchoolFacilitiesForm> {
                                                 children: [
                                                   Radio(
                                                     value: 'Yes',
-                                                    groupValue: schoolFacilitiesController.selectedValue2,
+                                                    groupValue:
+                                                        schoolFacilitiesController
+                                                            .selectedValue2,
                                                     onChanged: (value) {
                                                       setState(() {
-                                                        schoolFacilitiesController.selectedValue2 =
+                                                        schoolFacilitiesController
+                                                                .selectedValue2 =
                                                             value as String?;
                                                       });
                                                     },
@@ -407,10 +456,13 @@ class _SchoolFacilitiesFormState extends State<SchoolFacilitiesForm> {
                                                 children: [
                                                   Radio(
                                                     value: 'No',
-                                                    groupValue: schoolFacilitiesController.selectedValue2,
+                                                    groupValue:
+                                                        schoolFacilitiesController
+                                                            .selectedValue2,
                                                     onChanged: (value) {
                                                       setState(() {
-                                                        schoolFacilitiesController.selectedValue2 =
+                                                        schoolFacilitiesController
+                                                                .selectedValue2 =
                                                             value as String?;
                                                       });
                                                     },
@@ -419,7 +471,8 @@ class _SchoolFacilitiesFormState extends State<SchoolFacilitiesForm> {
                                                 ],
                                               ),
                                             ),
-                                            if (schoolFacilitiesController.radioFieldError2)
+                                            if (schoolFacilitiesController
+                                                .radioFieldError2)
                                               const Padding(
                                                 padding:
                                                     EdgeInsets.only(left: 16.0),
@@ -448,10 +501,13 @@ class _SchoolFacilitiesFormState extends State<SchoolFacilitiesForm> {
                                                 children: [
                                                   Radio(
                                                     value: 'Yes',
-                                                    groupValue: schoolFacilitiesController.selectedValue3,
+                                                    groupValue:
+                                                        schoolFacilitiesController
+                                                            .selectedValue3,
                                                     onChanged: (value) {
                                                       setState(() {
-                                                        schoolFacilitiesController.selectedValue3 =
+                                                        schoolFacilitiesController
+                                                                .selectedValue3 =
                                                             value as String?;
                                                       });
                                                     },
@@ -472,10 +528,13 @@ class _SchoolFacilitiesFormState extends State<SchoolFacilitiesForm> {
                                                 children: [
                                                   Radio(
                                                     value: 'No',
-                                                    groupValue:schoolFacilitiesController.selectedValue3,
+                                                    groupValue:
+                                                        schoolFacilitiesController
+                                                            .selectedValue3,
                                                     onChanged: (value) {
                                                       setState(() {
-                                                        schoolFacilitiesController.selectedValue3 =
+                                                        schoolFacilitiesController
+                                                                .selectedValue3 =
                                                             value as String?;
                                                       });
                                                     },
@@ -484,7 +543,8 @@ class _SchoolFacilitiesFormState extends State<SchoolFacilitiesForm> {
                                                 ],
                                               ),
                                             ),
-                                            if (schoolFacilitiesController.radioFieldError3)
+                                            if (schoolFacilitiesController
+                                                .radioFieldError3)
                                               const Padding(
                                                 padding:
                                                     EdgeInsets.only(left: 16.0),
@@ -513,10 +573,13 @@ class _SchoolFacilitiesFormState extends State<SchoolFacilitiesForm> {
                                                 children: [
                                                   Radio(
                                                     value: 'Yes',
-                                                    groupValue: schoolFacilitiesController.selectedValue4,
+                                                    groupValue:
+                                                        schoolFacilitiesController
+                                                            .selectedValue4,
                                                     onChanged: (value) {
                                                       setState(() {
-                                                        schoolFacilitiesController.selectedValue4 =
+                                                        schoolFacilitiesController
+                                                                .selectedValue4 =
                                                             value as String?;
                                                       });
                                                     },
@@ -537,10 +600,13 @@ class _SchoolFacilitiesFormState extends State<SchoolFacilitiesForm> {
                                                 children: [
                                                   Radio(
                                                     value: 'No',
-                                                    groupValue: schoolFacilitiesController.selectedValue4,
+                                                    groupValue:
+                                                        schoolFacilitiesController
+                                                            .selectedValue4,
                                                     onChanged: (value) {
                                                       setState(() {
-                                                        schoolFacilitiesController.selectedValue4 =
+                                                        schoolFacilitiesController
+                                                                .selectedValue4 =
                                                             value as String?;
                                                       });
                                                     },
@@ -549,7 +615,8 @@ class _SchoolFacilitiesFormState extends State<SchoolFacilitiesForm> {
                                                 ],
                                               ),
                                             ),
-                                            if (schoolFacilitiesController.radioFieldError4)
+                                            if (schoolFacilitiesController
+                                                .radioFieldError4)
                                               const Padding(
                                                 padding:
                                                     EdgeInsets.only(left: 16.0),
@@ -578,10 +645,13 @@ class _SchoolFacilitiesFormState extends State<SchoolFacilitiesForm> {
                                                 children: [
                                                   Radio(
                                                     value: 'Yes',
-                                                    groupValue: schoolFacilitiesController.selectedValue5,
+                                                    groupValue:
+                                                        schoolFacilitiesController
+                                                            .selectedValue5,
                                                     onChanged: (value) {
                                                       setState(() {
-                                                        schoolFacilitiesController.selectedValue5 =
+                                                        schoolFacilitiesController
+                                                                .selectedValue5 =
                                                             value as String?;
                                                       });
                                                     },
@@ -602,9 +672,13 @@ class _SchoolFacilitiesFormState extends State<SchoolFacilitiesForm> {
                                                 children: [
                                                   Radio(
                                                     value: 'No',
-                                                    groupValue:schoolFacilitiesController.selectedValue5,
+                                                    groupValue:
+                                                        schoolFacilitiesController
+                                                            .selectedValue5,
                                                     onChanged: (value) {
-                                                      setState(() {schoolFacilitiesController.selectedValue5 =
+                                                      setState(() {
+                                                        schoolFacilitiesController
+                                                                .selectedValue5 =
                                                             value as String?;
                                                       });
                                                     },
@@ -613,7 +687,8 @@ class _SchoolFacilitiesFormState extends State<SchoolFacilitiesForm> {
                                                 ],
                                               ),
                                             ),
-                                            if (schoolFacilitiesController.radioFieldError5)
+                                            if (schoolFacilitiesController
+                                                .radioFieldError5)
                                               const Padding(
                                                 padding:
                                                     EdgeInsets.only(left: 16.0),
@@ -642,10 +717,13 @@ class _SchoolFacilitiesFormState extends State<SchoolFacilitiesForm> {
                                                 children: [
                                                   Radio(
                                                     value: 'Yes',
-                                                    groupValue: schoolFacilitiesController.selectedValue6,
+                                                    groupValue:
+                                                        schoolFacilitiesController
+                                                            .selectedValue6,
                                                     onChanged: (value) {
                                                       setState(() {
-                                                        schoolFacilitiesController.selectedValue6 =
+                                                        schoolFacilitiesController
+                                                                .selectedValue6 =
                                                             value as String?;
                                                       });
                                                     },
@@ -666,10 +744,13 @@ class _SchoolFacilitiesFormState extends State<SchoolFacilitiesForm> {
                                                 children: [
                                                   Radio(
                                                     value: 'No',
-                                                    groupValue: schoolFacilitiesController.selectedValue6,
+                                                    groupValue:
+                                                        schoolFacilitiesController
+                                                            .selectedValue6,
                                                     onChanged: (value) {
                                                       setState(() {
-                                                        schoolFacilitiesController.selectedValue6 =
+                                                        schoolFacilitiesController
+                                                                .selectedValue6 =
                                                             value as String?;
                                                       });
                                                     },
@@ -678,7 +759,8 @@ class _SchoolFacilitiesFormState extends State<SchoolFacilitiesForm> {
                                                 ],
                                               ),
                                             ),
-                                            if (schoolFacilitiesController.radioFieldError6)
+                                            if (schoolFacilitiesController
+                                                .radioFieldError6)
                                               const Padding(
                                                 padding:
                                                     EdgeInsets.only(left: 16.0),
@@ -748,10 +830,13 @@ class _SchoolFacilitiesFormState extends State<SchoolFacilitiesForm> {
                                                 children: [
                                                   Radio(
                                                     value: 'Yes',
-                                                    groupValue: schoolFacilitiesController.selectedValue7,
+                                                    groupValue:
+                                                        schoolFacilitiesController
+                                                            .selectedValue7,
                                                     onChanged: (value) {
                                                       setState(() {
-                                                        schoolFacilitiesController.selectedValue7 =
+                                                        schoolFacilitiesController
+                                                                .selectedValue7 =
                                                             value as String?;
                                                       });
                                                     },
@@ -772,17 +857,19 @@ class _SchoolFacilitiesFormState extends State<SchoolFacilitiesForm> {
                                                 children: [
                                                   Radio(
                                                     value: 'No',
-                                                    groupValue: schoolFacilitiesController.selectedValue7,
+                                                    groupValue:
+                                                        schoolFacilitiesController
+                                                            .selectedValue7,
                                                     onChanged: (value) {
                                                       setState(() {
-                                                        schoolFacilitiesController.selectedValue7 =
+                                                        schoolFacilitiesController
+                                                                .selectedValue7 =
                                                             value as String?;
                                                       });
                                                       if (value == 'No') {
-
-                                                        schoolFacilitiesController.multipleImage.clear();
-
-
+                                                        schoolFacilitiesController
+                                                            .multipleImage
+                                                            .clear();
                                                       }
                                                     },
                                                   ),
@@ -790,7 +877,8 @@ class _SchoolFacilitiesFormState extends State<SchoolFacilitiesForm> {
                                                 ],
                                               ),
                                             ),
-                                            if (schoolFacilitiesController.radioFieldError7)
+                                            if (schoolFacilitiesController
+                                                .radioFieldError7)
                                               const Padding(
                                                 padding:
                                                     EdgeInsets.only(left: 16.0),
@@ -808,7 +896,9 @@ class _SchoolFacilitiesFormState extends State<SchoolFacilitiesForm> {
                                               value: 20,
                                               side: 'height',
                                             ),
-                                            if (schoolFacilitiesController.selectedValue7 == 'Yes') ...[
+                                            if (schoolFacilitiesController
+                                                    .selectedValue7 ==
+                                                'Yes') ...[
                                               LabelText(
                                                 label:
                                                     'Upload photos of Playground',
@@ -826,13 +916,15 @@ class _SchoolFacilitiesFormState extends State<SchoolFacilitiesForm> {
                                                           10.0),
                                                   border: Border.all(
                                                       width: 2,
-                                                      color: schoolFacilitiesController.isImageUploaded ==
+                                                      color: schoolFacilitiesController
+                                                                  .isImageUploaded ==
                                                               false
                                                           ? AppColors.primary
                                                           : AppColors.error),
                                                 ),
                                                 child: ListTile(
-                                                    title: schoolFacilitiesController.isImageUploaded ==
+                                                    title: schoolFacilitiesController
+                                                                .isImageUploaded ==
                                                             false
                                                         ? const Text(
                                                             'Click or Upload Image',
@@ -855,11 +947,14 @@ class _SchoolFacilitiesFormState extends State<SchoolFacilitiesForm> {
                                                           builder: ((builder) =>
                                                               schoolFacilitiesController
                                                                   .bottomSheet(
-                                                                      context,1)));
+                                                                      context,
+                                                                      1)));
                                                     }),
                                               ),
                                               ErrorText(
-                                                isVisible: schoolFacilitiesController.validateRegister,
+                                                isVisible:
+                                                    schoolFacilitiesController
+                                                        .validateRegister,
                                                 message:
                                                     'Playground Image Required',
                                               ),
@@ -961,8 +1056,11 @@ class _SchoolFacilitiesFormState extends State<SchoolFacilitiesForm> {
                                                     title: 'Back',
                                                     onPressedButton: () {
                                                       setState(() {
-                                                        schoolFacilitiesController.showBasicDetails = true;
-                                                        schoolFacilitiesController.showSchoolFacilities =
+                                                        schoolFacilitiesController
+                                                                .showBasicDetails =
+                                                            true;
+                                                        schoolFacilitiesController
+                                                                .showSchoolFacilities =
                                                             false;
                                                       });
                                                     }),
@@ -971,63 +1069,93 @@ class _SchoolFacilitiesFormState extends State<SchoolFacilitiesForm> {
                                                   title: 'Next',
                                                   onPressedButton: () {
                                                     setState(() {
-                                                      schoolFacilitiesController.radioFieldError2 =
-                                                          schoolFacilitiesController.selectedValue2 ==
+                                                      schoolFacilitiesController
+                                                              .radioFieldError2 =
+                                                          schoolFacilitiesController
+                                                                      .selectedValue2 ==
                                                                   null ||
-                                                              schoolFacilitiesController.selectedValue2!
+                                                              schoolFacilitiesController
+                                                                  .selectedValue2!
                                                                   .isEmpty;
-                                                      schoolFacilitiesController.radioFieldError3 =
-                                                          schoolFacilitiesController.selectedValue3 ==
+                                                      schoolFacilitiesController
+                                                              .radioFieldError3 =
+                                                          schoolFacilitiesController
+                                                                      .selectedValue3 ==
                                                                   null ||
-                                                              schoolFacilitiesController.selectedValue3!
+                                                              schoolFacilitiesController
+                                                                  .selectedValue3!
                                                                   .isEmpty;
-                                                      schoolFacilitiesController.radioFieldError4 =
-                                                          schoolFacilitiesController.selectedValue4 ==
+                                                      schoolFacilitiesController
+                                                              .radioFieldError4 =
+                                                          schoolFacilitiesController
+                                                                      .selectedValue4 ==
                                                                   null ||
-                                                              schoolFacilitiesController.selectedValue4!
+                                                              schoolFacilitiesController
+                                                                  .selectedValue4!
                                                                   .isEmpty;
-                                                      schoolFacilitiesController.radioFieldError5 =
-                                                          schoolFacilitiesController.selectedValue5 ==
+                                                      schoolFacilitiesController
+                                                              .radioFieldError5 =
+                                                          schoolFacilitiesController
+                                                                      .selectedValue5 ==
                                                                   null ||
-                                                              schoolFacilitiesController.selectedValue5!
+                                                              schoolFacilitiesController
+                                                                  .selectedValue5!
                                                                   .isEmpty;
-                                                      schoolFacilitiesController.radioFieldError6 =
-                                                          schoolFacilitiesController.selectedValue6 ==
+                                                      schoolFacilitiesController
+                                                              .radioFieldError6 =
+                                                          schoolFacilitiesController
+                                                                      .selectedValue6 ==
                                                                   null ||
-                                                              schoolFacilitiesController.selectedValue6!
+                                                              schoolFacilitiesController
+                                                                  .selectedValue6!
                                                                   .isEmpty;
-                                                      schoolFacilitiesController.radioFieldError7 =
-                                                          schoolFacilitiesController.selectedValue7 ==
+                                                      schoolFacilitiesController
+                                                              .radioFieldError7 =
+                                                          schoolFacilitiesController
+                                                                      .selectedValue7 ==
                                                                   null ||
-                                                              schoolFacilitiesController.selectedValue7!
+                                                              schoolFacilitiesController
+                                                                  .selectedValue7!
                                                                   .isEmpty;
 
                                                       // Validate the upload photo playground only if "Yes" is selected
-                                                      if (schoolFacilitiesController.selectedValue7 ==
+                                                      if (schoolFacilitiesController
+                                                              .selectedValue7 ==
                                                           'Yes') {
-                                                        schoolFacilitiesController.validateRegister =
+                                                        schoolFacilitiesController
+                                                                .validateRegister =
                                                             schoolFacilitiesController
                                                                 .multipleImage
                                                                 .isEmpty;
                                                       } else {
-                                                        schoolFacilitiesController.validateRegister =
+                                                        schoolFacilitiesController
+                                                                .validateRegister =
                                                             false;
                                                       }
                                                     });
 
                                                     if (_formKey.currentState!
                                                             .validate() &&
-                                                        !schoolFacilitiesController.radioFieldError2 &&
-                                                        !schoolFacilitiesController.radioFieldError3 &&
-                                                        !schoolFacilitiesController.radioFieldError4 &&
-                                                        !schoolFacilitiesController.radioFieldError5 &&
-                                                        !schoolFacilitiesController.radioFieldError6 &&
-                                                        !schoolFacilitiesController.radioFieldError7 &&
-                                                        !schoolFacilitiesController.validateRegister) {
+                                                        !schoolFacilitiesController
+                                                            .radioFieldError2 &&
+                                                        !schoolFacilitiesController
+                                                            .radioFieldError3 &&
+                                                        !schoolFacilitiesController
+                                                            .radioFieldError4 &&
+                                                        !schoolFacilitiesController
+                                                            .radioFieldError5 &&
+                                                        !schoolFacilitiesController
+                                                            .radioFieldError6 &&
+                                                        !schoolFacilitiesController
+                                                            .radioFieldError7 &&
+                                                        !schoolFacilitiesController
+                                                            .validateRegister) {
                                                       setState(() {
-                                                        schoolFacilitiesController.showSchoolFacilities =
+                                                        schoolFacilitiesController
+                                                                .showSchoolFacilities =
                                                             false;
-                                                        schoolFacilitiesController.showLibrary = true;
+                                                        schoolFacilitiesController
+                                                            .showLibrary = true;
                                                       });
                                                     }
                                                   },
@@ -1039,7 +1167,8 @@ class _SchoolFacilitiesFormState extends State<SchoolFacilitiesForm> {
                                               side: 'height',
                                             ),
                                           ],
-                                          if (schoolFacilitiesController.showLibrary) ...[
+                                          if (schoolFacilitiesController
+                                              .showLibrary) ...[
                                             LabelText(
                                               label: 'Teacher Capacity',
                                             ),
@@ -1058,12 +1187,16 @@ class _SchoolFacilitiesFormState extends State<SchoolFacilitiesForm> {
                                                 children: [
                                                   Radio(
                                                     value: 'Yes',
-                                                    groupValue: schoolFacilitiesController.selectedValue8,
+                                                    groupValue:
+                                                        schoolFacilitiesController
+                                                            .selectedValue8,
                                                     onChanged: (value) {
                                                       setState(() {
-                                                        schoolFacilitiesController.selectedValue8 =
+                                                        schoolFacilitiesController
+                                                                .selectedValue8 =
                                                             value as String?;
-                                                        schoolFacilitiesController.radioFieldError8 =
+                                                        schoolFacilitiesController
+                                                                .radioFieldError8 =
                                                             false; // Reset error state
                                                       });
                                                     },
@@ -1083,23 +1216,34 @@ class _SchoolFacilitiesFormState extends State<SchoolFacilitiesForm> {
                                                 children: [
                                                   Radio(
                                                     value: 'No',
-                                                    groupValue: schoolFacilitiesController.selectedValue8,
+                                                    groupValue:
+                                                        schoolFacilitiesController
+                                                            .selectedValue8,
                                                     onChanged: (value) {
                                                       setState(() {
-                                                        schoolFacilitiesController.selectedValue8 =
+                                                        schoolFacilitiesController
+                                                                .selectedValue8 =
                                                             value as String?;
-                                                        schoolFacilitiesController.radioFieldError8 =
+                                                        schoolFacilitiesController
+                                                                .radioFieldError8 =
                                                             false; // Reset error state
                                                       });
                                                       if (value == 'No') {
-
-                                                        schoolFacilitiesController.selectedDesignation = null;
-                                                        schoolFacilitiesController.selectedValue9 = null;
-                                                        schoolFacilitiesController.selectedValue10 = null;
-                                                        schoolFacilitiesController.nameOfLibrarianController.clear();
-                                                        schoolFacilitiesController.multipleImage2.clear();
-
-
+                                                        schoolFacilitiesController
+                                                                .selectedDesignation =
+                                                            null;
+                                                        schoolFacilitiesController
+                                                                .selectedValue9 =
+                                                            null;
+                                                        schoolFacilitiesController
+                                                                .selectedValue10 =
+                                                            null;
+                                                        schoolFacilitiesController
+                                                            .nameOfLibrarianController
+                                                            .clear();
+                                                        schoolFacilitiesController
+                                                            .multipleImage2
+                                                            .clear();
                                                       }
                                                     },
                                                   ),
@@ -1107,7 +1251,8 @@ class _SchoolFacilitiesFormState extends State<SchoolFacilitiesForm> {
                                                 ],
                                               ),
                                             ),
-                                            if (schoolFacilitiesController.radioFieldError8)
+                                            if (schoolFacilitiesController
+                                                .radioFieldError8)
                                               Padding(
                                                 padding: const EdgeInsets.only(
                                                     left: 16.0),
@@ -1125,7 +1270,9 @@ class _SchoolFacilitiesFormState extends State<SchoolFacilitiesForm> {
                                               value: 20,
                                               side: 'height',
                                             ),
-                                            if (schoolFacilitiesController.selectedValue8 == 'Yes') ...[
+                                            if (schoolFacilitiesController
+                                                    .selectedValue8 ==
+                                                'Yes') ...[
                                               LabelText(
                                                 label:
                                                     'Where is the Library located?',
@@ -1138,7 +1285,9 @@ class _SchoolFacilitiesFormState extends State<SchoolFacilitiesForm> {
                                                   labelText: 'Select an option',
                                                   border: OutlineInputBorder(),
                                                 ),
-                                                value: schoolFacilitiesController.selectedDesignation,
+                                                value:
+                                                    schoolFacilitiesController
+                                                        .selectedDesignation,
                                                 items: [
                                                   DropdownMenuItem(
                                                       value: 'Corridor',
@@ -1161,7 +1310,8 @@ class _SchoolFacilitiesFormState extends State<SchoolFacilitiesForm> {
                                                 ],
                                                 onChanged: (value) {
                                                   setState(() {
-                                                    schoolFacilitiesController.selectedDesignation =
+                                                    schoolFacilitiesController
+                                                            .selectedDesignation =
                                                         value;
                                                   });
                                                 },
@@ -1211,12 +1361,15 @@ class _SchoolFacilitiesFormState extends State<SchoolFacilitiesForm> {
                                                     Radio(
                                                       value: 'Yes',
                                                       groupValue:
-                                                      schoolFacilitiesController.selectedValue9,
+                                                          schoolFacilitiesController
+                                                              .selectedValue9,
                                                       onChanged: (value) {
                                                         setState(() {
-                                                          schoolFacilitiesController.selectedValue9 =
+                                                          schoolFacilitiesController
+                                                                  .selectedValue9 =
                                                               value as String?;
-                                                          schoolFacilitiesController.radioFieldError9 =
+                                                          schoolFacilitiesController
+                                                                  .radioFieldError9 =
                                                               false; // Reset error state
                                                         });
                                                       },
@@ -1237,12 +1390,15 @@ class _SchoolFacilitiesFormState extends State<SchoolFacilitiesForm> {
                                                     Radio(
                                                       value: 'No',
                                                       groupValue:
-                                                      schoolFacilitiesController.selectedValue9,
+                                                          schoolFacilitiesController
+                                                              .selectedValue9,
                                                       onChanged: (value) {
                                                         setState(() {
-                                                          schoolFacilitiesController.selectedValue9 =
+                                                          schoolFacilitiesController
+                                                                  .selectedValue9 =
                                                               value as String?;
-                                                          schoolFacilitiesController.radioFieldError9 =
+                                                          schoolFacilitiesController
+                                                                  .radioFieldError9 =
                                                               false; // Reset error state
                                                         });
                                                       },
@@ -1251,7 +1407,8 @@ class _SchoolFacilitiesFormState extends State<SchoolFacilitiesForm> {
                                                   ],
                                                 ),
                                               ),
-                                              if (schoolFacilitiesController.radioFieldError9)
+                                              if (schoolFacilitiesController
+                                                  .radioFieldError9)
                                                 Padding(
                                                   padding:
                                                       const EdgeInsets.only(
@@ -1285,12 +1442,15 @@ class _SchoolFacilitiesFormState extends State<SchoolFacilitiesForm> {
                                                     Radio(
                                                       value: 'Yes',
                                                       groupValue:
-                                                      schoolFacilitiesController.selectedValue10,
+                                                          schoolFacilitiesController
+                                                              .selectedValue10,
                                                       onChanged: (value) {
                                                         setState(() {
-                                                          schoolFacilitiesController.selectedValue10 =
+                                                          schoolFacilitiesController
+                                                                  .selectedValue10 =
                                                               value as String?;
-                                                          schoolFacilitiesController.radioFieldError10 =
+                                                          schoolFacilitiesController
+                                                                  .radioFieldError10 =
                                                               false; // Reset error state
                                                         });
                                                       },
@@ -1311,12 +1471,15 @@ class _SchoolFacilitiesFormState extends State<SchoolFacilitiesForm> {
                                                     Radio(
                                                       value: 'No',
                                                       groupValue:
-                                                      schoolFacilitiesController.selectedValue10,
+                                                          schoolFacilitiesController
+                                                              .selectedValue10,
                                                       onChanged: (value) {
                                                         setState(() {
-                                                          schoolFacilitiesController.selectedValue10 =
+                                                          schoolFacilitiesController
+                                                                  .selectedValue10 =
                                                               value as String?;
-                                                          schoolFacilitiesController.radioFieldError10 =
+                                                          schoolFacilitiesController
+                                                                  .radioFieldError10 =
                                                               false; // Reset error state
                                                         });
                                                       },
@@ -1325,7 +1488,8 @@ class _SchoolFacilitiesFormState extends State<SchoolFacilitiesForm> {
                                                   ],
                                                 ),
                                               ),
-                                              if (schoolFacilitiesController.radioFieldError10)
+                                              if (schoolFacilitiesController
+                                                  .radioFieldError10)
                                                 Padding(
                                                   padding:
                                                       const EdgeInsets.only(
@@ -1344,7 +1508,8 @@ class _SchoolFacilitiesFormState extends State<SchoolFacilitiesForm> {
                                                 value: 20,
                                                 side: 'height',
                                               ),
-                                              if (schoolFacilitiesController.selectedValue10 ==
+                                              if (schoolFacilitiesController
+                                                      .selectedValue10 ==
                                                   'Yes') ...[
                                                 LabelText(
                                                   label:
@@ -1358,11 +1523,14 @@ class _SchoolFacilitiesFormState extends State<SchoolFacilitiesForm> {
                                                 Container(
                                                   height: 60,
                                                   decoration: BoxDecoration(
-                                                    borderRadius: BorderRadius.circular(10.0),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            10.0),
                                                     border: Border.all(
                                                       width: 2,
                                                       color: schoolFacilitiesController
-                                                          .isImageUploaded2  == false
+                                                                  .isImageUploaded2 ==
+                                                              false
                                                           ? AppColors.primary
                                                           : AppColors.error,
                                                     ),
@@ -1371,90 +1539,133 @@ class _SchoolFacilitiesFormState extends State<SchoolFacilitiesForm> {
                                                     title: Text(
                                                       'Click or Upload Image',
                                                       style: TextStyle(
-                                                        color:  schoolFacilitiesController
-                                                            .isImageUploaded2  == false
+                                                        color: schoolFacilitiesController
+                                                                    .isImageUploaded2 ==
+                                                                false
                                                             ? Colors.black
                                                             : AppColors.error,
                                                       ),
                                                     ),
-                                                    trailing: const Icon(Icons.camera_alt, color: AppColors.onBackground),
+                                                    trailing: const Icon(
+                                                        Icons.camera_alt,
+                                                        color: AppColors
+                                                            .onBackground),
                                                     onTap: () {
                                                       showModalBottomSheet(
-                                                        backgroundColor: AppColors.primary,
+                                                        backgroundColor:
+                                                            AppColors.primary,
                                                         context: context,
-                                                        builder: (builder) => schoolFacilitiesController.bottomSheet(context, 2),
+                                                        builder: (builder) =>
+                                                            schoolFacilitiesController
+                                                                .bottomSheet(
+                                                                    context, 2),
                                                       );
                                                     },
                                                   ),
                                                 ),
                                                 ErrorText(
-                                                  isVisible: schoolFacilitiesController
-                                                      .validateRegister2,
+                                                  isVisible:
+                                                      schoolFacilitiesController
+                                                          .validateRegister2,
                                                   message: 'Image Required',
                                                 ),
                                                 CustomSizedBox(
                                                   value: 20,
                                                   side: 'height',
                                                 ),
-                                                schoolFacilitiesController.multipleImage2.isNotEmpty
+                                                schoolFacilitiesController
+                                                        .multipleImage2
+                                                        .isNotEmpty
                                                     ? Container(
-                                                  width: responsive.responsiveValue(
-                                                    small: 600.0,
-                                                    medium: 900.0,
-                                                    large: 1400.0,
-                                                  ),
-                                                  height: responsive.responsiveValue(
-                                                    small: 170.0,
-                                                    medium: 170.0,
-                                                    large: 170.0,
-                                                  ),
-                                                  decoration: BoxDecoration(
-                                                    border: Border.all(color: Colors.grey),
-                                                    borderRadius: BorderRadius.circular(10),
-                                                  ),
-                                                  child: ListView.builder(
-                                                    scrollDirection: Axis.horizontal,
-                                                    itemCount: schoolFacilitiesController.multipleImage2.length,
-                                                    itemBuilder: (context, index) {
-                                                      return SizedBox(
-                                                        height: 200,
-                                                        width: 200,
-                                                        child: Column(
-                                                          children: [
-                                                            Padding(
-                                                              padding: const EdgeInsets.all(8.0),
-                                                              child: GestureDetector(
-                                                                onTap: () {
-                                                                  CustomImagePreview.showImagePreview(
-                                                                    schoolFacilitiesController.multipleImage2[index].path,
-                                                                    context,
-                                                                  );
-                                                                },
-                                                                child: Image.file(
-                                                                  File(schoolFacilitiesController.multipleImage2[index].path),
-                                                                  width: 190,
-                                                                  height: 120,
-                                                                  fit: BoxFit.fill,
-                                                                ),
-                                                              ),
-                                                            ),
-                                                            GestureDetector(
-                                                              onTap: () {
-                                                                setState(() {
-                                                                  schoolFacilitiesController.multipleImage2.removeAt(index);
-                                                                });
-                                                              },
-                                                              child: const Icon(
-                                                                Icons.delete,
-                                                                color: Colors.red,
-                                                              ),
-                                                            ),
-                                                          ],
+                                                        width: responsive
+                                                            .responsiveValue(
+                                                          small: 600.0,
+                                                          medium: 900.0,
+                                                          large: 1400.0,
                                                         ),
-                                                      );
-                                                    },
-                                                  ),
-                                                )
+                                                        height: responsive
+                                                            .responsiveValue(
+                                                          small: 170.0,
+                                                          medium: 170.0,
+                                                          large: 170.0,
+                                                        ),
+                                                        decoration:
+                                                            BoxDecoration(
+                                                          border: Border.all(
+                                                              color:
+                                                                  Colors.grey),
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(10),
+                                                        ),
+                                                        child: ListView.builder(
+                                                          scrollDirection:
+                                                              Axis.horizontal,
+                                                          itemCount:
+                                                              schoolFacilitiesController
+                                                                  .multipleImage2
+                                                                  .length,
+                                                          itemBuilder:
+                                                              (context, index) {
+                                                            return SizedBox(
+                                                              height: 200,
+                                                              width: 200,
+                                                              child: Column(
+                                                                children: [
+                                                                  Padding(
+                                                                    padding:
+                                                                        const EdgeInsets
+                                                                            .all(
+                                                                            8.0),
+                                                                    child:
+                                                                        GestureDetector(
+                                                                      onTap:
+                                                                          () {
+                                                                        CustomImagePreview
+                                                                            .showImagePreview(
+                                                                          schoolFacilitiesController
+                                                                              .multipleImage2[index]
+                                                                              .path,
+                                                                          context,
+                                                                        );
+                                                                      },
+                                                                      child: Image
+                                                                          .file(
+                                                                        File(schoolFacilitiesController
+                                                                            .multipleImage2[index]
+                                                                            .path),
+                                                                        width:
+                                                                            190,
+                                                                        height:
+                                                                            120,
+                                                                        fit: BoxFit
+                                                                            .fill,
+                                                                      ),
+                                                                    ),
+                                                                  ),
+                                                                  GestureDetector(
+                                                                    onTap: () {
+                                                                      setState(
+                                                                          () {
+                                                                        schoolFacilitiesController
+                                                                            .multipleImage2
+                                                                            .removeAt(index);
+                                                                      });
+                                                                    },
+                                                                    child:
+                                                                        const Icon(
+                                                                      Icons
+                                                                          .delete,
+                                                                      color: Colors
+                                                                          .red,
+                                                                    ),
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                            );
+                                                          },
+                                                        ),
+                                                      )
                                                     : const SizedBox(),
                                                 CustomSizedBox(
                                                   value: 40,
@@ -1468,9 +1679,12 @@ class _SchoolFacilitiesFormState extends State<SchoolFacilitiesForm> {
                                                     title: 'Back',
                                                     onPressedButton: () {
                                                       setState(() {
-                                                        schoolFacilitiesController.showSchoolFacilities =
+                                                        schoolFacilitiesController
+                                                                .showSchoolFacilities =
                                                             true;
-                                                        schoolFacilitiesController.showLibrary = false;
+                                                        schoolFacilitiesController
+                                                                .showLibrary =
+                                                            false;
                                                       });
                                                     }),
                                                 const Spacer(),
@@ -1478,57 +1692,83 @@ class _SchoolFacilitiesFormState extends State<SchoolFacilitiesForm> {
                                                     title: 'Submit',
                                                     onPressedButton: () async {
                                                       print('userid');
-                                                      print( widget.userid);
+                                                      print(widget.userid);
                                                       setState(() {
-                                                        schoolFacilitiesController.radioFieldError8 =
-                                                            schoolFacilitiesController.selectedValue8 ==
+                                                        schoolFacilitiesController
+                                                                .radioFieldError8 =
+                                                            schoolFacilitiesController
+                                                                        .selectedValue8 ==
                                                                     null ||
-                                                                schoolFacilitiesController.selectedValue8!
+                                                                schoolFacilitiesController
+                                                                    .selectedValue8!
                                                                     .isEmpty;
-                                                        schoolFacilitiesController.radioFieldError9 =
-                                                            schoolFacilitiesController.selectedValue8 ==
-                                                                    'Yes' &&
-                                                                (schoolFacilitiesController.selectedValue9 ==
-                                                                        null ||
-                                                                    schoolFacilitiesController.selectedValue9!
-                                                                        .isEmpty);
+                                                        schoolFacilitiesController
+                                                            .radioFieldError9 = schoolFacilitiesController
+                                                                    .selectedValue8 ==
+                                                                'Yes' &&
+                                                            (schoolFacilitiesController
+                                                                        .selectedValue9 ==
+                                                                    null ||
+                                                                schoolFacilitiesController
+                                                                    .selectedValue9!
+                                                                    .isEmpty);
 
-                                                        schoolFacilitiesController.radioFieldError10 =
-                                                            schoolFacilitiesController.selectedValue8 ==
-                                                                    'Yes' &&
-                                                                (schoolFacilitiesController.selectedValue10 ==
-                                                                        null ||
-                                                                    schoolFacilitiesController.selectedValue10!
-                                                                        .isEmpty);
+                                                        schoolFacilitiesController
+                                                            .radioFieldError10 = schoolFacilitiesController
+                                                                    .selectedValue8 ==
+                                                                'Yes' &&
+                                                            (schoolFacilitiesController
+                                                                        .selectedValue10 ==
+                                                                    null ||
+                                                                schoolFacilitiesController
+                                                                    .selectedValue10!
+                                                                    .isEmpty);
 
-                                                        if (schoolFacilitiesController.selectedValue10 ==
+                                                        if (schoolFacilitiesController
+                                                                .selectedValue10 ==
                                                             'Yes') {
-                                                          schoolFacilitiesController.validateRegister2 =
+                                                          schoolFacilitiesController
+                                                                  .validateRegister2 =
                                                               schoolFacilitiesController
                                                                   .multipleImage2
                                                                   .isEmpty;
                                                         } else {
-                                                          schoolFacilitiesController.validateRegister2 =
+                                                          schoolFacilitiesController
+                                                                  .validateRegister2 =
                                                               false;
                                                         }
                                                       });
 
                                                       if (_formKey.currentState!
                                                               .validate() &&
-                                                          !schoolFacilitiesController.radioFieldError8 &&
-                                                          !schoolFacilitiesController.radioFieldError9 &&
-                                                          !schoolFacilitiesController.radioFieldError10 &&
-                                                          !schoolFacilitiesController.validateRegister2) {
+                                                          !schoolFacilitiesController
+                                                              .radioFieldError8 &&
+                                                          !schoolFacilitiesController
+                                                              .radioFieldError9 &&
+                                                          !schoolFacilitiesController
+                                                              .radioFieldError10 &&
+                                                          !schoolFacilitiesController
+                                                              .validateRegister2) {
                                                         print('Inserted');
 
-                                                        List<File> imgPlayFiles = [];
-                                                        for (var imagePath in schoolFacilitiesController.imagePaths) {
-                                                          imgPlayFiles.add(File(imagePath)); // Convert image path to File
+                                                        List<File>
+                                                            imgPlayFiles = [];
+                                                        for (var imagePath
+                                                            in schoolFacilitiesController
+                                                                .imagePaths) {
+                                                          imgPlayFiles.add(File(
+                                                              imagePath)); // Convert image path to File
                                                         }
 
-                                                        List<File> register_picFiles = [];
-                                                        for (var imagePath2 in schoolFacilitiesController.imagePaths2) {
-                                                          register_picFiles.add(File(imagePath2)); // Convert image path to File
+                                                        List<File>
+                                                            register_picFiles =
+                                                            [];
+                                                        for (var imagePath2
+                                                            in schoolFacilitiesController
+                                                                .imagePaths2) {
+                                                          register_picFiles.add(
+                                                              File(
+                                                                  imagePath2)); // Convert image path to File
                                                         }
                                                         DateTime now =
                                                             DateTime.now();
@@ -1541,23 +1781,32 @@ class _SchoolFacilitiesFormState extends State<SchoolFacilitiesForm> {
                                                             int length) {
                                                           const _chars =
                                                               'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-                                                          Random _rnd = Random();
+                                                          Random _rnd =
+                                                              Random();
                                                           return String.fromCharCodes(
                                                               Iterable.generate(
                                                                   length,
-                                                                      (_) => _chars
-                                                                      .codeUnitAt(_rnd
-                                                                      .nextInt(
-                                                                      _chars
-                                                                          .length))));
+                                                                  (_) => _chars.codeUnitAt(
+                                                                      _rnd.nextInt(
+                                                                          _chars
+                                                                              .length))));
                                                         }
 
                                                         String uniqueId =
-                                                        generateUniqueId(6);
+                                                            generateUniqueId(6);
 
-                                                        String imgPlayFilesPaths = imgPlayFiles.map((file) => file.path).join(',');
-                                                        String register_picFilesPaths = register_picFiles.map((file) => file.path).join(',');
-
+                                                        String
+                                                            imgPlayFilesPaths =
+                                                            imgPlayFiles
+                                                                .map((file) =>
+                                                                    file.path)
+                                                                .join(',');
+                                                        String
+                                                            register_picFilesPaths =
+                                                            register_picFiles
+                                                                .map((file) =>
+                                                                    file.path)
+                                                                .join(',');
 
                                                         SchoolFacilitiesRecords enrolmentCollectionObj = SchoolFacilitiesRecords(
                                                             tourId: schoolFacilitiesController.tourValue ??
@@ -1565,7 +1814,7 @@ class _SchoolFacilitiesFormState extends State<SchoolFacilitiesForm> {
                                                             school: schoolFacilitiesController.schoolValue ??
                                                                 '',
                                                             playImg:
-                                                            imgPlayFilesPaths,
+                                                                imgPlayFilesPaths,
                                                             correctUdise: schoolFacilitiesController
                                                                 .correctUdiseCodeController
                                                                 .text,
@@ -1578,31 +1827,28 @@ class _SchoolFacilitiesFormState extends State<SchoolFacilitiesForm> {
                                                                     .nameOfLibrarianController
                                                                     .text,
                                                             imgRegister:
-                                                            register_picFilesPaths,
+                                                                register_picFilesPaths,
                                                             udiseCode:
-                                                            schoolFacilitiesController.selectedValue ?? 'No',
+                                                                schoolFacilitiesController.selectedValue ??
+                                                                    'No',
                                                             residentialValue:
-                                                            schoolFacilitiesController.selectedValue2!,
+                                                                schoolFacilitiesController
+                                                                    .selectedValue2!,
                                                             electricityValue:
-                                                            schoolFacilitiesController.selectedValue3!,
+                                                                schoolFacilitiesController
+                                                                    .selectedValue3!,
                                                             internetValue:
-                                                            schoolFacilitiesController.selectedValue4!,
+                                                                schoolFacilitiesController
+                                                                    .selectedValue4!,
                                                             projectorValue:
-                                                            schoolFacilitiesController.selectedValue5!,
-                                                            smartClassValue:
-                                                            schoolFacilitiesController.selectedValue6!,
-                                                            playgroundValue:
-                                                            schoolFacilitiesController.selectedValue7!,
-                                                            libValue:
-                                                            schoolFacilitiesController.selectedValue8!,
-                                                            libLocation:
-                                                            schoolFacilitiesController.selectedDesignation,
-                                                            librarianTraining:
-                                                            schoolFacilitiesController.selectedValue9,
-                                                            libRegisterValue:
-                                                            schoolFacilitiesController.selectedValue10,
-                                                            created_at:
-                                                                formattedDate.toString(),
+                                                                schoolFacilitiesController.selectedValue5!,
+                                                            smartClassValue: schoolFacilitiesController.selectedValue6!,
+                                                            playgroundValue: schoolFacilitiesController.selectedValue7!,
+                                                            libValue: schoolFacilitiesController.selectedValue8!,
+                                                            libLocation: schoolFacilitiesController.selectedDesignation,
+                                                            librarianTraining: schoolFacilitiesController.selectedValue9,
+                                                            libRegisterValue: schoolFacilitiesController.selectedValue10,
+                                                            created_at: formattedDate.toString(),
                                                             created_by: widget.userid.toString());
 
                                                         int result =
@@ -1614,69 +1860,93 @@ class _SchoolFacilitiesFormState extends State<SchoolFacilitiesForm> {
                                                           schoolFacilitiesController
                                                               .clearFields();
                                                           setState(() {
-editController.clearFields();
-                                                          // Clear the image list
-                                                            schoolFacilitiesController.isImageUploaded = false;
-                                                            schoolFacilitiesController.isImageUploaded2 = false;
-                                                            schoolFacilitiesController.selectedValue3 = '';
-                                                            schoolFacilitiesController.selectedValue2 = '';
-                                                            schoolFacilitiesController.selectedValue = '';
-                                                            schoolFacilitiesController.selectedValue4 = '';
-                                                            schoolFacilitiesController.selectedValue5 = '';
-                                                            schoolFacilitiesController.selectedValue6 = '';
-                                                            schoolFacilitiesController.selectedValue7 = '';
-                                                            schoolFacilitiesController.selectedValue8 = '';
-                                                            schoolFacilitiesController.selectedValue9 = '';
-                                                            schoolFacilitiesController.selectedValue10 = '';
-                                                            schoolFacilitiesController.selectedDesignation = '';
-                                                            schoolFacilitiesController.correctUdiseCodeController.clear();
-                                                            schoolFacilitiesController.noOfFunctionalClassroomController.clear();
-                                                            schoolFacilitiesController.noOfEnrolledStudentAsOnDateController.clear();
-                                                            schoolFacilitiesController.nameOfLibrarianController.clear();
-                                                            schoolFacilitiesController.correctUdiseCodeController.clear();
-
-
-
+                                                            editController
+                                                                .clearFields();
+                                                            // Clear the image list
+                                                            schoolFacilitiesController
+                                                                    .isImageUploaded =
+                                                                false;
+                                                            schoolFacilitiesController
+                                                                    .isImageUploaded2 =
+                                                                false;
+                                                            schoolFacilitiesController
+                                                                .selectedValue3 = '';
+                                                            schoolFacilitiesController
+                                                                .selectedValue2 = '';
+                                                            schoolFacilitiesController
+                                                                .selectedValue = '';
+                                                            schoolFacilitiesController
+                                                                .selectedValue4 = '';
+                                                            schoolFacilitiesController
+                                                                .selectedValue5 = '';
+                                                            schoolFacilitiesController
+                                                                .selectedValue6 = '';
+                                                            schoolFacilitiesController
+                                                                .selectedValue7 = '';
+                                                            schoolFacilitiesController
+                                                                .selectedValue8 = '';
+                                                            schoolFacilitiesController
+                                                                .selectedValue9 = '';
+                                                            schoolFacilitiesController
+                                                                .selectedValue10 = '';
+                                                            schoolFacilitiesController
+                                                                .selectedDesignation = '';
+                                                            schoolFacilitiesController
+                                                                .correctUdiseCodeController
+                                                                .clear();
+                                                            schoolFacilitiesController
+                                                                .noOfFunctionalClassroomController
+                                                                .clear();
+                                                            schoolFacilitiesController
+                                                                .noOfEnrolledStudentAsOnDateController
+                                                                .clear();
+                                                            schoolFacilitiesController
+                                                                .nameOfLibrarianController
+                                                                .clear();
+                                                            schoolFacilitiesController
+                                                                .correctUdiseCodeController
+                                                                .clear();
                                                           });
 
                                                           String jsonData1 =
-                                                          jsonEncode(
-                                                              enrolmentCollectionObj
-                                                                  .toJson());
+                                                              jsonEncode(
+                                                                  enrolmentCollectionObj
+                                                                      .toJson());
 
                                                           try {
                                                             JsonFileDownloader
-                                                            downloader =
-                                                            JsonFileDownloader();
-                                                            String? filePath = await downloader
-                                                                .downloadJsonFile(
-                                                                jsonData1,
-                                                                uniqueId,
+                                                                downloader =
+                                                                JsonFileDownloader();
+                                                            String? filePath =
+                                                                await downloader
+                                                                    .downloadJsonFile(
+                                                              jsonData1,
+                                                              uniqueId,
                                                               imgPlayFiles,
                                                               register_picFiles,
-
-
                                                             );
                                                             // Notify user of success
                                                             customSnackbar(
                                                               'File Downloaded Successfully',
                                                               'File saved at $filePath',
                                                               AppColors.primary,
-                                                              AppColors.onPrimary,
-                                                              Icons.download_done,
+                                                              AppColors
+                                                                  .onPrimary,
+                                                              Icons
+                                                                  .download_done,
                                                             );
                                                           } catch (e) {
                                                             customSnackbar(
                                                               'Error',
                                                               e.toString(),
                                                               AppColors.primary,
-                                                              AppColors.onPrimary,
+                                                              AppColors
+                                                                  .onPrimary,
                                                               Icons.error,
                                                             );
                                                           }
 
                                                           customSnackbar(
-
                                                               'Submitted Successfully',
                                                               'Submitted',
                                                               AppColors.primary,
@@ -1685,11 +1955,13 @@ editController.clearFields();
                                                               Icons.verified);
 
                                                           // Navigate to HomeScreen
-                                                          Navigator.pushReplacement(
+                                                          Navigator
+                                                              .pushReplacement(
                                                             context,
                                                             MaterialPageRoute(
-                                                                builder: (context) =>
-                                                                    HomeScreen()),
+                                                                builder:
+                                                                    (context) =>
+                                                                        SchoolFacilitiesSync()),
                                                           );
                                                         } else {
                                                           customSnackbar(
@@ -1716,19 +1988,14 @@ editController.clearFields();
   }
 }
 
-
-
-
 class JsonFileDownloader {
   // Method to download JSON data to the Downloads directory
   Future<String?> downloadJsonFile(
-      String jsonData,
-      String uniqueId,
-      List<File> imgPlayFiles,
-      List<File> registerPicFiles,
-      ) async {
-
-
+    String jsonData,
+    String uniqueId,
+    List<File> imgPlayFiles,
+    List<File> registerPicFiles,
+  ) async {
     Directory? downloadsDirectory;
 
     if (Platform.isAndroid) {
@@ -1749,10 +2016,9 @@ class JsonFileDownloader {
       Map<String, dynamic> jsonObject = jsonDecode(jsonData);
 
       jsonObject['base64_imgPlayFiles'] =
-      await _convertImagesToBase64(imgPlayFiles);
+          await _convertImagesToBase64(imgPlayFiles);
       jsonObject['base64_registerPicFiles'] =
-      await _convertImagesToBase64(registerPicFiles);
-
+          await _convertImagesToBase64(registerPicFiles);
 
       // Write the updated JSON data to the file
       await file.writeAsString(jsonEncode(jsonObject));
@@ -1778,8 +2044,6 @@ class JsonFileDownloader {
     // Return Base64-encoded images as a comma-separated string
     return base64Images.join(',');
   }
-
-
 
   // Method to get the correct directory for Android based on version
   Future<Directory?> _getAndroidDirectory() async {

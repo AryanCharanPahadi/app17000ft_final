@@ -100,12 +100,17 @@ class _InPersonQuantitativeSync extends State<InPersonQuantitativeSync> {
                     itemBuilder: (context, index) {
                       final item = inPersonQuantitativeController.inPersonQuantitative[index];
                       return ListTile(
-                        title: Text(
-                          "${index + 1}. Tour ID: ${item.tourId!}\nSchool: ${item.school!}",
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: MediaQuery.of(context).size.width * 0.04, // Dynamic font size based on screen width
-                          ),
+                        title:  Text(
+                          "${index + 1}. Tour ID: ${item.tourId}\n"
+                              "School.: ${item.school}\n",
+                          style: const TextStyle(
+                              fontWeight: FontWeight.bold),
+                          textAlign: TextAlign
+                              .left, // Adjust text alignment if needed
+                          maxLines:
+                          2, // Limit the lines, or remove this if you don't want a limit
+                          overflow: TextOverflow
+                              .ellipsis, // Handles overflow gracefully
                         ),
                         trailing: Row(
                           mainAxisSize: MainAxisSize.min,

@@ -24,9 +24,9 @@ import 'package:app17000ft_new/components/custom_sizedBox.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:intl/intl.dart';
 import '../../components/custom_confirmation.dart';
+import '../../components/custom_drawer.dart';
 import '../../components/custom_snackbar.dart';
 import '../../helper/database_helper.dart';
-import '../../home/home_screen.dart';
 import 'alexa_issue.dart';
 import 'digilab_issue.dart';
 import 'furniture_issue.dart';
@@ -257,7 +257,7 @@ class _IssueTrackerFormState extends State<IssueTrackerForm> {
     issueTrackerController.selectedValue3 = '';
     issueTrackerController.selectedValue4 = '';
     issueTrackerController.selectedValue5 = '';
-    // _selectedResolvedBy3 = null; // Reset staff name selection
+    _selectedStaff = null; // Reset staff name selection
     issueTrackerController.libraryDescriptionController.clear();
     issueTrackerController.multipleImage.clear();
     issueTrackerController.dateController.clear();
@@ -347,7 +347,8 @@ class _IssueTrackerFormState extends State<IssueTrackerForm> {
     // If all validations pass, add the issue
     if (isValid && (_formKey.currentState!.validate())) {
       List<File> play_issue_imgFiles = [];
-      for (var imagePath in issueTrackerController.imagePaths) {
+      for (var imagePath in issueTrackerController.imagePaths2
+      ) {
         play_issue_imgFiles.add(File(imagePath)); // Convert image path to File
       }
       String play_issue_imgFilesPaths =
@@ -376,7 +377,7 @@ class _IssueTrackerFormState extends State<IssueTrackerForm> {
     issueTrackerController.selectedValue7 = '';
     issueTrackerController.selectedValue8 = '';
     issueTrackerController.selectedValue9 = '';
-    // _selectedResolvedBy4 = null;
+    _selectedStaff2 = null;
     issueTrackerController.playgroundDescriptionController.clear();
     issueTrackerController.multipleImage2.clear();
     issueTrackerController.dateController3.clear();
@@ -466,7 +467,7 @@ class _IssueTrackerFormState extends State<IssueTrackerForm> {
     // If all validations pass, add the issue
     if (isValid && (_formKey.currentState!.validate())) {
       List<File> imagesFiles = [];
-      for (var imagePath in issueTrackerController.imagePaths) {
+      for (var imagePath in issueTrackerController.imagePaths3) {
         imagesFiles.add(File(imagePath)); // Convert image path to File
       }
       String imagesFilesFilesPaths =
@@ -495,8 +496,8 @@ class _IssueTrackerFormState extends State<IssueTrackerForm> {
     issueTrackerController.selectedValue13 = '';
     issueTrackerController.selectedValue11 = '';
     issueTrackerController.selectedValue12 = '';
-    // _selectedResolvedBy5 = null;
-    issueTrackerController.playgroundDescriptionController.clear();
+    _selectedStaff3 = null;
+    issueTrackerController.digiLabDescriptionController.clear();
     issueTrackerController.multipleImage3.clear();
     issueTrackerController.dateController5.clear();
     issueTrackerController.dateController6.clear();
@@ -585,7 +586,7 @@ class _IssueTrackerFormState extends State<IssueTrackerForm> {
     // If all validations pass, add the issue
     if (isValid && (_formKey.currentState!.validate())) {
       List<File> images2Files = [];
-      for (var imagePath in issueTrackerController.imagePaths) {
+      for (var imagePath in issueTrackerController.imagePaths4) {
         images2Files.add(File(imagePath)); // Convert image path to File
       }
       String images2FilesPaths =
@@ -615,7 +616,7 @@ class _IssueTrackerFormState extends State<IssueTrackerForm> {
     issueTrackerController.selectedValue11 = '';
     issueTrackerController.selectedValue14 = '';
     issueTrackerController.selectedValue17 = '';
-    // _selectedResolvedBy = null;
+    _selectedStaff4 = null;
     issueTrackerController.classroomDescriptionController.clear();
     issueTrackerController.multipleImage4.clear();
     issueTrackerController.dateController7.clear();
@@ -710,7 +711,7 @@ class _IssueTrackerFormState extends State<IssueTrackerForm> {
     // If all validations pass, add the issue
     if (isValid && (_formKey.currentState!.validate())) {
       List<File> images3Files = [];
-      for (var imagePath in issueTrackerController.imagePaths) {
+      for (var imagePath in issueTrackerController.imagePaths5) {
         images3Files.add(File(imagePath)); // Convert image path to File
       }
       String images3FilesPaths =
@@ -746,7 +747,7 @@ class _IssueTrackerFormState extends State<IssueTrackerForm> {
     issueTrackerController.selectedValue19 = '';
     issueTrackerController.selectedValue18 = '';
     issueTrackerController.selectedValue21 = '';
-    // _selectedResolvedBy2 = null;
+    _selectedStaff5 = null;
     issueTrackerController.alexaDescriptionController.clear();
     issueTrackerController.multipleImage5.clear();
     issueTrackerController.dateController9.clear();
@@ -1016,11 +1017,6 @@ class _IssueTrackerFormState extends State<IssueTrackerForm> {
                                         title: 'Next',
                                         onPressedButton: () {
                                           print('submit Basic Details');
-                                          print('Dropdown values for category 1: $issueTrackerController.filteredStaffNames');
-                                          print('Dropdown values for category 2: $issueTrackerController.filteredStaffNames');
-                                          print('Dropdown values for category 3: $issueTrackerController.filteredStaffNames');
-                                          print('Dropdown values for category 4: $issueTrackerController.filteredStaffNames');
-                                          print('Dropdown values for category5 : $issueTrackerController.filteredStaffNames');
 
                                           setState(() {
                                             issueTrackerController
@@ -1287,46 +1283,41 @@ class _IssueTrackerFormState extends State<IssueTrackerForm> {
                                           height: 60,
                                           decoration: BoxDecoration(
                                             borderRadius:
-                                                BorderRadius.circular(10.0),
+                                            BorderRadius.circular(10.0),
                                             border: Border.all(
                                                 width: 2,
-                                                color: issueTrackerController
-                                                            .isImageUploaded ==
-                                                        false
+                                                color: issueTrackerController.isImageUploaded == false
                                                     ? AppColors.primary
                                                     : AppColors.error),
                                           ),
                                           child: ListTile(
-                                              title: issueTrackerController
-                                                          .isImageUploaded ==
-                                                      false
+                                              title: issueTrackerController.isImageUploaded == false
                                                   ? const Text(
-                                                      'Click or Upload Image',
-                                                    )
+                                                'Click or Upload Image',
+                                              )
                                                   : const Text(
-                                                      'Click or Upload Image',
-                                                      style: TextStyle(
-                                                          color:
-                                                              AppColors.error),
-                                                    ),
+                                                'Click or Upload Image',
+                                                style: TextStyle(
+                                                    color:
+                                                    AppColors.error),
+                                              ),
                                               trailing: const Icon(
                                                   Icons.camera_alt,
                                                   color:
-                                                      AppColors.onBackground),
+                                                  AppColors.onBackground),
                                               onTap: () {
                                                 showModalBottomSheet(
                                                     backgroundColor:
-                                                        AppColors.primary,
+                                                    AppColors.primary,
                                                     context: context,
                                                     builder: ((builder) =>
                                                         issueTrackerController
                                                             .bottomSheet(
-                                                                context, 1)));
+                                                            context)));
                                               }),
                                         ),
                                         ErrorText(
-                                          isVisible: issueTrackerController
-                                              .validateRegister,
+                                          isVisible: issueTrackerController.validateRegister,
                                           message: 'Image Required',
                                         ),
                                         CustomSizedBox(
@@ -1334,97 +1325,97 @@ class _IssueTrackerFormState extends State<IssueTrackerForm> {
                                           side: 'height',
                                         ),
                                         issueTrackerController
-                                                .multipleImage.isNotEmpty
+                                            .multipleImage.isNotEmpty
                                             ? Container(
-                                                width:
-                                                    responsive.responsiveValue(
-                                                        small: 600.0,
-                                                        medium: 900.0,
-                                                        large: 1400.0),
-                                                height:
-                                                    responsive.responsiveValue(
-                                                        small: 170.0,
-                                                        medium: 170.0,
-                                                        large: 170.0),
-                                                decoration: BoxDecoration(
-                                                  border: Border.all(
-                                                      color: Colors.grey),
-                                                  borderRadius:
-                                                      BorderRadius.circular(10),
+                                          width:
+                                          responsive.responsiveValue(
+                                              small: 600.0,
+                                              medium: 900.0,
+                                              large: 1400.0),
+                                          height:
+                                          responsive.responsiveValue(
+                                              small: 170.0,
+                                              medium: 170.0,
+                                              large: 170.0),
+                                          decoration: BoxDecoration(
+                                            border: Border.all(
+                                                color: Colors.grey),
+                                            borderRadius:
+                                            BorderRadius.circular(10),
+                                          ),
+                                          child:
+                                          issueTrackerController
+                                              .multipleImage
+                                              .isEmpty
+                                              ? const Center(
+                                            child: Text(
+                                                'No images selected.'),
+                                          )
+                                              : ListView.builder(
+                                            scrollDirection:
+                                            Axis.horizontal,
+                                            itemCount:
+                                            issueTrackerController
+                                                .multipleImage
+                                                .length,
+                                            itemBuilder:
+                                                (context,
+                                                index) {
+                                              return SizedBox(
+                                                height: 200,
+                                                width: 200,
+                                                child: Column(
+                                                  children: [
+                                                    Padding(
+                                                      padding: const EdgeInsets
+                                                          .all(
+                                                          8.0),
+                                                      child:
+                                                      GestureDetector(
+                                                        onTap:
+                                                            () {
+                                                          CustomImagePreview.showImagePreview(
+                                                              issueTrackerController.multipleImage[index].path,
+                                                              context);
+                                                        },
+                                                        child: Image
+                                                            .file(
+                                                          File(issueTrackerController
+                                                              .multipleImage[index]
+                                                              .path),
+                                                          width:
+                                                          190,
+                                                          height:
+                                                          120,
+                                                          fit: BoxFit
+                                                              .fill,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    GestureDetector(
+                                                      onTap:
+                                                          () {
+                                                        setState(
+                                                                () {
+                                                              issueTrackerController
+                                                                  .multipleImage
+                                                                  .removeAt(index);
+                                                            });
+                                                      },
+                                                      child:
+                                                      const Icon(
+                                                        Icons
+                                                            .delete,
+                                                        color: Colors
+                                                            .red,
+                                                      ),
+                                                    ),
+                                                  ],
                                                 ),
-                                                child:
-                                                    issueTrackerController
-                                                            .multipleImage
-                                                            .isEmpty
-                                                        ? const Center(
-                                                            child: Text(
-                                                                'No images selected.'),
-                                                          )
-                                                        : ListView.builder(
-                                                            scrollDirection:
-                                                                Axis.horizontal,
-                                                            itemCount:
-                                                                issueTrackerController
-                                                                    .multipleImage
-                                                                    .length,
-                                                            itemBuilder:
-                                                                (context,
-                                                                    index) {
-                                                              return SizedBox(
-                                                                height: 200,
-                                                                width: 200,
-                                                                child: Column(
-                                                                  children: [
-                                                                    Padding(
-                                                                      padding: const EdgeInsets
-                                                                          .all(
-                                                                          8.0),
-                                                                      child:
-                                                                          GestureDetector(
-                                                                        onTap:
-                                                                            () {
-                                                                          CustomImagePreview.showImagePreview(
-                                                                              issueTrackerController.multipleImage[index].path,
-                                                                              context);
-                                                                        },
-                                                                        child: Image
-                                                                            .file(
-                                                                          File(issueTrackerController
-                                                                              .multipleImage[index]
-                                                                              .path),
-                                                                          width:
-                                                                              190,
-                                                                          height:
-                                                                              120,
-                                                                          fit: BoxFit
-                                                                              .fill,
-                                                                        ),
-                                                                      ),
-                                                                    ),
-                                                                    GestureDetector(
-                                                                      onTap:
-                                                                          () {
-                                                                        setState(
-                                                                            () {
-                                                                          issueTrackerController
-                                                                              .multipleImage
-                                                                              .removeAt(index);
-                                                                        });
-                                                                      },
-                                                                      child:
-                                                                          const Icon(
-                                                                        Icons
-                                                                            .delete,
-                                                                        color: Colors
-                                                                            .red,
-                                                                      ),
-                                                                    ),
-                                                                  ],
-                                                                ),
-                                                              );
-                                                            },
-                                                          ),
-                                              )
+                                              );
+                                            },
+                                          ),
+                                        )
                                             : const SizedBox(),
                                         CustomSizedBox(
                                           value: 40,
@@ -2019,136 +2010,141 @@ class _IssueTrackerFormState extends State<IssueTrackerForm> {
                                           height: 60,
                                           decoration: BoxDecoration(
                                             borderRadius:
-                                                BorderRadius.circular(10.0),
+                                            BorderRadius.circular(10.0),
                                             border: Border.all(
-                                              width: 2,
-                                              color: issueTrackerController
-                                                          .isImageUploaded2 ==
-                                                      false
-                                                  ? AppColors.primary
-                                                  : AppColors.error,
-                                            ),
+                                                width: 2,
+                                                color:
+                                                issueTrackerController.isImageUploaded2 == false
+                                                    ? AppColors.primary
+                                                    : AppColors.error),
                                           ),
                                           child: ListTile(
-                                            title: Text(
-                                              'Click or Upload Image',
-                                              style: TextStyle(
-                                                color: issueTrackerController
-                                                            .isImageUploaded2 ==
-                                                        false
-                                                    ? Colors.black
-                                                    : AppColors.error,
+                                              title: issueTrackerController.isImageUploaded2 == false
+                                                  ? const Text(
+                                                'Click or Upload Image',
+                                              )
+                                                  : const Text(
+                                                'Click or Upload Image',
+                                                style: TextStyle(
+                                                    color:
+                                                    AppColors.error),
                                               ),
-                                            ),
-                                            trailing: const Icon(
-                                                Icons.camera_alt,
-                                                color: AppColors.onBackground),
-                                            onTap: () {
-                                              showModalBottomSheet(
-                                                backgroundColor:
+                                              trailing: const Icon(
+                                                  Icons.camera_alt,
+                                                  color:
+                                                  AppColors.onBackground),
+                                              onTap: () {
+                                                showModalBottomSheet(
+                                                    backgroundColor:
                                                     AppColors.primary,
-                                                context: context,
-                                                builder: (builder) =>
-                                                    issueTrackerController
-                                                        .bottomSheet(
-                                                            context, 2),
-                                              );
-                                            },
-                                          ),
+                                                    context: context,
+                                                    builder: ((builder) =>
+                                                        issueTrackerController
+                                                            .bottomSheet2(
+                                                            context)));
+                                              }),
                                         ),
                                         ErrorText(
-                                          isVisible: issueTrackerController
-                                              .validateRegister2,
+                                          isVisible: issueTrackerController.validateRegister2,
                                           message:
-                                              'Library Register Image Required',
+                                          'library Register Image Required',
                                         ),
                                         CustomSizedBox(
                                           value: 20,
                                           side: 'height',
                                         ),
                                         issueTrackerController
-                                                .multipleImage2.isNotEmpty
+                                            .multipleImage2.isNotEmpty
                                             ? Container(
-                                                width:
-                                                    responsive.responsiveValue(
-                                                  small: 600.0,
-                                                  medium: 900.0,
-                                                  large: 1400.0,
-                                                ),
-                                                height:
-                                                    responsive.responsiveValue(
-                                                  small: 170.0,
-                                                  medium: 170.0,
-                                                  large: 170.0,
-                                                ),
-                                                decoration: BoxDecoration(
-                                                  border: Border.all(
-                                                      color: Colors.grey),
-                                                  borderRadius:
-                                                      BorderRadius.circular(10),
-                                                ),
-                                                child: ListView.builder(
-                                                  scrollDirection:
-                                                      Axis.horizontal,
-                                                  itemCount:
-                                                      issueTrackerController
-                                                          .multipleImage2
-                                                          .length,
-                                                  itemBuilder:
-                                                      (context, index) {
-                                                    return SizedBox(
-                                                      height: 200,
-                                                      width: 200,
-                                                      child: Column(
-                                                        children: [
-                                                          Padding(
-                                                            padding:
-                                                                const EdgeInsets
-                                                                    .all(8.0),
-                                                            child:
-                                                                GestureDetector(
-                                                              onTap: () {
-                                                                CustomImagePreview
-                                                                    .showImagePreview(
-                                                                  issueTrackerController
-                                                                      .multipleImage2[
-                                                                          index]
-                                                                      .path,
-                                                                  context,
-                                                                );
-                                                              },
-                                                              child: Image.file(
-                                                                File(issueTrackerController
-                                                                    .multipleImage2[
-                                                                        index]
-                                                                    .path),
-                                                                width: 190,
-                                                                height: 120,
-                                                                fit:
-                                                                    BoxFit.fill,
-                                                              ),
-                                                            ),
-                                                          ),
-                                                          GestureDetector(
-                                                            onTap: () {
-                                                              setState(() {
-                                                                issueTrackerController
-                                                                    .multipleImage2
-                                                                    .removeAt(
-                                                                        index);
-                                                              });
-                                                            },
-                                                            child: const Icon(
-                                                              Icons.delete,
-                                                              color: Colors.red,
-                                                            ),
-                                                          ),
-                                                        ],
+                                          width:
+                                          responsive.responsiveValue(
+                                              small: 600.0,
+                                              medium: 900.0,
+                                              large: 1400.0),
+                                          height:
+                                          responsive.responsiveValue(
+                                              small: 170.0,
+                                              medium: 170.0,
+                                              large: 170.0),
+                                          decoration: BoxDecoration(
+                                            border: Border.all(
+                                                color: Colors.grey),
+                                            borderRadius:
+                                            BorderRadius.circular(10),
+                                          ),
+                                          child:
+                                          issueTrackerController
+                                              .multipleImage2
+                                              .isEmpty
+                                              ? const Center(
+                                            child: Text(
+                                                'No images selected.'),
+                                          )
+                                              : ListView.builder(
+                                            scrollDirection:
+                                            Axis.horizontal,
+                                            itemCount:
+                                            issueTrackerController
+                                                .multipleImage2
+                                                .length,
+                                            itemBuilder:
+                                                (context,
+                                                index) {
+                                              return SizedBox(
+                                                height: 200,
+                                                width: 200,
+                                                child: Column(
+                                                  children: [
+                                                    Padding(
+                                                      padding: const EdgeInsets
+                                                          .all(
+                                                          8.0),
+                                                      child:
+                                                      GestureDetector(
+                                                        onTap:
+                                                            () {
+                                                          CustomImagePreview2.showImagePreview2(
+                                                              issueTrackerController.multipleImage2[index].path,
+                                                              context);
+                                                        },
+                                                        child: Image
+                                                            .file(
+                                                          File(issueTrackerController
+                                                              .multipleImage2[index]
+                                                              .path),
+                                                          width:
+                                                          190,
+                                                          height:
+                                                          120,
+                                                          fit: BoxFit
+                                                              .fill,
+                                                        ),
                                                       ),
-                                                    );
-                                                  },
+                                                    ),
+                                                    GestureDetector(
+                                                      onTap:
+                                                          () {
+                                                        setState(
+                                                                () {
+                                                              issueTrackerController
+                                                                  .multipleImage2
+                                                                  .removeAt(index);
+                                                            });
+                                                      },
+                                                      child:
+                                                      const Icon(
+                                                        Icons
+                                                            .delete,
+                                                        color: Colors
+                                                            .red,
+                                                      ),
+                                                    ),
+                                                  ],
                                                 ),
-                                              )
+                                              );
+                                            },
+                                          ),
+                                        )
                                             : const SizedBox(),
 
                                         CustomSizedBox(
@@ -4133,136 +4129,141 @@ class _IssueTrackerFormState extends State<IssueTrackerForm> {
                                           height: 60,
                                           decoration: BoxDecoration(
                                             borderRadius:
-                                                BorderRadius.circular(10.0),
+                                            BorderRadius.circular(10.0),
                                             border: Border.all(
-                                              width: 2,
-                                              color: issueTrackerController
-                                                          .isImageUploaded3 ==
-                                                      false
-                                                  ? AppColors.primary
-                                                  : AppColors.error,
-                                            ),
+                                                width: 2,
+                                                color:
+                                                issueTrackerController.isImageUploaded3 == false
+                                                    ? AppColors.primary
+                                                    : AppColors.error),
                                           ),
                                           child: ListTile(
-                                            title: Text(
-                                              'Click or Upload Image',
-                                              style: TextStyle(
-                                                color: issueTrackerController
-                                                            .isImageUploaded3 ==
-                                                        false
-                                                    ? Colors.black
-                                                    : AppColors.error,
+                                              title: issueTrackerController.isImageUploaded3 == false
+                                                  ? const Text(
+                                                'Click or Upload Image',
+                                              )
+                                                  : const Text(
+                                                'Click or Upload Image',
+                                                style: TextStyle(
+                                                    color:
+                                                    AppColors.error),
                                               ),
-                                            ),
-                                            trailing: const Icon(
-                                                Icons.camera_alt,
-                                                color: AppColors.onBackground),
-                                            onTap: () {
-                                              showModalBottomSheet(
-                                                backgroundColor:
+                                              trailing: const Icon(
+                                                  Icons.camera_alt,
+                                                  color:
+                                                  AppColors.onBackground),
+                                              onTap: () {
+                                                showModalBottomSheet(
+                                                    backgroundColor:
                                                     AppColors.primary,
-                                                context: context,
-                                                builder: (builder) =>
-                                                    issueTrackerController
-                                                        .bottomSheet(
-                                                            context, 3),
-                                              );
-                                            },
-                                          ),
+                                                    context: context,
+                                                    builder: ((builder) =>
+                                                        issueTrackerController
+                                                            .bottomSheet3(
+                                                            context)));
+                                              }),
                                         ),
                                         ErrorText(
-                                          isVisible: issueTrackerController
-                                              .validateRegister3,
+                                          isVisible: issueTrackerController.validateRegister3,
                                           message:
-                                              'Library Register Image Required',
+                                          'library Register Image Required',
                                         ),
                                         CustomSizedBox(
                                           value: 20,
                                           side: 'height',
                                         ),
                                         issueTrackerController
-                                                .multipleImage3.isNotEmpty
+                                            .multipleImage3.isNotEmpty
                                             ? Container(
-                                                width:
-                                                    responsive.responsiveValue(
-                                                  small: 600.0,
-                                                  medium: 900.0,
-                                                  large: 1400.0,
-                                                ),
-                                                height:
-                                                    responsive.responsiveValue(
-                                                  small: 170.0,
-                                                  medium: 170.0,
-                                                  large: 170.0,
-                                                ),
-                                                decoration: BoxDecoration(
-                                                  border: Border.all(
-                                                      color: Colors.grey),
-                                                  borderRadius:
-                                                      BorderRadius.circular(10),
-                                                ),
-                                                child: ListView.builder(
-                                                  scrollDirection:
-                                                      Axis.horizontal,
-                                                  itemCount:
-                                                      issueTrackerController
-                                                          .multipleImage3
-                                                          .length,
-                                                  itemBuilder:
-                                                      (context, index) {
-                                                    return SizedBox(
-                                                      height: 200,
-                                                      width: 200,
-                                                      child: Column(
-                                                        children: [
-                                                          Padding(
-                                                            padding:
-                                                                const EdgeInsets
-                                                                    .all(8.0),
-                                                            child:
-                                                                GestureDetector(
-                                                              onTap: () {
-                                                                CustomImagePreview
-                                                                    .showImagePreview(
-                                                                  issueTrackerController
-                                                                      .multipleImage3[
-                                                                          index]
-                                                                      .path,
-                                                                  context,
-                                                                );
-                                                              },
-                                                              child: Image.file(
-                                                                File(issueTrackerController
-                                                                    .multipleImage3[
-                                                                        index]
-                                                                    .path),
-                                                                width: 190,
-                                                                height: 120,
-                                                                fit:
-                                                                    BoxFit.fill,
-                                                              ),
-                                                            ),
-                                                          ),
-                                                          GestureDetector(
-                                                            onTap: () {
-                                                              setState(() {
-                                                                issueTrackerController
-                                                                    .multipleImage3
-                                                                    .removeAt(
-                                                                        index);
-                                                              });
-                                                            },
-                                                            child: const Icon(
-                                                              Icons.delete,
-                                                              color: Colors.red,
-                                                            ),
-                                                          ),
-                                                        ],
+                                          width:
+                                          responsive.responsiveValue(
+                                              small: 600.0,
+                                              medium: 900.0,
+                                              large: 1400.0),
+                                          height:
+                                          responsive.responsiveValue(
+                                              small: 170.0,
+                                              medium: 170.0,
+                                              large: 170.0),
+                                          decoration: BoxDecoration(
+                                            border: Border.all(
+                                                color: Colors.grey),
+                                            borderRadius:
+                                            BorderRadius.circular(10),
+                                          ),
+                                          child:
+                                          issueTrackerController
+                                              .multipleImage3
+                                              .isEmpty
+                                              ? const Center(
+                                            child: Text(
+                                                'No images selected.'),
+                                          )
+                                              : ListView.builder(
+                                            scrollDirection:
+                                            Axis.horizontal,
+                                            itemCount:
+                                            issueTrackerController
+                                                .multipleImage3
+                                                .length,
+                                            itemBuilder:
+                                                (context,
+                                                index) {
+                                              return SizedBox(
+                                                height: 200,
+                                                width: 200,
+                                                child: Column(
+                                                  children: [
+                                                    Padding(
+                                                      padding: const EdgeInsets
+                                                          .all(
+                                                          8.0),
+                                                      child:
+                                                      GestureDetector(
+                                                        onTap:
+                                                            () {
+                                                          CustomImagePreview3.showImagePreview3(
+                                                              issueTrackerController.multipleImage3[index].path,
+                                                              context);
+                                                        },
+                                                        child: Image
+                                                            .file(
+                                                          File(issueTrackerController
+                                                              .multipleImage3[index]
+                                                              .path),
+                                                          width:
+                                                          190,
+                                                          height:
+                                                          120,
+                                                          fit: BoxFit
+                                                              .fill,
+                                                        ),
                                                       ),
-                                                    );
-                                                  },
+                                                    ),
+                                                    GestureDetector(
+                                                      onTap:
+                                                          () {
+                                                        setState(
+                                                                () {
+                                                              issueTrackerController
+                                                                  .multipleImage3
+                                                                  .removeAt(index);
+                                                            });
+                                                      },
+                                                      child:
+                                                      const Icon(
+                                                        Icons
+                                                            .delete,
+                                                        color: Colors
+                                                            .red,
+                                                      ),
+                                                    ),
+                                                  ],
                                                 ),
-                                              )
+                                              );
+                                            },
+                                          ),
+                                        )
                                             : const SizedBox(),
                                         CustomSizedBox(
                                           value: 40,
@@ -4986,140 +4987,138 @@ class _IssueTrackerFormState extends State<IssueTrackerForm> {
                                             height: 60,
                                             decoration: BoxDecoration(
                                               borderRadius:
-                                                  BorderRadius.circular(10.0),
+                                              BorderRadius.circular(10.0),
                                               border: Border.all(
-                                                width: 2,
-                                                color: issueTrackerController
-                                                            .isImageUploaded4 ==
-                                                        false
-                                                    ? AppColors.primary
-                                                    : AppColors.error,
-                                              ),
+                                                  width: 2,
+                                                  color:
+                                                  issueTrackerController.isImageUploaded4 == false
+                                                      ? AppColors.primary
+                                                      : AppColors.error),
                                             ),
                                             child: ListTile(
-                                              title: Text(
-                                                'Click or Upload Image',
-                                                style: TextStyle(
-                                                  color: issueTrackerController
-                                                              .isImageUploaded4 ==
-                                                          false
-                                                      ? Colors.black
-                                                      : AppColors.error,
+                                                title:
+                                                issueTrackerController.isImageUploaded4 == false
+                                                    ? const Text(
+                                                  'Click or Upload Image',
+                                                )
+                                                    : const Text(
+                                                  'Click or Upload Image',
+                                                  style: TextStyle(
+                                                      color: AppColors
+                                                          .error),
                                                 ),
-                                              ),
-                                              trailing: const Icon(
-                                                  Icons.camera_alt,
-                                                  color:
-                                                      AppColors.onBackground),
-                                              onTap: () {
-                                                showModalBottomSheet(
-                                                  backgroundColor:
+                                                trailing: const Icon(
+                                                    Icons.camera_alt,
+                                                    color:
+                                                    AppColors.onBackground),
+                                                onTap: () {
+                                                  showModalBottomSheet(
+                                                      backgroundColor:
                                                       AppColors.primary,
-                                                  context: context,
-                                                  builder: (builder) =>
-                                                      issueTrackerController
-                                                          .bottomSheet(
-                                                              context, 4),
-                                                );
-                                              },
-                                            ),
+                                                      context: context,
+                                                      builder: ((builder) =>
+                                                          issueTrackerController
+                                                              .bottomSheet4(
+                                                              context)));
+                                                }),
                                           ),
                                           ErrorText(
-                                            isVisible: issueTrackerController
-                                                .validateRegister4,
+                                            isVisible: issueTrackerController.validateRegister4,
                                             message:
-                                                'Library Register Image Required',
+                                            'library Register Image Required',
                                           ),
                                           CustomSizedBox(
                                             value: 20,
                                             side: 'height',
                                           ),
                                           issueTrackerController
-                                                  .multipleImage4.isNotEmpty
+                                              .multipleImage4.isNotEmpty
                                               ? Container(
-                                                  width: responsive
-                                                      .responsiveValue(
-                                                    small: 600.0,
-                                                    medium: 900.0,
-                                                    large: 1400.0,
-                                                  ),
-                                                  height: responsive
-                                                      .responsiveValue(
-                                                    small: 170.0,
-                                                    medium: 170.0,
-                                                    large: 170.0,
-                                                  ),
-                                                  decoration: BoxDecoration(
-                                                    border: Border.all(
-                                                        color: Colors.grey),
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            10),
-                                                  ),
-                                                  child: ListView.builder(
-                                                    scrollDirection:
-                                                        Axis.horizontal,
-                                                    itemCount:
-                                                        issueTrackerController
-                                                            .multipleImage4
-                                                            .length,
-                                                    itemBuilder:
-                                                        (context, index) {
-                                                      return SizedBox(
-                                                        height: 200,
-                                                        width: 200,
-                                                        child: Column(
-                                                          children: [
-                                                            Padding(
-                                                              padding:
-                                                                  const EdgeInsets
-                                                                      .all(8.0),
-                                                              child:
-                                                                  GestureDetector(
-                                                                onTap: () {
-                                                                  CustomImagePreview
-                                                                      .showImagePreview(
-                                                                    issueTrackerController
-                                                                        .multipleImage4[
-                                                                            index]
-                                                                        .path,
-                                                                    context,
-                                                                  );
-                                                                },
-                                                                child:
-                                                                    Image.file(
-                                                                  File(issueTrackerController
-                                                                      .multipleImage4[
-                                                                          index]
-                                                                      .path),
-                                                                  width: 190,
-                                                                  height: 120,
-                                                                  fit: BoxFit
-                                                                      .fill,
-                                                                ),
-                                                              ),
-                                                            ),
-                                                            GestureDetector(
-                                                              onTap: () {
-                                                                setState(() {
-                                                                  issueTrackerController
-                                                                      .multipleImage4
-                                                                      .removeAt(
-                                                                          index);
-                                                                });
-                                                              },
-                                                              child: const Icon(
-                                                                Icons.delete,
-                                                                color:
-                                                                    Colors.red,
-                                                              ),
-                                                            ),
-                                                          ],
+                                            width: responsive
+                                                .responsiveValue(
+                                                small: 600.0,
+                                                medium: 900.0,
+                                                large: 1400.0),
+                                            height: responsive
+                                                .responsiveValue(
+                                                small: 170.0,
+                                                medium: 170.0,
+                                                large: 170.0),
+                                            decoration: BoxDecoration(
+                                              border: Border.all(
+                                                  color: Colors.grey),
+                                              borderRadius:
+                                              BorderRadius.circular(
+                                                  10),
+                                            ),
+                                            child:
+                                            issueTrackerController
+                                                .multipleImage4
+                                                .isEmpty
+                                                ? const Center(
+                                              child: Text(
+                                                  'No images selected.'),
+                                            )
+                                                : ListView.builder(
+                                              scrollDirection:
+                                              Axis.horizontal,
+                                              itemCount:
+                                              issueTrackerController
+                                                  .multipleImage4
+                                                  .length,
+                                              itemBuilder:
+                                                  (context,
+                                                  index) {
+                                                return SizedBox(
+                                                  height: 200,
+                                                  width: 200,
+                                                  child: Column(
+                                                    children: [
+                                                      Padding(
+                                                        padding: const EdgeInsets
+                                                            .all(
+                                                            8.0),
+                                                        child:
+                                                        GestureDetector(
+                                                          onTap:
+                                                              () {
+                                                            CustomImagePreview4.showImagePreview4(issueTrackerController.multipleImage4[index].path,
+                                                                context);
+                                                          },
+                                                          child:
+                                                          Image.file(
+                                                            File(issueTrackerController.multipleImage4[index].path),
+                                                            width:
+                                                            190,
+                                                            height:
+                                                            120,
+                                                            fit:
+                                                            BoxFit.fill,
+                                                          ),
                                                         ),
-                                                      );
-                                                    },
+                                                      ),
+                                                      GestureDetector(
+                                                        onTap:
+                                                            () {
+                                                          setState(
+                                                                  () {
+                                                                issueTrackerController.multipleImage4.removeAt(index);
+                                                              });
+                                                        },
+                                                        child:
+                                                        const Icon(
+                                                          Icons
+                                                              .delete,
+                                                          color:
+                                                          Colors.red,
+                                                        ),
+                                                      ),
+                                                    ],
                                                   ),
-                                                )
+                                                );
+                                              },
+                                            ),
+                                          )
                                               : const SizedBox(),
                                           CustomSizedBox(
                                             value: 40,
@@ -5478,17 +5477,25 @@ class _IssueTrackerFormState extends State<IssueTrackerForm> {
                                             CustomButton(
                                                 title: 'Next',
                                                 onPressedButton: () {
-                                                  if (_formKey.currentState!
-                                                      .validate()) {
+                                                  setState(() {
+                                                    // Only validate radioFieldError14 if the office is NOT 'Sikkim'
+                                                    if (controller.office != 'Sikkim') {
+                                                      issueTrackerController.radioFieldError14 = issueTrackerController.selectedValue14 == null || issueTrackerController.selectedValue14!.isEmpty;
+                                                    } else {
+                                                      issueTrackerController.radioFieldError14 = false; // No validation for Sikkim
+                                                    }
+                                                  });
+
+                                                  // Validate the form only if the office is NOT 'Sikkim'
+                                                  if (_formKey.currentState!.validate() && !issueTrackerController.radioFieldError14) {
                                                     setState(() {
-                                                      issueTrackerController
-                                                              .showClassroom =
-                                                          false;
-                                                      issueTrackerController
-                                                          .showAlexa = true;
+                                                      issueTrackerController.showClassroom = false;
+                                                      issueTrackerController.showAlexa = true;
                                                     });
                                                   }
-                                                })
+                                                }
+                                            )
+
                                           ],
                                         ),
                                       ],
@@ -6284,140 +6291,138 @@ class _IssueTrackerFormState extends State<IssueTrackerForm> {
                                             height: 60,
                                             decoration: BoxDecoration(
                                               borderRadius:
-                                                  BorderRadius.circular(10.0),
+                                              BorderRadius.circular(10.0),
                                               border: Border.all(
-                                                width: 2,
-                                                color: issueTrackerController
-                                                            .isImageUploaded5 ==
-                                                        false
-                                                    ? AppColors.primary
-                                                    : AppColors.error,
-                                              ),
+                                                  width: 2,
+                                                  color:
+                                                  issueTrackerController.isImageUploaded5 == false
+                                                      ? AppColors.primary
+                                                      : AppColors.error),
                                             ),
                                             child: ListTile(
-                                              title: Text(
-                                                'Click or Upload Image',
-                                                style: TextStyle(
-                                                  color: issueTrackerController
-                                                              .isImageUploaded5 ==
-                                                          false
-                                                      ? Colors.black
-                                                      : AppColors.error,
+                                                title:
+                                                issueTrackerController.isImageUploaded5 == false
+                                                    ? const Text(
+                                                  'Click or Upload Image',
+                                                )
+                                                    : const Text(
+                                                  'Click or Upload Image',
+                                                  style: TextStyle(
+                                                      color: AppColors
+                                                          .error),
                                                 ),
-                                              ),
-                                              trailing: const Icon(
-                                                  Icons.camera_alt,
-                                                  color:
-                                                      AppColors.onBackground),
-                                              onTap: () {
-                                                showModalBottomSheet(
-                                                  backgroundColor:
+                                                trailing: const Icon(
+                                                    Icons.camera_alt,
+                                                    color:
+                                                    AppColors.onBackground),
+                                                onTap: () {
+                                                  showModalBottomSheet(
+                                                      backgroundColor:
                                                       AppColors.primary,
-                                                  context: context,
-                                                  builder: (builder) =>
-                                                      issueTrackerController
-                                                          .bottomSheet(
-                                                              context, 5),
-                                                );
-                                              },
-                                            ),
+                                                      context: context,
+                                                      builder: ((builder) =>
+                                                          issueTrackerController
+                                                              .bottomSheet5(
+                                                              context)));
+                                                }),
                                           ),
                                           ErrorText(
-                                            isVisible: issueTrackerController
-                                                .validateRegister5,
+                                            isVisible: issueTrackerController.validateRegister5,
                                             message:
-                                                'Library Register Image Required',
+                                            'library Register Image Required',
                                           ),
                                           CustomSizedBox(
                                             value: 20,
                                             side: 'height',
                                           ),
                                           issueTrackerController
-                                                  .multipleImage5.isNotEmpty
+                                              .multipleImage5.isNotEmpty
                                               ? Container(
-                                                  width: responsive
-                                                      .responsiveValue(
-                                                    small: 600.0,
-                                                    medium: 900.0,
-                                                    large: 1400.0,
-                                                  ),
-                                                  height: responsive
-                                                      .responsiveValue(
-                                                    small: 170.0,
-                                                    medium: 170.0,
-                                                    large: 170.0,
-                                                  ),
-                                                  decoration: BoxDecoration(
-                                                    border: Border.all(
-                                                        color: Colors.grey),
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            10),
-                                                  ),
-                                                  child: ListView.builder(
-                                                    scrollDirection:
-                                                        Axis.horizontal,
-                                                    itemCount:
-                                                        issueTrackerController
-                                                            .multipleImage5
-                                                            .length,
-                                                    itemBuilder:
-                                                        (context, index) {
-                                                      return SizedBox(
-                                                        height: 200,
-                                                        width: 200,
-                                                        child: Column(
-                                                          children: [
-                                                            Padding(
-                                                              padding:
-                                                                  const EdgeInsets
-                                                                      .all(8.0),
-                                                              child:
-                                                                  GestureDetector(
-                                                                onTap: () {
-                                                                  CustomImagePreview
-                                                                      .showImagePreview(
-                                                                    issueTrackerController
-                                                                        .multipleImage5[
-                                                                            index]
-                                                                        .path,
-                                                                    context,
-                                                                  );
-                                                                },
-                                                                child:
-                                                                    Image.file(
-                                                                  File(issueTrackerController
-                                                                      .multipleImage5[
-                                                                          index]
-                                                                      .path),
-                                                                  width: 190,
-                                                                  height: 120,
-                                                                  fit: BoxFit
-                                                                      .fill,
-                                                                ),
-                                                              ),
-                                                            ),
-                                                            GestureDetector(
-                                                              onTap: () {
-                                                                setState(() {
-                                                                  issueTrackerController
-                                                                      .multipleImage5
-                                                                      .removeAt(
-                                                                          index);
-                                                                });
-                                                              },
-                                                              child: const Icon(
-                                                                Icons.delete,
-                                                                color:
-                                                                    Colors.red,
-                                                              ),
-                                                            ),
-                                                          ],
+                                            width: responsive
+                                                .responsiveValue(
+                                                small: 600.0,
+                                                medium: 900.0,
+                                                large: 1400.0),
+                                            height: responsive
+                                                .responsiveValue(
+                                                small: 170.0,
+                                                medium: 170.0,
+                                                large: 170.0),
+                                            decoration: BoxDecoration(
+                                              border: Border.all(
+                                                  color: Colors.grey),
+                                              borderRadius:
+                                              BorderRadius.circular(
+                                                  10),
+                                            ),
+                                            child:
+                                            issueTrackerController
+                                                .multipleImage5
+                                                .isEmpty
+                                                ? const Center(
+                                              child: Text(
+                                                  'No images selected.'),
+                                            )
+                                                : ListView.builder(
+                                              scrollDirection:
+                                              Axis.horizontal,
+                                              itemCount:
+                                              issueTrackerController
+                                                  .multipleImage5
+                                                  .length,
+                                              itemBuilder:
+                                                  (context,
+                                                  index) {
+                                                return SizedBox(
+                                                  height: 200,
+                                                  width: 200,
+                                                  child: Column(
+                                                    children: [
+                                                      Padding(
+                                                        padding: const EdgeInsets
+                                                            .all(
+                                                            8.0),
+                                                        child:
+                                                        GestureDetector(
+                                                          onTap:
+                                                              () {
+                                                            CustomImagePreview5.showImagePreview5(issueTrackerController.multipleImage5[index].path,
+                                                                context);
+                                                          },
+                                                          child:
+                                                          Image.file(
+                                                            File(issueTrackerController.multipleImage5[index].path),
+                                                            width:
+                                                            190,
+                                                            height:
+                                                            120,
+                                                            fit:
+                                                            BoxFit.fill,
+                                                          ),
                                                         ),
-                                                      );
-                                                    },
+                                                      ),
+                                                      GestureDetector(
+                                                        onTap:
+                                                            () {
+                                                          setState(
+                                                                  () {
+                                                                issueTrackerController.multipleImage5.removeAt(index);
+                                                              });
+                                                        },
+                                                        child:
+                                                        const Icon(
+                                                          Icons
+                                                              .delete,
+                                                          color:
+                                                          Colors.red,
+                                                        ),
+                                                      ),
+                                                    ],
                                                   ),
-                                                )
+                                                );
+                                              },
+                                            ),
+                                          )
                                               : const SizedBox(),
                                           CustomSizedBox(
                                             value: 40,
@@ -6777,8 +6782,19 @@ class _IssueTrackerFormState extends State<IssueTrackerForm> {
                                             CustomButton(
                                                 title: 'Submit',
                                                 onPressedButton: () async {
+                                                  setState(() {
+                                                    // Only validate radioFieldError18 if the office is NOT 'Sikkim'
+                                                    if (controller.office != 'Sikkim') {
+                                                      issueTrackerController.radioFieldError18 = issueTrackerController.selectedValue18 == null || issueTrackerController.selectedValue18!.isEmpty;
+                                                    } else {
+                                                      issueTrackerController.radioFieldError18 = false; // No validation for Sikkim
+                                                    }
+                                                  });
+
                                                   if (_formKey.currentState!
-                                                      .validate()) {
+                                                      .validate() &&
+                                                      !issueTrackerController
+                                                          .radioFieldError18) {
                                                     DateTime now =
                                                         DateTime.now();
                                                     String formattedDate =
@@ -7073,13 +7089,13 @@ class _IssueTrackerFormState extends State<IssueTrackerForm> {
                                                         AppColors.onPrimary,
                                                         Icons.verified,
                                                       );
-                                                      // Navigate to HomeScreen
-                                                      Navigator.pushReplacement(
-                                                        context,
-                                                        MaterialPageRoute(
-                                                            builder: (context) =>
-                                                                HomeScreen()),
-                                                      );
+                                                      // // Navigate to HomeScreen
+                                                      // Navigator.pushReplacement(
+                                                      //   context,
+                                                      //   MaterialPageRoute(
+                                                      //       builder: (context) =>
+                                                      //           CustomDrawer()),
+                                                      // );
                                                     } else {
                                                       customSnackbar(
                                                         'Error',

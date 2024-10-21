@@ -43,28 +43,28 @@ class IssueTrackerController extends GetxController with BaseController {
   bool isLoading = false;
 
   final TextEditingController correctUdiseCodeController =
-      TextEditingController();
+  TextEditingController();
   final TextEditingController libraryDescriptionController =
-      TextEditingController();
+  TextEditingController();
   final TextEditingController playgroundDescriptionController =
-      TextEditingController();
+  TextEditingController();
   final TextEditingController digiLabDescriptionController =
-      TextEditingController();
+  TextEditingController();
   final TextEditingController classroomDescriptionController =
-      TextEditingController();
+  TextEditingController();
   final TextEditingController alexaDescriptionController =
-      TextEditingController();
+  TextEditingController();
   final TextEditingController otherSolarDescriptionController =
-      TextEditingController();
+  TextEditingController();
   final TextEditingController tabletNumberController = TextEditingController();
   final TextEditingController dotDeviceMissingController =
-      TextEditingController();
+  TextEditingController();
   final TextEditingController dotDeviceNotConfiguredController =
-      TextEditingController();
+  TextEditingController();
   final TextEditingController dotDeviceNotConnectingController =
-      TextEditingController();
+  TextEditingController();
   final TextEditingController dotDeviceNotChargingController =
-      TextEditingController();
+  TextEditingController();
   final TextEditingController dotOtherIssueController = TextEditingController();
   final TextEditingController tabletNumber3Controller = TextEditingController();
   final TextEditingController dateController = TextEditingController();
@@ -233,93 +233,39 @@ class IssueTrackerController extends GetxController with BaseController {
   final List<XFile> _multipleImage6 = [];
   List<XFile> get multipleImage6 => _multipleImage6;
 
-  List<String> _imagePaths6 = [];
-  List<String> get imagePaths6 => _imagePaths6;
-
-  final List<XFile> _multipleImage7 = [];
-  List<XFile> get multipleImage7 => _multipleImage7;
-
-  List<String> _imagePaths7 = [];
-  List<String> get imagePaths7 => _imagePaths7;
-
-  final List<XFile> _multipleImage8 = [];
-  List<XFile> get multipleImage8 => _multipleImage8;
-
-  List<String> _imagePaths8 = [];
-  List<String> get imagePaths8 => _imagePaths8;
-
-  final List<XFile> _multipleImage9 = [];
-  List<XFile> get multipleImage9 => _multipleImage9;
-
-  List<String> _imagePaths9 = [];
-  List<String> get imagePaths9 => _imagePaths9;
 
   Future<String> compressImage(String imagePath) async {
     // Load the image
     final File imageFile = File(imagePath);
-    final img.Image? originalImage =
-        img.decodeImage(imageFile.readAsBytesSync());
+    final img.Image? originalImage = img.decodeImage(imageFile.readAsBytesSync());
 
-    if (originalImage == null)
-      return imagePath; // Return original path if decoding fails
+    if (originalImage == null) return imagePath; // Return original path if decoding fails
 
     // Resize the image (optional) and compress
-    final img.Image resizedImage =
-        img.copyResize(originalImage, width: 768); // Change the width as needed
-    final List<int> compressedImage =
-        img.encodeJpg(resizedImage, quality: 40); // Adjust quality (0-100)
+    final img.Image resizedImage = img.copyResize(originalImage, width: 768); // Change the width as needed
+    final List<int> compressedImage = img.encodeJpg(resizedImage, quality: 40); // Adjust quality (0-100)
 
     // Save the compressed image to a new file
     final Directory appDir = await getTemporaryDirectory();
-    final String compressedImagePath =
-        '${appDir.path}/compressed_${DateTime.now().millisecondsSinceEpoch}.jpg';
+    final String compressedImagePath = '${appDir.path}/compressed_${DateTime.now().millisecondsSinceEpoch}.jpg';
     final File compressedFile = File(compressedImagePath);
     await compressedFile.writeAsBytes(compressedImage);
 
     return compressedImagePath; // Return the path of the compressed image
   }
 
-  Future<String> takePhoto(ImageSource source, int index) async {
+  Future<String> takePhoto(ImageSource source) async {
     final ImagePicker picker = ImagePicker();
     List<XFile> selectedImages = [];
     XFile? pickedImage;
-
-    // Determine which list to use based on the index parameter
-    List<XFile> multipleImages;
-    List<String> imagePaths;
-
-    switch (index) {
-      case 1:
-        multipleImages = _multipleImage;
-        imagePaths = _imagePaths;
-        break;
-      case 2:
-        multipleImages = _multipleImage2;
-        imagePaths = _imagePaths2;
-        break;
-      case 3:
-        multipleImages = _multipleImage3;
-        imagePaths = _imagePaths3;
-        break;
-      case 4:
-        multipleImages = _multipleImage4;
-        imagePaths = _imagePaths4;
-        break;
-      case 5:
-        multipleImages = _multipleImage5;
-        imagePaths = _imagePaths5;
-        break;
-      default:
-        throw ArgumentError('Invalid index: $index');
-    }
 
     if (source == ImageSource.gallery) {
       selectedImages = await picker.pickMultiImage();
       for (var selectedImage in selectedImages) {
         // Compress each selected image
         String compressedPath = await compressImage(selectedImage.path);
-        multipleImages.add(XFile(compressedPath));
-        imagePaths.add(compressedPath);
+        _multipleImage.add(XFile(compressedPath));
+        _imagePaths.add(compressedPath);
       }
       update();
     } else if (source == ImageSource.camera) {
@@ -327,15 +273,128 @@ class IssueTrackerController extends GetxController with BaseController {
       if (pickedImage != null) {
         // Compress the picked image
         String compressedPath = await compressImage(pickedImage.path);
-        multipleImages.add(XFile(compressedPath));
-        imagePaths.add(compressedPath);
+        _multipleImage.add(XFile(compressedPath));
+        _imagePaths.add(compressedPath);
       }
       update();
     }
 
-    return imagePaths.toString();
+    return _imagePaths.toString();
   }
 
+
+  Future<String> takePhoto2(ImageSource source) async {
+    final ImagePicker picker2 = ImagePicker();
+    List<XFile> selectedImages2 = [];
+    XFile? pickedImage;
+
+    if (source == ImageSource.gallery) {
+      selectedImages2 = await picker2.pickMultiImage();
+      for (var selectedImage2 in selectedImages2) {
+        // Compress each selected image
+        String compressedPath = await compressImage(selectedImage2.path);
+        _multipleImage2.add(XFile(compressedPath));
+        _imagePaths2.add(compressedPath);
+      }
+      update();
+    } else if (source == ImageSource.camera) {
+      pickedImage = await picker2.pickImage(source: source);
+      if (pickedImage != null) {
+        // Compress the picked image
+        String compressedPath = await compressImage(pickedImage.path);
+        _multipleImage2.add(XFile(compressedPath));
+        _imagePaths2.add(compressedPath);
+      }
+      update();
+    }
+
+    return _imagePaths2.toString();
+  }
+
+  Future<String> takePhoto3(ImageSource source) async {
+    final ImagePicker picker3 = ImagePicker();
+    List<XFile> selectedImages3 = [];
+    XFile? pickedImage;
+
+    if (source == ImageSource.gallery) {
+      selectedImages3 = await picker3.pickMultiImage();
+      for (var selectedImage3 in selectedImages3) {
+        // Compress each selected image
+        String compressedPath = await compressImage(selectedImage3.path);
+        _multipleImage3.add(XFile(compressedPath));
+        _imagePaths3.add(compressedPath);
+      }
+      update();
+    } else if (source == ImageSource.camera) {
+      pickedImage = await picker3.pickImage(source: source);
+      if (pickedImage != null) {
+        // Compress the picked image
+        String compressedPath = await compressImage(pickedImage.path);
+        _multipleImage3.add(XFile(compressedPath));
+        _imagePaths3.add(compressedPath);
+      }
+      update();
+    }
+
+    return _imagePaths3.toString();
+  }
+
+  Future<String> takePhoto4(ImageSource source) async {
+    final ImagePicker picker4 = ImagePicker();
+    List<XFile> selectedImages4 = [];
+    XFile? pickedImage;
+
+    if (source == ImageSource.gallery) {
+      selectedImages4 = await picker4.pickMultiImage();
+      for (var selectedImage4 in selectedImages4) {
+        // Compress each selected image
+        String compressedPath = await compressImage(selectedImage4.path);
+        _multipleImage4.add(XFile(compressedPath));
+        _imagePaths4.add(compressedPath);
+      }
+      update();
+    } else if (source == ImageSource.camera) {
+      pickedImage = await picker4.pickImage(source: source);
+      if (pickedImage != null) {
+        // Compress the picked image
+        String compressedPath = await compressImage(pickedImage.path);
+        _multipleImage4.add(XFile(compressedPath));
+        _imagePaths4.add(compressedPath);
+      }
+      update();
+    }
+
+    return _imagePaths4.toString();
+  }
+
+
+  Future<String> takePhoto5(ImageSource source) async {
+    final ImagePicker picker5 = ImagePicker();
+    List<XFile> selectedImages5 = [];
+    XFile? pickedImage;
+
+    if (source == ImageSource.gallery) {
+      selectedImages5 = await picker5.pickMultiImage();
+      for (var selectedImage5 in selectedImages5) {
+        // Compress each selected image
+        String compressedPath = await compressImage(selectedImage5.path);
+        _multipleImage5.add(XFile(compressedPath));
+        _imagePaths5.add(compressedPath);
+      }
+      update();
+    } else if (source == ImageSource.camera) {
+      pickedImage = await picker5.pickImage(source: source);
+      if (pickedImage != null) {
+        // Compress the picked image
+        String compressedPath = await compressImage(pickedImage.path);
+        _multipleImage5.add(XFile(compressedPath));
+        _imagePaths5.add(compressedPath);
+      }
+      update();
+    }
+
+    return _imagePaths5.toString();
+  }
   void setSchool(String? value) {
     _schoolValue = value;
     update();
@@ -346,7 +405,7 @@ class IssueTrackerController extends GetxController with BaseController {
     update();
   }
 
-  Widget bottomSheet(BuildContext context, int index) {
+  Widget bottomSheet(BuildContext context) {
     return Container(
       color: AppColors.primary,
       height: 100,
@@ -354,8 +413,7 @@ class IssueTrackerController extends GetxController with BaseController {
       margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
       child: Column(
         children: <Widget>[
-          const Text("Select Image",
-              style: TextStyle(fontSize: 20.0, color: Colors.white)),
+          const Text("Select Image", style: TextStyle(fontSize: 20.0, color: Colors.white)),
           const SizedBox(height: 20),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -363,21 +421,167 @@ class IssueTrackerController extends GetxController with BaseController {
               ElevatedButton(
                 style: ElevatedButton.styleFrom(backgroundColor: Colors.white),
                 onPressed: () async {
-                  await takePhoto(ImageSource.camera, index);
+                  await takePhoto(ImageSource.camera);
                   Get.back();
                 },
-                child: const Text('Camera',
-                    style: TextStyle(fontSize: 20.0, color: AppColors.primary)),
+                child: const Text('Camera', style: TextStyle(fontSize: 20.0, color: AppColors.primary)),
               ),
               const SizedBox(width: 30),
               ElevatedButton(
                 style: ElevatedButton.styleFrom(backgroundColor: Colors.white),
                 onPressed: () async {
-                  await takePhoto(ImageSource.gallery, index);
+                  await takePhoto(ImageSource.gallery);
                   Get.back();
                 },
-                child: const Text('Gallery',
-                    style: TextStyle(fontSize: 20.0, color: AppColors.primary)),
+                child: const Text('Gallery', style: TextStyle(fontSize: 20.0, color: AppColors.primary)),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget bottomSheet2(BuildContext context) {
+    return Container(
+      color: AppColors.primary,
+      height: 100,
+      width: double.infinity,
+      margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+      child: Column(
+        children: <Widget>[
+          const Text("Select Image", style: TextStyle(fontSize: 20.0, color: Colors.white)),
+          const SizedBox(height: 20),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(backgroundColor: Colors.white),
+                onPressed: () async {
+                  await takePhoto2(ImageSource.camera);
+                  Get.back();
+                },
+                child: const Text('Camera', style: TextStyle(fontSize: 20.0, color: AppColors.primary)),
+              ),
+              const SizedBox(width: 30),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(backgroundColor: Colors.white),
+                onPressed: () async {
+                  await takePhoto2(ImageSource.gallery);
+                  Get.back();
+                },
+                child: const Text('Gallery', style: TextStyle(fontSize: 20.0, color: AppColors.primary)),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget bottomSheet3(BuildContext context) {
+    return Container(
+      color: AppColors.primary,
+      height: 100,
+      width: double.infinity,
+      margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+      child: Column(
+        children: <Widget>[
+          const Text("Select Image", style: TextStyle(fontSize: 20.0, color: Colors.white)),
+          const SizedBox(height: 20),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(backgroundColor: Colors.white),
+                onPressed: () async {
+                  await takePhoto3(ImageSource.camera);
+                  Get.back();
+                },
+                child: const Text('Camera', style: TextStyle(fontSize: 20.0, color: AppColors.primary)),
+              ),
+              const SizedBox(width: 30),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(backgroundColor: Colors.white),
+                onPressed: () async {
+                  await takePhoto3(ImageSource.gallery);
+                  Get.back();
+                },
+                child: const Text('Gallery', style: TextStyle(fontSize: 20.0, color: AppColors.primary)),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget bottomSheet4(BuildContext context) {
+    return Container(
+      color: AppColors.primary,
+      height: 100,
+      width: double.infinity,
+      margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+      child: Column(
+        children: <Widget>[
+          const Text("Select Image", style: TextStyle(fontSize: 20.0, color: Colors.white)),
+          const SizedBox(height: 20),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(backgroundColor: Colors.white),
+                onPressed: () async {
+                  await takePhoto4(ImageSource.camera);
+                  Get.back();
+                },
+                child: const Text('Camera', style: TextStyle(fontSize: 20.0, color: AppColors.primary)),
+              ),
+              const SizedBox(width: 30),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(backgroundColor: Colors.white),
+                onPressed: () async {
+                  await takePhoto4(ImageSource.gallery);
+                  Get.back();
+                },
+                child: const Text('Gallery', style: TextStyle(fontSize: 20.0, color: AppColors.primary)),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget bottomSheet5(BuildContext context) {
+    return Container(
+      color: AppColors.primary,
+      height: 100,
+      width: double.infinity,
+      margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+      child: Column(
+        children: <Widget>[
+          const Text("Select Image", style: TextStyle(fontSize: 20.0, color: Colors.white)),
+          const SizedBox(height: 20),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(backgroundColor: Colors.white),
+                onPressed: () async {
+                  await takePhoto5(ImageSource.camera);
+                  Get.back();
+                },
+                child: const Text('Camera', style: TextStyle(fontSize: 20.0, color: AppColors.primary)),
+              ),
+              const SizedBox(width: 30),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(backgroundColor: Colors.white),
+                onPressed: () async {
+                  await takePhoto5(ImageSource.gallery);
+                  Get.back();
+                },
+                child: const Text('Gallery', style: TextStyle(fontSize: 20.0, color: AppColors.primary)),
               ),
             ],
           ),
@@ -410,6 +614,103 @@ class IssueTrackerController extends GetxController with BaseController {
     );
   }
 
+  void showImagePreview2(String imagePath2, BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          child: Container(
+            width: 300,
+            height: 300,
+            decoration: BoxDecoration(
+              border: Border.all(color: Colors.grey),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: GestureDetector(
+              onTap: () {
+                Navigator.pop(context);
+              },
+              child: Image.file(File(imagePath2), fit: BoxFit.contain),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  void showImagePreview3(String imagePath3, BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          child: Container(
+            width: 300,
+            height: 300,
+            decoration: BoxDecoration(
+              border: Border.all(color: Colors.grey),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: GestureDetector(
+              onTap: () {
+                Navigator.pop(context);
+              },
+              child: Image.file(File(imagePath3), fit: BoxFit.contain),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+
+  void showImagePreview4(String imagePath4, BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          child: Container(
+            width: 300,
+            height: 300,
+            decoration: BoxDecoration(
+              border: Border.all(color: Colors.grey),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: GestureDetector(
+              onTap: () {
+                Navigator.pop(context);
+              },
+              child: Image.file(File(imagePath4), fit: BoxFit.contain),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+
+  void showImagePreview5(String imagePath5, BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          child: Container(
+            width: 300,
+            height: 300,
+            decoration: BoxDecoration(
+              border: Border.all(color: Colors.grey),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: GestureDetector(
+              onTap: () {
+                Navigator.pop(context);
+              },
+              child: Image.file(File(imagePath5), fit: BoxFit.contain),
+            ),
+          ),
+        );
+      },
+    );
+  }
   bool _isLoading1 = true;
   bool get isLoading1 => _isLoading1; // Expose the loading state
 
@@ -539,33 +840,47 @@ class IssueTrackerController extends GetxController with BaseController {
 
 
   void clearFields() {
+    selectedValue = '';
+    selectedValue2 = '';
+    selectedValue6 = '';
+    selectedValue10 = '';
+    selectedValue14 = '';
+    selectedValue18 = '';
     _tourValue = null;
     _schoolValue = null;
     correctUdiseCodeController.clear();
     libraryDescriptionController.clear();
+    playgroundDescriptionController.clear();
+    digiLabDescriptionController.clear();
+    classroomDescriptionController.clear();
+    alexaDescriptionController.clear();
     dateController.clear();
     dateController2.clear();
     _multipleImage.clear();
     _imagePaths.clear();
     _multipleImage2.clear();
     _imagePaths2.clear();
+    _multipleImage3.clear();
+    _imagePaths3.clear();
+    _multipleImage4.clear();
+    _imagePaths4.clear();
+    _multipleImage5.clear();
+    _imagePaths5.clear();
     update();
   }
 
   Future<void> fetchData() async {
     isLoading = true;
-    update();
+
     _issueTrackerList =
-        await LocalDbController().fetchLocalIssueTrackerRecords();
+    await LocalDbController().fetchLocalIssueTrackerRecords();
     _libIssueList = await LocalDbController().fetchLocalLibIssueRecords();
     _furnitureIssueList = await LocalDbController().fetchLocalFurnitureIssue();
     _playgroundIssueList =
-        await LocalDbController().fetchLocalPlaygroundIssue();
+    await LocalDbController().fetchLocalPlaygroundIssue();
     _digiLabIssueList = await LocalDbController().fetchLocalDigiLabIssue();
     _alexaIssueList = await LocalDbController().fetchLocalAlexaIssue();
 
-    // _libIssueList = await LocalDbController().fetchLocalLibIssue();
-    // _playIssueList = await LocalDbController().fetchLocalPlayIssue();
     isLoading = false;
     update();
   }

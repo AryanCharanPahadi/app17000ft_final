@@ -1,8 +1,6 @@
-import 'package:flutter/material.dart';
-import 'package:package_info_plus/package_info_plus.dart';
+
 import 'package:get/get.dart';
 import '../helper/shared_prefernce.dart';
-import 'custom_confirmation.dart';
 
 class UserController extends GetxController {
   var username = ''.obs;
