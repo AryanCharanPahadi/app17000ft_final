@@ -114,13 +114,13 @@ class _HomeScreenState extends State<HomeScreen> {
                     userController.clearUserData();
 
                     // Step 2: Clear tour and school selections and reset UI
-                    await selectController.unlockTourAndSchools();
-                    selectController.clearFields();  // Ensure fields are cleared
+                    await selectController.unlockTourAndSchools();  // Unlock any selected Tour ID and schools
+                    selectController.clearFields();  // Ensure tour and school fields are cleared
 
                     // Step 3: Clear user data from SharedPreferences
-                    await SharedPreferencesHelper.logout();
+                    await SharedPreferencesHelper.logout();  // Complete logout and clear session
 
-                    // Step 4: Clear previous navigation stack and go to LoginScreen
+                    // Step 4: Clear previous navigation stack and navigate to LoginScreen
                     Get.offAll(() => const LoginScreen());
 
                     // Optional: Display confirmation snackbar

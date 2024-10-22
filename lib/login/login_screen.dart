@@ -191,6 +191,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                   controller.office = myrsp['office'];
 
                                   final SelectController selectController = Get.put(SelectController());
+                                   selectController.unlockTourAndSchools();
                                   selectController.clearFields(); // Reset fields for new data
                                   // selectController.tourController.fetchTourDetails();
                                   Get.offAll(() => const HomeScreen());
