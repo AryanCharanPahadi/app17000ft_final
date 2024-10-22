@@ -14,6 +14,7 @@ import '../forms/school_enrolment/school_enrolment_sync.dart';
 import '../forms/school_facilities_&_mapping_form/school_facilities_sync.dart';
 import '../forms/school_recce_form/school_recce_sync.dart';
 import '../forms/school_staff_vec_form/school_vec_sync.dart';
+import '../forms/select_tour_id/select_controller.dart';
 import '../forms/select_tour_id/select_from.dart';
 import '../helper/responsive_helper.dart';
 import '../helper/shared_prefernce.dart';
@@ -233,34 +234,41 @@ class _CustomDrawerState extends State<CustomDrawer> {
             },
           ),
 
-      DrawerMenu(
-        title: 'Logout',
-        icons: const FaIcon(FontAwesomeIcons.arrowRightFromBracket),
-        onPressed: () async {
-          final UserController userController = Get.find<UserController>();
+          DrawerMenu(
+            title: 'Logout',
+            icons: const FaIcon(FontAwesomeIcons.arrowRightFromBracket),
+            onPressed: () async {
+              final UserController userController = Get.find<UserController>();
+              final SelectController selectController = Get.put(SelectController());
 
-          // Step 1: Clear user data from memory (controller)
-          userController.clearUserData();
+              // Step 1: Clear user data from memory (controller)
+              userController.clearUserData();
 
-          // Step 2: Clear user data from SharedPreferences
-          await SharedPreferencesHelper.logout();
+              // Step 2: Clear tour and school selections and reset UI
+              await selectController.unlockTourAndSchools();  // Unlock any selected Tour ID and schools
+              selectController.clearFields();  // Ensure tour and school fields are cleared
 
-          // Step 3: Clear previous navigation stack and go to LoginScreen
-          Get.offAll(() => const LoginScreen());
+              // Step 3: Clear user data from SharedPreferences
+              await SharedPreferencesHelper.logout();  // Complete logout and clear session
 
-          // Optional: Display confirmation snackbar
-          customSnackbar(
-            'Success',
-            'You have been logged out successfully.',
-            AppColors.secondary,
-            AppColors.onSecondary,
-            Icons.verified,
-          );
-        },
-      )
+              // Step 4: Clear previous navigation stack and navigate to LoginScreen
+              Get.offAll(() => const LoginScreen());
+
+              // Optional: Display confirmation snackbar
+              customSnackbar(
+                'Success',
+                'You have been logged out successfully.',
+                AppColors.secondary,
+                AppColors.onSecondary,
+                Icons.verified,
+              );
+            },
+          )
 
 
-      ],
+
+
+        ],
       ),
     );
   }

@@ -25,6 +25,7 @@ import 'package:app17000ft_new/components/custom_sizedBox.dart';
 
 import '../../components/custom_snackbar.dart';
 import '../../helper/database_helper.dart';
+import '../select_tour_id/select_controller.dart';
 import 'cab_meter_tracing_modal.dart';
 import 'cab_meter_tracing_sync.dart';
 
@@ -64,40 +65,86 @@ class _CabMeterTracingFormState extends State<CabMeterTracingForm> {
                 builder: (cabMeterController) {
                   return Form(
                     key: _formKey,
-                    child: GetBuilder<TourController>(
+                    child:GetBuilder<TourController>(
                       init: TourController(),
                       builder: (tourController) {
+                        // Fetch tour details
                         tourController.fetchTourDetails();
 
-                        return Column(children: [
-                          LabelText(
-                            label: 'Tour ID',
-                            astrick: true,
-                          ),
-                          CustomSizedBox(
-                            value: 20,
-                            side: 'height',
-                          ),
-                          CustomDropdownFormField(
-                            focusNode: cabMeterController.tourIdFocusNode,
-                            options: tourController.getLocalTourList
-                                .map((e) => e.tourId!)
-                                .toList(),
-                            selectedOption: cabMeterController.tourValue,
-                            onChanged: (value) {
-                              splitSchoolLists = tourController.getLocalTourList
-                                  .where((e) => e.tourId == value)
-                                  .map((e) => e.allSchool!.split('|').toList())
-                                  .expand((x) => x)
-                                  .toList();
-                              setState(() {
-                                cabMeterController.setSchool(null);
-                                cabMeterController.setTour(value);
-                              });
-                            },
-                            labelText: "Select Tour ID",
-                          ),
-                          CustomSizedBox(
+                        // Get locked tour ID from SelectController
+                        final selectController =
+                        Get.put(SelectController());
+                        String? lockedTourId =
+                            selectController.lockedTourId;
+
+                        // Consider the lockedTourId as the selected tour ID if it's not null
+                        String? selectedTourId = lockedTourId ??
+                            cabMeterController.tourValue;
+
+                        // Fetch the corresponding schools if lockedTourId or selectedTourId is present
+                        if (selectedTourId != null) {
+                          splitSchoolLists = tourController
+                              .getLocalTourList
+                              .where((e) => e.tourId == selectedTourId)
+                              .map((e) => e.allSchool!
+                              .split(',')
+                              .map((s) => s.trim())
+                              .toList())
+                              .expand((x) => x)
+                              .toList();
+                        }
+
+                        return Column(
+                            children: [
+                              LabelText(
+                                label: 'Tour ID',
+                                astrick: true,
+                              ),
+                              CustomSizedBox(
+                                value: 20,
+                                side: 'height',
+                              ),
+                              CustomDropdownFormField(
+                                focusNode: cabMeterController
+                                    .tourIdFocusNode,
+                                // Show the locked tour ID directly, and disable dropdown interaction if locked
+                                options: lockedTourId != null
+                                    ? [
+                                  lockedTourId
+                                ] // Show only the locked tour ID
+                                    : tourController.getLocalTourList
+                                    .map((e) => e
+                                    .tourId!) // Ensure tourId is non-nullable
+                                    .toList(),
+                                selectedOption: selectedTourId,
+                                onChanged: lockedTourId ==
+                                    null // Disable changing when tour ID is locked
+                                    ? (value) {
+                                  // Fetch and set the schools for the selected tour
+                                  splitSchoolLists = tourController
+                                      .getLocalTourList
+                                      .where(
+                                          (e) => e.tourId == value)
+                                      .map((e) => e.allSchool!
+                                      .split(',')
+                                      .map((s) => s.trim())
+                                      .toList())
+                                      .expand((x) => x)
+                                      .toList();
+
+                                  // Single setState call for efficiency
+                                  setState(() {
+                                    cabMeterController
+                                        .setSchool(null);
+                                    cabMeterController
+                                        .setTour(value);
+                                  });
+                                }
+                                    : null, // Disable dropdown if lockedTourId is present
+                                labelText: "Select Tour ID",
+                              ),
+
+                              CustomSizedBox(
                             value: 20,
                             side: 'height',
                           ),
@@ -460,7 +507,17 @@ class _CabMeterTracingFormState extends State<CabMeterTracingForm> {
                                   cabImageFiles.add(File(
                                       imagePath)); // Convert image path to File
                                 }
+                                final selectController =
+                                Get.put(SelectController());
+                                String? lockedTourId =
+                                    selectController.lockedTourId;
 
+                                // Use lockedTourId if it is available, otherwise use the selected tour ID from schoolEnrolmentController
+                                String tourIdToInsert =
+                                    lockedTourId ??
+                                        cabMeterController
+                                            .tourValue ??
+                                        '';
                                 // Generate a unique ID
                                 String generateUniqueId(int length) {
                                   const _chars =
@@ -500,7 +557,7 @@ class _CabMeterTracingFormState extends State<CabMeterTracingForm> {
                                   image: cabImageFilePaths,
                                   user_id: widget.userid ?? '',
                                   office: widget.office ?? '',
-                                  tour_id: cabMeterController.tourValue ?? '',
+                                  tour_id: tourIdToInsert,
                                   created_at: formattedDate,
                                   uniqueId: uniqueId,
                                 );

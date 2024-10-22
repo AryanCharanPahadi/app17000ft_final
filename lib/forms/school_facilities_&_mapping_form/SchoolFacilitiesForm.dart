@@ -31,6 +31,7 @@ import '../../components/custom_snackbar.dart';
 import '../../helper/database_helper.dart';
 import '../../home/home_screen.dart';
 import '../edit_form/edit controller.dart';
+import '../select_tour_id/select_controller.dart';
 
 class SchoolFacilitiesForm extends StatefulWidget {
   String? userid;
@@ -138,23 +139,38 @@ class _SchoolFacilitiesFormState extends State<SchoolFacilitiesForm> {
                                 child: GetBuilder<TourController>(
                                     init: TourController(),
                                     builder: (tourController) {
-                                      // Fetch tour details once, not on every rebuild.
-                                      if (tourController
-                                          .getLocalTourList.isEmpty) {
-                                        tourController.fetchTourDetails();
+                                      // Fetch tour details
+                                      tourController.fetchTourDetails();
+
+                                      // Get locked tour ID from SelectController
+                                      final selectController =
+                                      Get.put(SelectController());
+                                      String? lockedTourId =
+                                          selectController.lockedTourId;
+
+                                      // Consider the lockedTourId as the selected tour ID if it's not null
+                                      String? selectedTourId = lockedTourId ??
+                                          schoolFacilitiesController.tourValue;
+
+                                      // Fetch the corresponding schools if lockedTourId or selectedTourId is present
+                                      if (selectedTourId != null) {
+                                        schoolFacilitiesController.splitSchoolLists = tourController
+                                            .getLocalTourList
+                                            .where((e) => e.tourId == selectedTourId)
+                                            .map((e) => e.allSchool!
+                                            .split(',')
+                                            .map((s) => s.trim())
+                                            .toList())
+                                            .expand((x) => x)
+                                            .toList();
                                       }
 
                                       return Column(
-                                        children: [
-                                          if (schoolFacilitiesController
-                                              .showBasicDetails) ...[
-                                            LabelText(
-                                              label: 'Basic Details',
-                                            ),
-                                            CustomSizedBox(
-                                              value: 20,
-                                              side: 'height',
-                                            ),
+                                          children: [
+                                            if (schoolFacilitiesController.showBasicDetails) ...[
+                                              LabelText(
+                                                label: 'Basic Details',
+                                              ),
                                             LabelText(
                                               label: 'Tour ID',
                                               astrick: true,
@@ -164,32 +180,32 @@ class _SchoolFacilitiesFormState extends State<SchoolFacilitiesForm> {
                                               side: 'height',
                                             ),
                                             CustomDropdownFormField(
-                                              focusNode:
-                                                  schoolFacilitiesController
-                                                      .tourIdFocusNode,
-                                              options: tourController
-                                                  .getLocalTourList
+                                              focusNode: schoolFacilitiesController
+                                                  .tourIdFocusNode,
+                                              // Show the locked tour ID directly, and disable dropdown interaction if locked
+                                              options: lockedTourId != null
+                                                  ? [
+                                                lockedTourId
+                                              ] // Show only the locked tour ID
+                                                  : tourController.getLocalTourList
                                                   .map((e) => e
-                                                      .tourId!) // Ensure tourId is non-nullable
+                                                  .tourId!) // Ensure tourId is non-nullable
                                                   .toList(),
-                                              selectedOption:
-                                                  schoolFacilitiesController
-                                                      .tourValue,
-                                              onChanged: (value) {
-                                                // Safely handle the school list splitting by commas
-                                                schoolFacilitiesController
-                                                        .splitSchoolLists =
-                                                    tourController
-                                                        .getLocalTourList
-                                                        .where((e) =>
-                                                            e.tourId == value)
-                                                        .map((e) => e.allSchool!
-                                                            .split(',')
-                                                            .map(
-                                                                (s) => s.trim())
-                                                            .toList())
-                                                        .expand((x) => x)
-                                                        .toList();
+                                              selectedOption: selectedTourId,
+                                              onChanged: lockedTourId ==
+                                                  null // Disable changing when tour ID is locked
+                                                  ? (value) {
+                                                // Fetch and set the schools for the selected tour
+                                                schoolFacilitiesController.splitSchoolLists = tourController
+                                                    .getLocalTourList
+                                                    .where(
+                                                        (e) => e.tourId == value)
+                                                    .map((e) => e.allSchool!
+                                                    .split(',')
+                                                    .map((s) => s.trim())
+                                                    .toList())
+                                                    .expand((x) => x)
+                                                    .toList();
 
                                                 // Single setState call for efficiency
                                                 setState(() {
@@ -198,7 +214,8 @@ class _SchoolFacilitiesFormState extends State<SchoolFacilitiesForm> {
                                                   schoolFacilitiesController
                                                       .setTour(value);
                                                 });
-                                              },
+                                              }
+                                                  : null, // Disable dropdown if lockedTourId is present
                                               labelText: "Select Tour ID",
                                             ),
                                             CustomSizedBox(
@@ -213,11 +230,9 @@ class _SchoolFacilitiesFormState extends State<SchoolFacilitiesForm> {
                                               value: 20,
                                               side: 'height',
                                             ),
-                                            // DropdownSearch for selecting a single school
                                             DropdownSearch<String>(
                                               validator: (value) {
-                                                if (value == null ||
-                                                    value.isEmpty) {
+                                                if (value == null || value.isEmpty) {
                                                   return "Please Select School";
                                                 }
                                                 return null;
@@ -225,16 +240,15 @@ class _SchoolFacilitiesFormState extends State<SchoolFacilitiesForm> {
                                               popupProps: PopupProps.menu(
                                                 showSelectedItems: true,
                                                 showSearchBox: true,
-                                                disabledItemFn: (String s) =>
-                                                    s.startsWith(
-                                                        'I'), // Disable based on condition
+                                                disabledItemFn: (String s) => s.startsWith(
+                                                    'I'), // Disable based on condition
                                               ),
-                                              items: schoolFacilitiesController
-                                                  .splitSchoolLists, // Split school list as strings
+                                              items:
+                                              schoolFacilitiesController.splitSchoolLists, // Show schools based on selected or locked tour ID
                                               dropdownDecoratorProps:
-                                                  const DropDownDecoratorProps(
+                                              const DropDownDecoratorProps(
                                                 dropdownSearchDecoration:
-                                                    InputDecoration(
+                                                InputDecoration(
                                                   labelText: "Select School",
                                                   hintText: "Select School",
                                                 ),
@@ -247,8 +261,7 @@ class _SchoolFacilitiesFormState extends State<SchoolFacilitiesForm> {
                                                 });
                                               },
                                               selectedItem:
-                                                  schoolFacilitiesController
-                                                      .schoolValue,
+                                              schoolFacilitiesController.schoolValue,
                                             ),
                                             CustomSizedBox(
                                               value: 20,
@@ -1807,10 +1820,20 @@ class _SchoolFacilitiesFormState extends State<SchoolFacilitiesForm> {
                                                                 .map((file) =>
                                                                     file.path)
                                                                 .join(',');
+                                                        final selectController =
+                                                        Get.put(SelectController());
+                                                        String? lockedTourId =
+                                                            selectController.lockedTourId;
+
+                                                        // Use lockedTourId if it is available, otherwise use the selected tour ID from schoolEnrolmentController
+                                                        String tourIdToInsert =
+                                                            lockedTourId ??
+                                                                schoolFacilitiesController
+                                                                    .tourValue ??
+                                                                '';
 
                                                         SchoolFacilitiesRecords enrolmentCollectionObj = SchoolFacilitiesRecords(
-                                                            tourId: schoolFacilitiesController.tourValue ??
-                                                                '',
+                                                            tourId: tourIdToInsert,
                                                             school: schoolFacilitiesController.schoolValue ??
                                                                 '',
                                                             playImg:

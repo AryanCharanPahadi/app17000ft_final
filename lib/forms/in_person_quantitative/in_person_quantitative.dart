@@ -30,6 +30,7 @@ import 'package:app17000ft_new/components/custom_sizedBox.dart';
 import 'package:app17000ft_new/home/home_screen.dart';
 
 import '../../components/custom_confirmation.dart';
+import '../select_tour_id/select_controller.dart';
 import 'in_person_quantitative_controller.dart';
 import 'in_person_quantitative_modal.dart';
 import 'in_person_quantitative_sync.dart';
@@ -339,112 +340,130 @@ class _InPersonQuantitativeState extends State<InPersonQuantitative> {
                             child: GetBuilder<TourController>(
                                 init: TourController(),
                                 builder: (tourController) {
-                                  // Fetch tour details once, not on every rebuild.
-                                  if (tourController.getLocalTourList.isEmpty) {
-                                    tourController.fetchTourDetails();
+                                  // Fetch tour details
+                                  tourController.fetchTourDetails();
+
+                                  // Get locked tour ID from SelectController
+                                  final selectController =
+                                  Get.put(SelectController());
+                                  String? lockedTourId =
+                                      selectController.lockedTourId;
+
+                                  // Consider the lockedTourId as the selected tour ID if it's not null
+                                  String? selectedTourId = lockedTourId ??
+                                      inPersonQuantitativeController.tourValue;
+
+                                  // Fetch the corresponding schools if lockedTourId or selectedTourId is present
+                                  if (selectedTourId != null) {
+                                    inPersonQuantitativeController.splitSchoolLists = tourController
+                                        .getLocalTourList
+                                        .where((e) => e.tourId == selectedTourId)
+                                        .map((e) => e.allSchool!
+                                        .split(',')
+                                        .map((s) => s.trim())
+                                        .toList())
+                                        .expand((x) => x)
+                                        .toList();
                                   }
 
-                                  return Column(children: [
-                                    if (inPersonQuantitativeController
-                                        .showBasicDetails) ...[
-                                      LabelText(
-                                        label: 'Basic Details',
-                                      ),
-                                      CustomSizedBox(
-                                        value: 20,
-                                        side: 'height',
-                                      ),
-                                      LabelText(
-                                        label: 'Tour ID',
-                                        astrick: true,
-                                      ),
-                                      CustomSizedBox(
-                                        value: 20,
-                                        side: 'height',
-                                      ),
-                                      CustomDropdownFormField(
-                                        focusNode:
-                                            inPersonQuantitativeController
+                                  return Column(
+                                      children: [
+                                        if (inPersonQuantitativeController.showBasicDetails) ...[
+                                          LabelText(
+                                            label: 'Basic Details',
+                                          ),
+                                          LabelText(
+                                            label: 'Tour ID',
+                                            astrick: true,
+                                          ),
+                                          CustomSizedBox(
+                                            value: 20,
+                                            side: 'height',
+                                          ),
+                                          CustomDropdownFormField(
+                                            focusNode: inPersonQuantitativeController
                                                 .tourIdFocusNode,
-                                        options: tourController.getLocalTourList
-                                            .map((e) => e
+                                            // Show the locked tour ID directly, and disable dropdown interaction if locked
+                                            options: lockedTourId != null
+                                                ? [
+                                              lockedTourId
+                                            ] // Show only the locked tour ID
+                                                : tourController.getLocalTourList
+                                                .map((e) => e
                                                 .tourId!) // Ensure tourId is non-nullable
-                                            .toList(),
-                                        selectedOption:
-                                            inPersonQuantitativeController
-                                                .tourValue,
-                                        onChanged: (value) {
-                                          // Safely handle the school list splitting by commas
-                                          inPersonQuantitativeController
-                                                  .splitSchoolLists =
-                                              tourController.getLocalTourList
+                                                .toList(),
+                                            selectedOption: selectedTourId,
+                                            onChanged: lockedTourId ==
+                                                null // Disable changing when tour ID is locked
+                                                ? (value) {
+                                              // Fetch and set the schools for the selected tour
+                                              inPersonQuantitativeController.splitSchoolLists = tourController
+                                                  .getLocalTourList
                                                   .where(
                                                       (e) => e.tourId == value)
                                                   .map((e) => e.allSchool!
-                                                      .split(',')
-                                                      .map((s) => s.trim())
-                                                      .toList())
+                                                  .split(',')
+                                                  .map((s) => s.trim())
+                                                  .toList())
                                                   .expand((x) => x)
                                                   .toList();
 
-                                          // Single setState call for efficiency
-                                          setState(() {
-                                            inPersonQuantitativeController
-                                                .setSchool(null);
-                                            inPersonQuantitativeController
-                                                .setTour(value);
-                                          });
-                                        },
-                                        labelText: "Select Tour ID",
-                                      ),
-                                      CustomSizedBox(
-                                        value: 20,
-                                        side: 'height',
-                                      ),
-                                      LabelText(
-                                        label: 'School',
-                                        astrick: true,
-                                      ),
-                                      CustomSizedBox(
-                                        value: 20,
-                                        side: 'height',
-                                      ),
-                                      // DropdownSearch for selecting a single school
-                                      DropdownSearch<String>(
-                                        validator: (value) {
-                                          if (value == null || value.isEmpty) {
-                                            return "Please Select School";
-                                          }
-                                          return null;
-                                        },
-                                        popupProps: PopupProps.menu(
-                                          showSelectedItems: true,
-                                          showSearchBox: true,
-                                          disabledItemFn: (String s) =>
-                                              s.startsWith(
-                                                  'I'), // Disable based on condition
-                                        ),
-                                        items: inPersonQuantitativeController
-                                            .splitSchoolLists, // Split school list as strings
-                                        dropdownDecoratorProps:
-                                            const DropDownDecoratorProps(
-                                          dropdownSearchDecoration:
-                                              InputDecoration(
-                                            labelText: "Select School",
-                                            hintText: "Select School",
+                                              // Single setState call for efficiency
+                                              setState(() {
+                                                inPersonQuantitativeController
+                                                    .setSchool(null);
+                                                inPersonQuantitativeController
+                                                    .setTour(value);
+                                              });
+                                            }
+                                                : null, // Disable dropdown if lockedTourId is present
+                                            labelText: "Select Tour ID",
                                           ),
-                                        ),
-                                        onChanged: (value) {
-                                          // Set the selected school
-                                          setState(() {
-                                            inPersonQuantitativeController
-                                                .setSchool(value);
-                                          });
-                                        },
-                                        selectedItem:
-                                            inPersonQuantitativeController
-                                                .schoolValue,
-                                      ),
+                                          CustomSizedBox(
+                                            value: 20,
+                                            side: 'height',
+                                          ),
+                                          LabelText(
+                                            label: 'School',
+                                            astrick: true,
+                                          ),
+                                          CustomSizedBox(
+                                            value: 20,
+                                            side: 'height',
+                                          ),
+                                          DropdownSearch<String>(
+                                            validator: (value) {
+                                              if (value == null || value.isEmpty) {
+                                                return "Please Select School";
+                                              }
+                                              return null;
+                                            },
+                                            popupProps: PopupProps.menu(
+                                              showSelectedItems: true,
+                                              showSearchBox: true,
+                                              disabledItemFn: (String s) => s.startsWith(
+                                                  'I'), // Disable based on condition
+                                            ),
+                                            items:
+                                            inPersonQuantitativeController.splitSchoolLists, // Show schools based on selected or locked tour ID
+                                            dropdownDecoratorProps:
+                                            const DropDownDecoratorProps(
+                                              dropdownSearchDecoration:
+                                              InputDecoration(
+                                                labelText: "Select School",
+                                                hintText: "Select School",
+                                              ),
+                                            ),
+                                            onChanged: (value) {
+                                              // Set the selected school
+                                              setState(() {
+                                                inPersonQuantitativeController
+                                                    .setSchool(value);
+                                              });
+                                            },
+                                            selectedItem:
+                                            inPersonQuantitativeController.schoolValue,
+                                          ),
                                       CustomSizedBox(
                                         value: 20,
                                         side: 'height',
@@ -3459,7 +3478,17 @@ class _InPersonQuantitativeState extends State<InPersonQuantitative> {
                                                           .designation,
                                                     };
                                                   }).toList());
+                                                  final selectController =
+                                                  Get.put(SelectController());
+                                                  String? lockedTourId =
+                                                      selectController.lockedTourId;
 
+                                                  // Use lockedTourId if it is available, otherwise use the selected tour ID from schoolEnrolmentController
+                                                  String tourIdToInsert =
+                                                      lockedTourId ??
+                                                          inPersonQuantitativeController
+                                                              .tourValue ??
+                                                          '';
                                                   // Convert issues data to JSON
                                                   String
                                                       issueAndResolutionJson =
@@ -3557,9 +3586,7 @@ class _InPersonQuantitativeState extends State<InPersonQuantitative> {
                                                       enrolmentCollectionObj =
                                                       InPersonQuantitativeRecords(
                                                     tourId:
-                                                        inPersonQuantitativeController
-                                                                .tourValue ??
-                                                            '',
+                                                    tourIdToInsert,
                                                     school:
                                                         inPersonQuantitativeController
                                                                 .schoolValue ??

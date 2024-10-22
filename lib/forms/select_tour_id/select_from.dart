@@ -3,25 +3,15 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:dropdown_search/dropdown_search.dart';
-
 import '../../components/custom_appBar.dart';
 import '../../components/custom_confirmation.dart';
 import '../../components/custom_dropdown.dart';
 import '../../components/custom_labeltext.dart';
 import '../../components/custom_sizedBox.dart';
-import '../../tourDetails/tour_controller.dart';
+import '../../components/custom_snackbar.dart';
 
-class SelectForm extends StatefulWidget {
+class SelectForm extends StatelessWidget {
   const SelectForm({super.key});
-
-  @override
-  State<SelectForm> createState() => _SelectFormState();
-}
-
-class _SelectFormState extends State<SelectForm> {
-  List<String> splitSchoolLists = [];
-  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  final ScrollController _scrollController = ScrollController();
 
   @override
   Widget build(BuildContext context) {
@@ -35,7 +25,7 @@ class _SelectFormState extends State<SelectForm> {
             title: 'Exit Confirmation',
             yes: 'Yes',
             no: 'No',
-            desc: 'Are you sure you want to leave exit?',
+            desc: 'Are you sure you want to exit?',
             onPressed: () async {
               Navigator.of(context).pop(true);
             },
@@ -45,147 +35,165 @@ class _SelectFormState extends State<SelectForm> {
       },
       child: Scaffold(
         appBar: const CustomAppbar(
-          title: 'School Enrollment Form',
+          title: 'Select Tour Id',
         ),
         body: Padding(
           padding: const EdgeInsets.all(16.0),
           child: SingleChildScrollView(
-            controller: _scrollController,
+            controller: Get.put(SelectController()).scrollController,
             child: Column(
               children: [
                 GetBuilder<SelectController>(
                   init: SelectController(),
-                  builder: (schoolEnrolmentController) {
+                  builder: (selectController) {
+                    selectController.tourController.fetchTourDetails();
+
+                    // Get the list of tour IDs
+                    List<String?> tourIds = selectController.tourController.getLocalTourList
+                        .map((e) => e.tourId)
+                        .toList();
+
                     return Form(
-                      key: _formKey,
-                      child: GetBuilder<TourController>(
-                        init: TourController(),
-                        builder: (tourController) {
-                          tourController.fetchTourDetails();
-                          List<String> allTourIds = tourController.getLocalTourList
-                              .map((e) => e.tourId!) // Ensure tourId is non-nullable
-                              .toList();
+                      key: selectController.formKey,
+                      child: Column(
+                        children: [
+                          CustomSizedBox(value: 20, side: 'height'),
+                          LabelText(label: 'Tour ID (Radio Selection)', astrick: false),
+                          CustomSizedBox(value: 20, side: 'height'),
+                          // Radio buttons for selecting a tour ID
+                          Column(
+                            children: tourIds.map((tourId) {
+                              return RadioListTile<String?>(
+                                title: Text(tourId ?? ''),
+                                value: tourId,
+                                groupValue: selectController.selectedRadioTourId,
+                                onChanged: selectController.lockedTourId == null
+                                    ? (value) {
+                                  selectController.selectedRadioTourId = value;
+                                  selectController.setTour(value);
+                                  selectController.updateSchoolList(value);
+                                }
+                                    : null, // Disable if a tour is locked
+                              );
+                            }).toList(),
+                          ),
+                          CustomSizedBox(value: 20, side: 'height'),
+                          LabelText(label: 'Tour ID (Dropdown)', astrick: true),
+                          CustomSizedBox(value: 20, side: 'height'),
+                          // Dropdown shows only the locked tour ID or selected tour ID
+                          CustomDropdownFormField(
+                            focusNode: selectController.tourIdFocusNode,
+                            options: selectController.lockedTourId != null
+                                ? [selectController.lockedTourId!]
+                                : selectController.selectedRadioTourId != null
+                                ? [selectController.selectedRadioTourId!]
+                                : tourIds.where((e) => e != null).cast<String>().toList(),
+                            selectedOption: selectController.tourValue ?? selectController.selectedRadioTourId,
+                            onChanged: selectController.lockedTourId == null
+                                ? (value) {
+                              selectController.updateSchoolList(value);
+                              selectController.setSchool(null);
+                              selectController.setTour(value);
+                            }
+                                : null, // Disable if tour is locked
+                            labelText: "Select Tour ID",
+                          ),
+                          CustomSizedBox(value: 20, side: 'height'),
+                          LabelText(label: 'School', astrick: true),
+                          CustomSizedBox(value: 20, side: 'height'),
+                          // DropdownSearch showing schools
+                          DropdownSearch<String>(
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return "Please Select School";
+                              }
+                              return null;
+                            },
+                            popupProps: PopupProps.menu(
+                              showSelectedItems: true,
+                              showSearchBox: true,
+                              disabledItemFn: (String s) => s.startsWith('I'),
+                              fit: FlexFit.loose,
+                              itemBuilder: (context, item, isSelected) {
+                                return ListTile(
+                                  title: Text(item),
+                                  selected: isSelected,
+                                );
+                              },
+                            ),
+                            items: selectController.lockedSchools != null
+                                ? selectController.lockedSchools!
+                                : selectController.splitSchoolLists,
+                            dropdownDecoratorProps: const DropDownDecoratorProps(
+                              dropdownSearchDecoration: InputDecoration(
+                                labelText: "Select School",
+                                hintText: "Select School",
+                              ),
+                            ),
+                            onChanged: selectController.lockedTourId == null
+                                ? (value) {
+                              selectController.setSchool(value);
+                            }
+                                : null, // Disable if tour is locked
+                            selectedItem: selectController.schoolValue,
+                          ),
+                          CustomSizedBox(value: 20, side: 'height'),
+                          // Submit button
+                          ElevatedButton(
+                            onPressed: selectController.lockedTourId == null &&
+                                selectController.splitSchoolLists.isNotEmpty
+                                ? () {
+                              if (selectController.selectedRadioTourId != null) {
+                                // If no specific school is selected, lock all schools
+                                List<String> schoolsToLock = selectController.schoolValue != null
+                                    ? [selectController.schoolValue!]
+                                    : selectController.splitSchoolLists;
 
-                          return Column(
-                            children: [
-                              LabelText(
-                                label: 'Select Tour ID (Radio)',
-                                astrick: true,
-                              ),
-                              CustomSizedBox(
-                                value: 20,
-                                side: 'height',
-                              ),
-                              // Radio button field for selecting tour ID
-                              Column(
-                                children: tourController.getLocalTourList
-                                    .map(
-                                      (tour) => RadioListTile<String>(
-                                    title: Text(tour.tourId ?? ''),
-                                    value: tour.tourId!,
-                                    groupValue: schoolEnrolmentController.tourValue,
-                                    onChanged: (value) {
-                                      setState(() {
-                                        // Update the selected tour ID and school list based on the selected tour
-                                        schoolEnrolmentController.setTour(value);
-                                        splitSchoolLists = tourController.getLocalTourList
-                                            .where((e) => e.tourId == value)
-                                            .map((e) => e.allSchool!
-                                            .split(',')
-                                            .map((s) => s.trim())
-                                            .toList())
-                                            .expand((x) => x)
-                                            .toList();
-                                      });
-                                    },
-                                    // Initially no radio button is selected
-                                    selected: schoolEnrolmentController.tourValue == tour.tourId,
-                                  ),
-                                )
-                                    .toList(),
-                              ),
-                              CustomSizedBox(
-                                value: 20,
-                                side: 'height',
-                              ),
-                              LabelText(
-                                label: 'Tour ID',
-                                astrick: true,
-                              ),
-                              CustomSizedBox(
-                                value: 20,
-                                side: 'height',
-                              ),
-                              // Dropdown shows all tour IDs initially, or the selected one from radio
-                              CustomDropdownFormField(
-                                focusNode: schoolEnrolmentController.tourIdFocusNode,
-                                options: schoolEnrolmentController.tourValue != null
-                                    ? [schoolEnrolmentController.tourValue!] // Show only selected value if a radio button is selected
-                                    : allTourIds, // Otherwise, show all tour IDs
-                                selectedOption: schoolEnrolmentController.tourValue,
-                                onChanged: (value) {
-                                  // Update school lists when dropdown changes
-                                  splitSchoolLists = tourController.getLocalTourList
-                                      .where((e) => e.tourId == value)
-                                      .map((e) => e.allSchool!
-                                      .split(',')
-                                      .map((s) => s.trim())
-                                      .toList())
-                                      .expand((x) => x)
-                                      .toList();
+                                // Lock the selected tour ID and schools
+                                selectController.lockTourAndSchools(
+                                  selectController.selectedRadioTourId!,
+                                  schoolsToLock,
+                                );
+                                customSnackbar(
+                                  'Tour Locked',
+                                  'Your tour ID and associated schools have been locked',
+                                  Colors.green,
+                                  Colors.white,
+                                  Icons.lock,
+                                );
 
-                                  setState(() {
-                                    schoolEnrolmentController.setSchool(null);
-                                    schoolEnrolmentController.setTour(value);
-                                  });
-                                },
-                                labelText: "Select Tour ID",
-                              ),
-                              CustomSizedBox(
-                                value: 20,
-                                side: 'height',
-                              ),
-                              LabelText(
-                                label: 'School',
-                                astrick: true,
-                              ),
-                              CustomSizedBox(
-                                value: 20,
-                                side: 'height',
-                              ),
-                              DropdownSearch<String>(
-                                validator: (value) {
-                                  if (value == null || value.isEmpty) {
-                                    return "Please Select School";
-                                  }
-                                  return null;
-                                },
-                                popupProps: PopupProps.menu(
-                                  showSelectedItems: true,
-                                  showSearchBox: true,
-                                  disabledItemFn: (String s) => s.startsWith('I'),
-                                ),
-                                items: splitSchoolLists,
-                                dropdownDecoratorProps: const DropDownDecoratorProps(
-                                  dropdownSearchDecoration: InputDecoration(
-                                    labelText: "Select School",
-                                    hintText: "Select School",
-                                  ),
-                                ),
-                                onChanged: (value) {
-                                  setState(() {
-                                    schoolEnrolmentController.setSchool(value);
-                                  });
-                                },
-                                selectedItem: schoolEnrolmentController.schoolValue,
-                              ),
-                              CustomSizedBox(
-                                value: 20,
-                                side: 'height',
-                              ),
-                            ],
-                          );
-                        },
+                              } else {
+                                customSnackbar(
+                                  'Error',
+                                  'Please select a tour ID',
+                                  Colors.red,
+                                  Colors.white,
+                                  Icons.error,
+                                );
+                              }
+                            }
+                                : null, // Disable if no tour is selected or locked
+                            child: const Text('Lock Tour and School'),
+                          ),
+                          // Unlock button (only visible if a tour is locked)
+                          if (selectController.lockedTourId != null) ...[
+                            CustomSizedBox(value: 20, side: 'height'),
+                            ElevatedButton(
+                              onPressed: () {
+                                selectController.unlockTourAndSchools();
+                                customSnackbar(
+                                  'Logged Out',
+                                  'All selections have been cleared.',
+                                  Colors.blue,
+                                  Colors.white,
+                                  Icons.logout,
+                                );
+
+                              },
+                              child: const Text('Unlock Tour and School'),
+                            ),
+                          ],
+                        ],
                       ),
                     );
                   },

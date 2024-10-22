@@ -20,6 +20,7 @@ import '../forms/cab_meter_tracking_form/cab_meter.dart';
 import '../forms/issue_tracker/issue_tracker_form.dart';
 import '../forms/school_facilities_&_mapping_form/SchoolFacilitiesForm.dart';
 import '../forms/school_staff_vec_form/school_vec_from.dart';
+import '../forms/select_tour_id/select_controller.dart';
 import '../helper/shared_prefernce.dart';
 import '../login/login_screen.dart';
 
@@ -106,15 +107,20 @@ class _HomeScreenState extends State<HomeScreen> {
                 IconButton(
                   icon: const Icon(Icons.logout, color: Colors.white),
                   onPressed: () async {
-                    final UserController userController = Get.put(UserController());
+                    final UserController userController = Get.find<UserController>();
+                    final SelectController selectController = Get.put(SelectController());
 
                     // Step 1: Clear user data from memory (controller)
                     userController.clearUserData();
 
-                    // Step 2: Clear user data from SharedPreferences
+                    // Step 2: Clear tour and school selections and reset UI
+                    await selectController.unlockTourAndSchools();
+                    selectController.clearFields();  // Ensure fields are cleared
+
+                    // Step 3: Clear user data from SharedPreferences
                     await SharedPreferencesHelper.logout();
 
-                    // Step 3: Clear previous navigation stack and go to LoginScreen
+                    // Step 4: Clear previous navigation stack and go to LoginScreen
                     Get.offAll(() => const LoginScreen());
 
                     // Optional: Display confirmation snackbar

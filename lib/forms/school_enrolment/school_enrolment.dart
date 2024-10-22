@@ -31,8 +31,9 @@ import 'package:app17000ft_new/forms/school_enrolment/school_enrolment_controlle
 import 'package:app17000ft_new/home/home_screen.dart';
 
 import '../../components/custom_confirmation.dart';
+import '../select_tour_id/select_controller.dart';
 
-  class SchoolEnrollmentForm extends StatefulWidget {
+class SchoolEnrollmentForm extends StatefulWidget {
   String? userid;
   final EnrolmentCollectionModel? existingRecord;
   String? tourId; // Add this line
@@ -58,8 +59,7 @@ class _SchoolEnrollmentFormState extends State<SchoolEnrollmentForm> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final ScrollController _scrollController = ScrollController();
   List<String> splitSchoolLists = [];
-  final EditController editController =
-  Get.put(EditController());
+  final EditController editController = Get.put(EditController());
   //final TourController _tourController = Get.put(TourController());
   // Define lists to hold the controllers and total notifiers for each grade
   final List<TextEditingController> boysControllers = [];
@@ -249,15 +249,13 @@ class _SchoolEnrollmentFormState extends State<SchoolEnrollmentForm> {
     super.dispose();
   }
 
-  TableRow tableRowMethod(
-      String classname,
-      TextEditingController boyController,
-      TextEditingController girlController,
-      ValueNotifier<int> totalNotifier) {
+  TableRow tableRowMethod(String classname, TextEditingController boyController,
+      TextEditingController girlController, ValueNotifier<int> totalNotifier) {
     return TableRow(
       children: [
         TableCell(
-          verticalAlignment: TableCellVerticalAlignment.middle, // Align vertically to middle
+          verticalAlignment:
+              TableCellVerticalAlignment.middle, // Align vertically to middle
           child: Center(
             child: Text(
               classname,
@@ -266,8 +264,10 @@ class _SchoolEnrollmentFormState extends State<SchoolEnrollmentForm> {
           ),
         ),
         TableCell(
-          verticalAlignment: TableCellVerticalAlignment.middle, // Align vertically to middle
-          child: Center( // Ensure the TextFormField is centered
+          verticalAlignment:
+              TableCellVerticalAlignment.middle, // Align vertically to middle
+          child: Center(
+            // Ensure the TextFormField is centered
             child: TextFormField(
               controller: boyController,
               decoration: const InputDecoration(border: InputBorder.none),
@@ -281,8 +281,10 @@ class _SchoolEnrollmentFormState extends State<SchoolEnrollmentForm> {
           ),
         ),
         TableCell(
-          verticalAlignment: TableCellVerticalAlignment.middle, // Align vertically to middle
-          child: Center( // Ensure the TextFormField is centered
+          verticalAlignment:
+              TableCellVerticalAlignment.middle, // Align vertically to middle
+          child: Center(
+            // Ensure the TextFormField is centered
             child: TextFormField(
               controller: girlController,
               decoration: const InputDecoration(border: InputBorder.none),
@@ -296,14 +298,16 @@ class _SchoolEnrollmentFormState extends State<SchoolEnrollmentForm> {
           ),
         ),
         TableCell(
-          verticalAlignment: TableCellVerticalAlignment.middle, // Align vertically to middle
+          verticalAlignment:
+              TableCellVerticalAlignment.middle, // Align vertically to middle
           child: Center(
             child: ValueListenableBuilder<int>(
               valueListenable: totalNotifier,
               builder: (context, total, child) {
                 return Text(
                   total.toString(),
-                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  style: const TextStyle(
+                      fontSize: 18, fontWeight: FontWeight.bold),
                 );
               },
             ),
@@ -351,7 +355,32 @@ class _SchoolEnrollmentFormState extends State<SchoolEnrollmentForm> {
                           child: GetBuilder<TourController>(
                               init: TourController(),
                               builder: (tourController) {
+                                // Fetch tour details
                                 tourController.fetchTourDetails();
+
+                                // Get locked tour ID from SelectController
+                                final selectController =
+                                    Get.put(SelectController());
+                                String? lockedTourId =
+                                    selectController.lockedTourId;
+
+                                // Consider the lockedTourId as the selected tour ID if it's not null
+                                String? selectedTourId = lockedTourId ??
+                                    schoolEnrolmentController.tourValue;
+
+                                // Fetch the corresponding schools if lockedTourId or selectedTourId is present
+                                if (selectedTourId != null) {
+                                  splitSchoolLists = tourController
+                                      .getLocalTourList
+                                      .where((e) => e.tourId == selectedTourId)
+                                      .map((e) => e.allSchool!
+                                          .split(',')
+                                          .map((s) => s.trim())
+                                          .toList())
+                                      .expand((x) => x)
+                                      .toList();
+                                }
+
                                 return Column(
                                   children: [
                                     LabelText(
@@ -361,6 +390,90 @@ class _SchoolEnrollmentFormState extends State<SchoolEnrollmentForm> {
                                     CustomSizedBox(
                                       value: 20,
                                       side: 'height',
+                                    ),
+                                    CustomDropdownFormField(
+                                      focusNode: schoolEnrolmentController
+                                          .tourIdFocusNode,
+                                      // Show the locked tour ID directly, and disable dropdown interaction if locked
+                                      options: lockedTourId != null
+                                          ? [
+                                              lockedTourId
+                                            ] // Show only the locked tour ID
+                                          : tourController.getLocalTourList
+                                              .map((e) => e
+                                                  .tourId!) // Ensure tourId is non-nullable
+                                              .toList(),
+                                      selectedOption: selectedTourId,
+                                      onChanged: lockedTourId ==
+                                              null // Disable changing when tour ID is locked
+                                          ? (value) {
+                                              // Fetch and set the schools for the selected tour
+                                              splitSchoolLists = tourController
+                                                  .getLocalTourList
+                                                  .where(
+                                                      (e) => e.tourId == value)
+                                                  .map((e) => e.allSchool!
+                                                      .split(',')
+                                                      .map((s) => s.trim())
+                                                      .toList())
+                                                  .expand((x) => x)
+                                                  .toList();
+
+                                              // Single setState call for efficiency
+                                              setState(() {
+                                                schoolEnrolmentController
+                                                    .setSchool(null);
+                                                schoolEnrolmentController
+                                                    .setTour(value);
+                                              });
+                                            }
+                                          : null, // Disable dropdown if lockedTourId is present
+                                      labelText: "Select Tour ID",
+                                    ),
+                                    CustomSizedBox(
+                                      value: 20,
+                                      side: 'height',
+                                    ),
+                                    LabelText(
+                                      label: 'School',
+                                      astrick: true,
+                                    ),
+                                    CustomSizedBox(
+                                      value: 20,
+                                      side: 'height',
+                                    ),
+                                    DropdownSearch<String>(
+                                      validator: (value) {
+                                        if (value == null || value.isEmpty) {
+                                          return "Please Select School";
+                                        }
+                                        return null;
+                                      },
+                                      popupProps: PopupProps.menu(
+                                        showSelectedItems: true,
+                                        showSearchBox: true,
+                                        disabledItemFn: (String s) => s.startsWith(
+                                            'I'), // Disable based on condition
+                                      ),
+                                      items:
+                                          splitSchoolLists, // Show schools based on selected or locked tour ID
+                                      dropdownDecoratorProps:
+                                          const DropDownDecoratorProps(
+                                        dropdownSearchDecoration:
+                                            InputDecoration(
+                                          labelText: "Select School",
+                                          hintText: "Select School",
+                                        ),
+                                      ),
+                                      onChanged: (value) {
+                                        // Set the selected school
+                                        setState(() {
+                                          schoolEnrolmentController
+                                              .setSchool(value);
+                                        });
+                                      },
+                                      selectedItem:
+                                          schoolEnrolmentController.schoolValue,
                                     ),
 
                                     CustomSizedBox(
@@ -779,14 +892,24 @@ class _SchoolEnrollmentFormState extends State<SchoolEnrollmentForm> {
                                           // Convert `jsonData` to a JSON string for enrolment records
                                           String enrolmentDataJson = jsonEncode(
                                               jsonData); // Ensure the JSON data is properly encoded
+                                          // Get locked tour ID from SelectController
+                                          final selectController =
+                                              Get.put(SelectController());
+                                          String? lockedTourId =
+                                              selectController.lockedTourId;
 
+                                          // Use lockedTourId if it is available, otherwise use the selected tour ID from schoolEnrolmentController
+                                          String tourIdToInsert =
+                                              lockedTourId ??
+                                                  schoolEnrolmentController
+                                                      .tourValue ??
+                                                  '';
                                           // Create the enrolment collection object
                                           EnrolmentCollectionModel
                                               enrolmentCollectionObj =
                                               EnrolmentCollectionModel(
-                                            tourId: schoolEnrolmentController
-                                                    .tourValue ??
-                                                '',
+                                            tourId:
+                                                tourIdToInsert, // Insert locked tour ID or selected tour ID
                                             school: schoolEnrolmentController
                                                     .schoolValue ??
                                                 '',
@@ -817,8 +940,7 @@ class _SchoolEnrollmentFormState extends State<SchoolEnrollmentForm> {
                                             schoolEnrolmentController
                                                 .remarksController
                                                 .clear();
-                                            editController
-                                                .clearFields();
+                                            editController.clearFields();
                                             // Reset any additional variables (like jsonData) in the current state
                                             setState(() {
                                               jsonData =
@@ -902,12 +1024,11 @@ class _SchoolEnrollmentFormState extends State<SchoolEnrollmentForm> {
 class JsonFileDownloader {
   // Method to download JSON data to the Downloads directory
   Future<String?> downloadJsonFile(
-      String jsonData,
-      String uniqueId,
-      List<File> imageFiles,
-      ) async {
+    String jsonData,
+    String uniqueId,
+    List<File> imageFiles,
+  ) async {
     // Request storage permission
-
 
     Directory? downloadsDirectory;
 
@@ -918,7 +1039,6 @@ class JsonFileDownloader {
     } else {
       downloadsDirectory = await getDownloadsDirectory();
     }
-
 
     if (downloadsDirectory != null) {
       // Prepare file path to save the JSON
@@ -947,8 +1067,6 @@ class JsonFileDownloader {
       throw Exception('Could not find the download directory');
     }
   }
-
-
 
   // Method to get the correct directory for Android based on version
   Future<Directory?> _getAndroidDirectory() async {

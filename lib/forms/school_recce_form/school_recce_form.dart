@@ -32,6 +32,7 @@ import 'package:app17000ft_new/components/custom_sizedBox.dart';
 import '../../components/custom_confirmation.dart';
 import '../../helper/database_helper.dart';
 import '../../home/home_screen.dart';
+import '../select_tour_id/select_controller.dart';
 
 class SchoolRecceForm extends StatefulWidget {
   String? userid;
@@ -1062,94 +1063,133 @@ class _SchoolRecceFormState extends State<SchoolRecceForm> {
                           builder: (schoolRecceController) {
                             return Form(
                                 key: _formKey,
-                                child:GetBuilder<TourController>(
+                                child: GetBuilder<TourController>(
                                     init: TourController(),
                                     builder: (tourController) {
-                                      // Fetch tour details once, not on every rebuild.
-                                      if (tourController.getLocalTourList.isEmpty) {
-                                        tourController.fetchTourDetails();
+                                      // Fetch tour details
+                                      tourController.fetchTourDetails();
+
+                                      // Get locked tour ID from SelectController
+                                      final selectController =
+                                      Get.put(SelectController());
+                                      String? lockedTourId =
+                                          selectController.lockedTourId;
+
+                                      // Consider the lockedTourId as the selected tour ID if it's not null
+                                      String? selectedTourId = lockedTourId ??
+                                          schoolRecceController.tourValue;
+
+                                      // Fetch the corresponding schools if lockedTourId or selectedTourId is present
+                                      if (selectedTourId != null) {
+                                        schoolRecceController.splitSchoolLists = tourController
+                                            .getLocalTourList
+                                            .where((e) => e.tourId == selectedTourId)
+                                            .map((e) => e.allSchool!
+                                            .split(',')
+                                            .map((s) => s.trim())
+                                            .toList())
+                                            .expand((x) => x)
+                                            .toList();
                                       }
 
-                                      return Column(children: [
-                                        if (schoolRecceController.showBasicDetails) ...[
-                                          LabelText(
-                                            label: 'Basic Details',
-                                          ),
-                                          CustomSizedBox(
-                                            value: 20,
-                                            side: 'height',
-                                          ),
-                                          LabelText(
-                                            label: 'Tour ID',
-                                            astrick: true,
-                                          ),
-                                          CustomSizedBox(
-                                            value: 20,
-                                            side: 'height',
-                                          ),
-                                          CustomDropdownFormField(
-                                            focusNode: schoolRecceController.tourIdFocusNode,
-                                            options: tourController.getLocalTourList
-                                                .map((e) => e.tourId!) // Ensure tourId is non-nullable
-                                                .toList(),
-                                            selectedOption: schoolRecceController.tourValue,
-                                            onChanged: (value) {
-                                              // Safely handle the school list splitting by commas
-                                              schoolRecceController.splitSchoolLists = tourController
-                                                  .getLocalTourList
-                                                  .where((e) => e.tourId == value)
-                                                  .map((e) => e.allSchool!.split(',').map((s) => s.trim()).toList())
-                                                  .expand((x) => x)
-                                                  .toList();
-
-                                              // Single setState call for efficiency
-                                              setState(() {
-                                                schoolRecceController.setSchool(null);
-                                                schoolRecceController.setTour(value);
-                                              });
-                                            },
-                                            labelText: "Select Tour ID",
-                                          ),
-                                          CustomSizedBox(
-                                            value: 20,
-                                            side: 'height',
-                                          ),
-                                          LabelText(
-                                            label: 'School',
-                                            astrick: true,
-                                          ),
-                                          CustomSizedBox(
-                                            value: 20,
-                                            side: 'height',
-                                          ),
-                                          // DropdownSearch for selecting a single school
-                                          DropdownSearch<String>(
-                                            validator: (value) {
-                                              if (value == null || value.isEmpty) {
-                                                return "Please Select School";
-                                              }
-                                              return null;
-                                            },
-                                            popupProps: PopupProps.menu(
-                                              showSelectedItems: true,
-                                              showSearchBox: true,
-                                              disabledItemFn: (String s) => s.startsWith('I'), // Disable based on condition
-                                            ),
-                                            items: schoolRecceController.splitSchoolLists, // Split school list as strings
-                                            dropdownDecoratorProps: const DropDownDecoratorProps(
-                                              dropdownSearchDecoration: InputDecoration(
-                                                labelText: "Select School",
-                                                hintText: "Select School",
+                                      return Column(
+                                          children: [
+                                            if (schoolRecceController.showBasicDetails) ...[
+                                              LabelText(
+                                                label: 'Basic Details',
                                               ),
-                                            ),
-                                            onChanged: (value) {
-                                              // Set the selected school
-                                              setState(() {
-                                                schoolRecceController.setSchool(value);
-                                              });
-                                            },
-                                            selectedItem: schoolRecceController.schoolValue,
-                                          ),
+                                              LabelText(
+                                                label: 'Tour ID',
+                                                astrick: true,
+                                              ),
+                                              CustomSizedBox(
+                                                value: 20,
+                                                side: 'height',
+                                              ),
+                                              CustomDropdownFormField(
+                                                focusNode: schoolRecceController
+                                                    .tourIdFocusNode,
+                                                // Show the locked tour ID directly, and disable dropdown interaction if locked
+                                                options: lockedTourId != null
+                                                    ? [
+                                                  lockedTourId
+                                                ] // Show only the locked tour ID
+                                                    : tourController.getLocalTourList
+                                                    .map((e) => e
+                                                    .tourId!) // Ensure tourId is non-nullable
+                                                    .toList(),
+                                                selectedOption: selectedTourId,
+                                                onChanged: lockedTourId ==
+                                                    null // Disable changing when tour ID is locked
+                                                    ? (value) {
+                                                  // Fetch and set the schools for the selected tour
+                                                  schoolRecceController.splitSchoolLists = tourController
+                                                      .getLocalTourList
+                                                      .where(
+                                                          (e) => e.tourId == value)
+                                                      .map((e) => e.allSchool!
+                                                      .split(',')
+                                                      .map((s) => s.trim())
+                                                      .toList())
+                                                      .expand((x) => x)
+                                                      .toList();
+
+                                                  // Single setState call for efficiency
+                                                  setState(() {
+                                                    schoolRecceController
+                                                        .setSchool(null);
+                                                    schoolRecceController
+                                                        .setTour(value);
+                                                  });
+                                                }
+                                                    : null, // Disable dropdown if lockedTourId is present
+                                                labelText: "Select Tour ID",
+                                              ),
+                                              CustomSizedBox(
+                                                value: 20,
+                                                side: 'height',
+                                              ),
+                                              LabelText(
+                                                label: 'School',
+                                                astrick: true,
+                                              ),
+                                              CustomSizedBox(
+                                                value: 20,
+                                                side: 'height',
+                                              ),
+                                              DropdownSearch<String>(
+                                                validator: (value) {
+                                                  if (value == null || value.isEmpty) {
+                                                    return "Please Select School";
+                                                  }
+                                                  return null;
+                                                },
+                                                popupProps: PopupProps.menu(
+                                                  showSelectedItems: true,
+                                                  showSearchBox: true,
+                                                  disabledItemFn: (String s) => s.startsWith(
+                                                      'I'), // Disable based on condition
+                                                ),
+                                                items:
+                                                schoolRecceController.splitSchoolLists, // Show schools based on selected or locked tour ID
+                                                dropdownDecoratorProps:
+                                                const DropDownDecoratorProps(
+                                                  dropdownSearchDecoration:
+                                                  InputDecoration(
+                                                    labelText: "Select School",
+                                                    hintText: "Select School",
+                                                  ),
+                                                ),
+                                                onChanged: (value) {
+                                                  // Set the selected school
+                                                  setState(() {
+                                                    schoolRecceController
+                                                        .setSchool(value);
+                                                  });
+                                                },
+                                                selectedItem:
+                                                schoolRecceController.schoolValue,
+                                              ),
                                           CustomSizedBox(
                                             value: 20,
                                             side: 'height',
@@ -5531,7 +5571,17 @@ class _SchoolRecceFormState extends State<SchoolRecceForm> {
                                                                   _chars
                                                                       .length))));
                                                     }
+                                                    final selectController =
+                                                    Get.put(SelectController());
+                                                    String? lockedTourId =
+                                                        selectController.lockedTourId;
 
+                                                    // Use lockedTourId if it is available, otherwise use the selected tour ID from schoolEnrolmentController
+                                                    String tourIdToInsert =
+                                                        lockedTourId ??
+                                                            schoolRecceController
+                                                                .tourValue ??
+                                                            '';
                                                     String uniqueId =
                                                     generateUniqueId(6);
                                                     // Capture selected grades as a comma-separated string
@@ -5544,9 +5594,7 @@ class _SchoolRecceFormState extends State<SchoolRecceForm> {
                                                     schoolRecceModal =
                                                     SchoolRecceModal(
                                                       tourId:
-                                                      schoolRecceController
-                                                          .tourValue ??
-                                                          '',
+                                                      tourIdToInsert,
                                                       school:
                                                       schoolRecceController
                                                           .schoolValue ??

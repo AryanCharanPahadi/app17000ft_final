@@ -32,6 +32,7 @@ import 'package:app17000ft_new/components/custom_sizedBox.dart';
 
 import '../../components/custom_confirmation.dart';
 
+import '../select_tour_id/select_controller.dart';
 import 'fln_observation_controller.dart';
 import 'fln_observation_sync.dart';
 
@@ -667,112 +668,130 @@ class _FlnObservationFormState extends State<FlnObservationForm> {
                                 child: GetBuilder<TourController>(
                                     init: TourController(),
                                     builder: (tourController) {
-                                      // Fetch tour details once, not on every rebuild.
-                                      if (tourController
-                                          .getLocalTourList.isEmpty) {
-                                        tourController.fetchTourDetails();
+                                      // Fetch tour details
+                                      tourController.fetchTourDetails();
+
+                                      // Get locked tour ID from SelectController
+                                      final selectController =
+                                      Get.put(SelectController());
+                                      String? lockedTourId =
+                                          selectController.lockedTourId;
+
+                                      // Consider the lockedTourId as the selected tour ID if it's not null
+                                      String? selectedTourId = lockedTourId ??
+                                          flnObservationController.tourValue;
+
+                                      // Fetch the corresponding schools if lockedTourId or selectedTourId is present
+                                      if (selectedTourId != null) {
+                                   splitSchoolLists = tourController
+                                            .getLocalTourList
+                                            .where((e) => e.tourId == selectedTourId)
+                                            .map((e) => e.allSchool!
+                                            .split(',')
+                                            .map((s) => s.trim())
+                                            .toList())
+                                            .expand((x) => x)
+                                            .toList();
                                       }
 
-                                      return Column(children: [
-                                        if (showBasicDetails) ...[
-                                          LabelText(
-                                            label: 'Basic Details',
-                                          ),
-                                          CustomSizedBox(
-                                            value: 20,
-                                            side: 'height',
-                                          ),
-                                          LabelText(
-                                            label: 'Tour ID',
-                                            astrick: true,
-                                          ),
-                                          CustomSizedBox(
-                                            value: 20,
-                                            side: 'height',
-                                          ),
-                                          CustomDropdownFormField(
-                                            focusNode: flnObservationController
-                                                .tourIdFocusNode,
-                                            options: tourController
-                                                .getLocalTourList
-                                                .map((e) => e
+                                      return Column(
+                                          children: [
+                                            if (showBasicDetails) ...[
+                                              LabelText(
+                                                label: 'Basic Details',
+                                              ),
+                                              LabelText(
+                                                label: 'Tour ID',
+                                                astrick: true,
+                                              ),
+                                              CustomSizedBox(
+                                                value: 20,
+                                                side: 'height',
+                                              ),
+                                              CustomDropdownFormField(
+                                                focusNode: flnObservationController
+                                                    .tourIdFocusNode,
+                                                // Show the locked tour ID directly, and disable dropdown interaction if locked
+                                                options: lockedTourId != null
+                                                    ? [
+                                                  lockedTourId
+                                                ] // Show only the locked tour ID
+                                                    : tourController.getLocalTourList
+                                                    .map((e) => e
                                                     .tourId!) // Ensure tourId is non-nullable
-                                                .toList(),
-                                            selectedOption:
-                                                flnObservationController
-                                                    .tourValue,
-                                            onChanged: (value) {
-                                              // Safely handle the school list splitting by commas
-                                              splitSchoolLists = tourController
-                                                  .getLocalTourList
-                                                  .where(
-                                                      (e) => e.tourId == value)
-                                                  .map((e) => e.allSchool!
+                                                    .toList(),
+                                                selectedOption: selectedTourId,
+                                                onChanged: lockedTourId ==
+                                                    null // Disable changing when tour ID is locked
+                                                    ? (value) {
+                                                  // Fetch and set the schools for the selected tour
+                                                  splitSchoolLists = tourController
+                                                      .getLocalTourList
+                                                      .where(
+                                                          (e) => e.tourId == value)
+                                                      .map((e) => e.allSchool!
                                                       .split(',')
                                                       .map((s) => s.trim())
                                                       .toList())
-                                                  .expand((x) => x)
-                                                  .toList();
+                                                      .expand((x) => x)
+                                                      .toList();
 
-                                              // Single setState call for efficiency
-                                              setState(() {
-                                                flnObservationController
-                                                    .setSchool(null);
-                                                flnObservationController
-                                                    .setTour(value);
-                                              });
-                                            },
-                                            labelText: "Select Tour ID",
-                                          ),
-                                          CustomSizedBox(
-                                            value: 20,
-                                            side: 'height',
-                                          ),
-                                          LabelText(
-                                            label: 'School',
-                                            astrick: true,
-                                          ),
-                                          CustomSizedBox(
-                                            value: 20,
-                                            side: 'height',
-                                          ),
-                                          // DropdownSearch for selecting a single school
-                                          DropdownSearch<String>(
-                                            validator: (value) {
-                                              if (value == null ||
-                                                  value.isEmpty) {
-                                                return "Please Select School";
-                                              }
-                                              return null;
-                                            },
-                                            popupProps: PopupProps.menu(
-                                              showSelectedItems: true,
-                                              showSearchBox: true,
-                                              disabledItemFn: (String s) =>
-                                                  s.startsWith(
-                                                      'I'), // Disable based on condition
-                                            ),
-                                            items:
-                                                splitSchoolLists, // Split school list as strings
-                                            dropdownDecoratorProps:
-                                                const DropDownDecoratorProps(
-                                              dropdownSearchDecoration:
-                                                  InputDecoration(
-                                                labelText: "Select School",
-                                                hintText: "Select School",
+                                                  // Single setState call for efficiency
+                                                  setState(() {
+                                                    flnObservationController
+                                                        .setSchool(null);
+                                                    flnObservationController
+                                                        .setTour(value);
+                                                  });
+                                                }
+                                                    : null, // Disable dropdown if lockedTourId is present
+                                                labelText: "Select Tour ID",
                                               ),
-                                            ),
-                                            onChanged: (value) {
-                                              // Set the selected school
-                                              setState(() {
-                                                flnObservationController
-                                                    .setSchool(value);
-                                              });
-                                            },
-                                            selectedItem:
-                                                flnObservationController
-                                                    .schoolValue,
-                                          ),
+                                              CustomSizedBox(
+                                                value: 20,
+                                                side: 'height',
+                                              ),
+                                              LabelText(
+                                                label: 'School',
+                                                astrick: true,
+                                              ),
+                                              CustomSizedBox(
+                                                value: 20,
+                                                side: 'height',
+                                              ),
+                                              DropdownSearch<String>(
+                                                validator: (value) {
+                                                  if (value == null || value.isEmpty) {
+                                                    return "Please Select School";
+                                                  }
+                                                  return null;
+                                                },
+                                                popupProps: PopupProps.menu(
+                                                  showSelectedItems: true,
+                                                  showSearchBox: true,
+                                                  disabledItemFn: (String s) => s.startsWith(
+                                                      'I'), // Disable based on condition
+                                                ),
+                                                items:
+                                              splitSchoolLists, // Show schools based on selected or locked tour ID
+                                                dropdownDecoratorProps:
+                                                const DropDownDecoratorProps(
+                                                  dropdownSearchDecoration:
+                                                  InputDecoration(
+                                                    labelText: "Select School",
+                                                    hintText: "Select School",
+                                                  ),
+                                                ),
+                                                onChanged: (value) {
+                                                  // Set the selected school
+                                                  setState(() {
+                                                    flnObservationController
+                                                        .setSchool(value);
+                                                  });
+                                                },
+                                                selectedItem:
+                                                flnObservationController.schoolValue,
+                                              ),
                                           CustomSizedBox(
                                             value: 20,
                                             side: 'height',
@@ -3795,6 +3814,17 @@ class _FlnObservationFormState extends State<FlnObservationForm> {
                                                     String formattedDate =
                                                         DateFormat('yyyy-MM-dd')
                                                             .format(now);
+                                                    final selectController =
+                                                    Get.put(SelectController());
+                                                    String? lockedTourId =
+                                                        selectController.lockedTourId;
+
+                                                    // Use lockedTourId if it is available, otherwise use the selected tour ID from schoolEnrolmentController
+                                                    String tourIdToInsert =
+                                                        lockedTourId ??
+                                                            flnObservationController
+                                                                .tourValue ??
+                                                            '';
                                                     String generateUniqueId(
                                                         int length) {
                                                       const _chars =
@@ -3943,8 +3973,7 @@ class _FlnObservationFormState extends State<FlnObservationForm> {
 
                                                     // Create the enrolment collection object
                                                     FlnObservationModel flnObservationModel = FlnObservationModel(
-                                                        tourId: flnObservationController.tourValue ??
-                                                            '',
+                                                        tourId:tourIdToInsert,
                                                         school: flnObservationController
                                                                 .schoolValue ??
                                                             '',
