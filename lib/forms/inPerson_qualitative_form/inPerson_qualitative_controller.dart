@@ -295,7 +295,7 @@ class InpersonQualitativeController extends GetxController with BaseController {
     _inPersonQualitativeList = [];
     _inPersonQualitativeList =
         await LocalDbController().fetchLocalInPersonQualitativeRecords();
-    isLoading = false;
+
 
     update();
   }

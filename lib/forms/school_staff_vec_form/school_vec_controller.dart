@@ -1,3 +1,4 @@
+
 import 'dart:io';
 
 import 'package:app17000ft_new/constants/color_const.dart';
@@ -101,15 +102,15 @@ class SchoolStaffVecController extends GetxController with BaseController {
     QualSpecifyController.clear();
     QualSpecify2Controller.clear();
 
+update();
 
 
   }
 
   Future<void> fetchData() async {
     isLoading = true;
-    update();
+    _schoolStaffVecList = [];
     _schoolStaffVecList = await LocalDbController().fetchLocalSchoolStaffVecRecords();
-    isLoading = false;
     update();
   }
 }

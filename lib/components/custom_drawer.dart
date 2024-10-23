@@ -238,15 +238,9 @@ class _CustomDrawerState extends State<CustomDrawer> {
             title: 'Logout',
             icons: const FaIcon(FontAwesomeIcons.arrowRightFromBracket),
             onPressed: () async {
-              final UserController userController = Get.find<UserController>();
-              final SelectController selectController = Get.put(SelectController());
 
-              // Step 1: Clear user data from memory (controller)
-              userController.clearUserData();
 
-              // Step 2: Clear tour and school selections and reset UI
-              await selectController.unlockTourAndSchools();  // Unlock any selected Tour ID and schools
-              selectController.clearFields();  // Ensure tour and school fields are cleared
+
 
               // Step 3: Clear user data from SharedPreferences
               await SharedPreferencesHelper.logout();  // Complete logout and clear session
@@ -264,6 +258,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
               );
             },
           )
+
 
 
 

@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
+import 'package:app17000ft_new/home/home_screen.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
@@ -638,18 +639,22 @@ class _FlnObservationFormState extends State<FlnObservationForm> {
     return WillPopScope(
         onWillPop: () async {
           IconData icon = Icons.check_circle;
-          bool shouldExit = await showDialog(
-              context: context,
-              builder: (_) => Confirmation(
-                  iconname: icon,
-                  title: 'Exit Confirmation',
-                  yes: 'Yes',
-                  no: 'no',
-                  desc: 'Are you sure you want to leave exit?',
-                  onPressed: () async {
-                    Navigator.of(context).pop(true);
-                  }));
-          return shouldExit;
+          bool? shouldExit = await showDialog<bool>(
+            context: context,
+            builder: (_) => Confirmation(
+              iconname: icon,
+              title: 'Exit Confirmation',
+              yes: 'Yes',
+              no: 'No',
+              desc: 'Are you sure you want to leave?',
+              onPressed: () {
+                Navigator.of(context).pop(true); // User confirms exit
+              },
+            ),
+          );
+
+          // If shouldExit is null, default to false
+          return shouldExit ?? false;
         },
         child: Scaffold(
             appBar: const CustomAppbar(
@@ -4089,7 +4094,7 @@ class _FlnObservationFormState extends State<FlnObservationForm> {
                                                         context,
                                                         MaterialPageRoute(
                                                             builder: (context) =>
-                                                                FlnObservationSync()),
+                                                                const HomeScreen()),
                                                       );
                                                     } else {
                                                       customSnackbar(

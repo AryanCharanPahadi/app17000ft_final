@@ -16,6 +16,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:permission_handler/permission_handler.dart';
 
+import '../components/user_controller.dart';
 import '../forms/issue_tracker/issue_tracker_controller.dart';
 import '../forms/select_tour_id/select_controller.dart';
 import '../version_file/version_controller.dart';
@@ -167,33 +168,24 @@ class _LoginScreenState extends State<LoginScreen> {
                                   );
                                   _loginFormkey.currentState?.reset();
                                   loginController.clearFields();
-                                  // Step 2: Ask for storage permission after successful login
-                                    bool permissionGranted = await requestPermission();
-                                    if (!permissionGranted) {
-                                      // customSnackbar(
-                                      //   'Permission Status',
-                                      //   'Permission Denied',
-                                      //   AppColors.secondary,
-                                      //   AppColors.onSecondary,
-                                      //   Icons.warning,
-                                      // );
-                                    } else {
-                                      // customSnackbar(
-                                      //   'Permission Status',
-                                      //   'Permission Granted',
-                                      //   AppColors.secondary,
-                                      //   AppColors.onSecondary,
-                                      //   Icons.verified,
-                                      // );
-                                    }
+
+                                  // Request for storage permission after successful login
+                                  bool permissionGranted = await requestPermission();
+                                  if (!permissionGranted) {
+                                    // Handle denied permission if needed
+                                  }
 
                                   final IssueTrackerController controller = Get.put(IssueTrackerController());
                                   controller.office = myrsp['office'];
 
                                   final SelectController selectController = Get.put(SelectController());
-                                   selectController.unlockTourAndSchools();
+                                  selectController.unlockTourAndSchools();
                                   selectController.clearFields(); // Reset fields for new data
-                                  // selectController.tourController.fetchTourDetails();
+                                  //
+                                  // // Load the UserController here after successful login
+                                  // Get.put(UserController()).loadUserData(); // Load user data into UserController
+
+                                  // Navigate to HomeScreen
                                   Get.offAll(() => const HomeScreen());
 
                                   Future.delayed(const Duration(milliseconds: 500), () {
@@ -214,6 +206,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           },
                           title: 'Login',
                         ),
+
                         SizedBox(
                           height: responsive.responsiveValue(
                               small: 10.0, medium: 20.0, large: 30.0),

@@ -43,28 +43,28 @@ class IssueTrackerController extends GetxController with BaseController {
   bool isLoading = false;
 
   final TextEditingController correctUdiseCodeController =
-  TextEditingController();
+      TextEditingController();
   final TextEditingController libraryDescriptionController =
-  TextEditingController();
+      TextEditingController();
   final TextEditingController playgroundDescriptionController =
-  TextEditingController();
+      TextEditingController();
   final TextEditingController digiLabDescriptionController =
-  TextEditingController();
+      TextEditingController();
   final TextEditingController classroomDescriptionController =
-  TextEditingController();
+      TextEditingController();
   final TextEditingController alexaDescriptionController =
-  TextEditingController();
+      TextEditingController();
   final TextEditingController otherSolarDescriptionController =
-  TextEditingController();
+      TextEditingController();
   final TextEditingController tabletNumberController = TextEditingController();
   final TextEditingController dotDeviceMissingController =
-  TextEditingController();
+      TextEditingController();
   final TextEditingController dotDeviceNotConfiguredController =
-  TextEditingController();
+      TextEditingController();
   final TextEditingController dotDeviceNotConnectingController =
-  TextEditingController();
+      TextEditingController();
   final TextEditingController dotDeviceNotChargingController =
-  TextEditingController();
+      TextEditingController();
   final TextEditingController dotOtherIssueController = TextEditingController();
   final TextEditingController tabletNumber3Controller = TextEditingController();
   final TextEditingController dateController = TextEditingController();
@@ -233,21 +233,25 @@ class IssueTrackerController extends GetxController with BaseController {
   final List<XFile> _multipleImage6 = [];
   List<XFile> get multipleImage6 => _multipleImage6;
 
-
   Future<String> compressImage(String imagePath) async {
     // Load the image
     final File imageFile = File(imagePath);
-    final img.Image? originalImage = img.decodeImage(imageFile.readAsBytesSync());
+    final img.Image? originalImage =
+        img.decodeImage(imageFile.readAsBytesSync());
 
-    if (originalImage == null) return imagePath; // Return original path if decoding fails
+    if (originalImage == null)
+      return imagePath; // Return original path if decoding fails
 
     // Resize the image (optional) and compress
-    final img.Image resizedImage = img.copyResize(originalImage, width: 768); // Change the width as needed
-    final List<int> compressedImage = img.encodeJpg(resizedImage, quality: 40); // Adjust quality (0-100)
+    final img.Image resizedImage =
+        img.copyResize(originalImage, width: 768); // Change the width as needed
+    final List<int> compressedImage =
+        img.encodeJpg(resizedImage, quality: 40); // Adjust quality (0-100)
 
     // Save the compressed image to a new file
     final Directory appDir = await getTemporaryDirectory();
-    final String compressedImagePath = '${appDir.path}/compressed_${DateTime.now().millisecondsSinceEpoch}.jpg';
+    final String compressedImagePath =
+        '${appDir.path}/compressed_${DateTime.now().millisecondsSinceEpoch}.jpg';
     final File compressedFile = File(compressedImagePath);
     await compressedFile.writeAsBytes(compressedImage);
 
@@ -281,7 +285,6 @@ class IssueTrackerController extends GetxController with BaseController {
 
     return _imagePaths.toString();
   }
-
 
   Future<String> takePhoto2(ImageSource source) async {
     final ImagePicker picker2 = ImagePicker();
@@ -367,7 +370,6 @@ class IssueTrackerController extends GetxController with BaseController {
     return _imagePaths4.toString();
   }
 
-
   Future<String> takePhoto5(ImageSource source) async {
     final ImagePicker picker5 = ImagePicker();
     List<XFile> selectedImages5 = [];
@@ -395,6 +397,7 @@ class IssueTrackerController extends GetxController with BaseController {
 
     return _imagePaths5.toString();
   }
+
   void setSchool(String? value) {
     _schoolValue = value;
     update();
@@ -413,7 +416,8 @@ class IssueTrackerController extends GetxController with BaseController {
       margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
       child: Column(
         children: <Widget>[
-          const Text("Select Image", style: TextStyle(fontSize: 20.0, color: Colors.white)),
+          const Text("Select Image",
+              style: TextStyle(fontSize: 20.0, color: Colors.white)),
           const SizedBox(height: 20),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -424,7 +428,8 @@ class IssueTrackerController extends GetxController with BaseController {
                   await takePhoto(ImageSource.camera);
                   Get.back();
                 },
-                child: const Text('Camera', style: TextStyle(fontSize: 20.0, color: AppColors.primary)),
+                child: const Text('Camera',
+                    style: TextStyle(fontSize: 20.0, color: AppColors.primary)),
               ),
               const SizedBox(width: 30),
               ElevatedButton(
@@ -433,7 +438,8 @@ class IssueTrackerController extends GetxController with BaseController {
                   await takePhoto(ImageSource.gallery);
                   Get.back();
                 },
-                child: const Text('Gallery', style: TextStyle(fontSize: 20.0, color: AppColors.primary)),
+                child: const Text('Gallery',
+                    style: TextStyle(fontSize: 20.0, color: AppColors.primary)),
               ),
             ],
           ),
@@ -450,7 +456,8 @@ class IssueTrackerController extends GetxController with BaseController {
       margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
       child: Column(
         children: <Widget>[
-          const Text("Select Image", style: TextStyle(fontSize: 20.0, color: Colors.white)),
+          const Text("Select Image",
+              style: TextStyle(fontSize: 20.0, color: Colors.white)),
           const SizedBox(height: 20),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -461,7 +468,8 @@ class IssueTrackerController extends GetxController with BaseController {
                   await takePhoto2(ImageSource.camera);
                   Get.back();
                 },
-                child: const Text('Camera', style: TextStyle(fontSize: 20.0, color: AppColors.primary)),
+                child: const Text('Camera',
+                    style: TextStyle(fontSize: 20.0, color: AppColors.primary)),
               ),
               const SizedBox(width: 30),
               ElevatedButton(
@@ -470,7 +478,8 @@ class IssueTrackerController extends GetxController with BaseController {
                   await takePhoto2(ImageSource.gallery);
                   Get.back();
                 },
-                child: const Text('Gallery', style: TextStyle(fontSize: 20.0, color: AppColors.primary)),
+                child: const Text('Gallery',
+                    style: TextStyle(fontSize: 20.0, color: AppColors.primary)),
               ),
             ],
           ),
@@ -487,7 +496,8 @@ class IssueTrackerController extends GetxController with BaseController {
       margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
       child: Column(
         children: <Widget>[
-          const Text("Select Image", style: TextStyle(fontSize: 20.0, color: Colors.white)),
+          const Text("Select Image",
+              style: TextStyle(fontSize: 20.0, color: Colors.white)),
           const SizedBox(height: 20),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -498,7 +508,8 @@ class IssueTrackerController extends GetxController with BaseController {
                   await takePhoto3(ImageSource.camera);
                   Get.back();
                 },
-                child: const Text('Camera', style: TextStyle(fontSize: 20.0, color: AppColors.primary)),
+                child: const Text('Camera',
+                    style: TextStyle(fontSize: 20.0, color: AppColors.primary)),
               ),
               const SizedBox(width: 30),
               ElevatedButton(
@@ -507,7 +518,8 @@ class IssueTrackerController extends GetxController with BaseController {
                   await takePhoto3(ImageSource.gallery);
                   Get.back();
                 },
-                child: const Text('Gallery', style: TextStyle(fontSize: 20.0, color: AppColors.primary)),
+                child: const Text('Gallery',
+                    style: TextStyle(fontSize: 20.0, color: AppColors.primary)),
               ),
             ],
           ),
@@ -524,7 +536,8 @@ class IssueTrackerController extends GetxController with BaseController {
       margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
       child: Column(
         children: <Widget>[
-          const Text("Select Image", style: TextStyle(fontSize: 20.0, color: Colors.white)),
+          const Text("Select Image",
+              style: TextStyle(fontSize: 20.0, color: Colors.white)),
           const SizedBox(height: 20),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -535,7 +548,8 @@ class IssueTrackerController extends GetxController with BaseController {
                   await takePhoto4(ImageSource.camera);
                   Get.back();
                 },
-                child: const Text('Camera', style: TextStyle(fontSize: 20.0, color: AppColors.primary)),
+                child: const Text('Camera',
+                    style: TextStyle(fontSize: 20.0, color: AppColors.primary)),
               ),
               const SizedBox(width: 30),
               ElevatedButton(
@@ -544,7 +558,8 @@ class IssueTrackerController extends GetxController with BaseController {
                   await takePhoto4(ImageSource.gallery);
                   Get.back();
                 },
-                child: const Text('Gallery', style: TextStyle(fontSize: 20.0, color: AppColors.primary)),
+                child: const Text('Gallery',
+                    style: TextStyle(fontSize: 20.0, color: AppColors.primary)),
               ),
             ],
           ),
@@ -561,7 +576,8 @@ class IssueTrackerController extends GetxController with BaseController {
       margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
       child: Column(
         children: <Widget>[
-          const Text("Select Image", style: TextStyle(fontSize: 20.0, color: Colors.white)),
+          const Text("Select Image",
+              style: TextStyle(fontSize: 20.0, color: Colors.white)),
           const SizedBox(height: 20),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -572,7 +588,8 @@ class IssueTrackerController extends GetxController with BaseController {
                   await takePhoto5(ImageSource.camera);
                   Get.back();
                 },
-                child: const Text('Camera', style: TextStyle(fontSize: 20.0, color: AppColors.primary)),
+                child: const Text('Camera',
+                    style: TextStyle(fontSize: 20.0, color: AppColors.primary)),
               ),
               const SizedBox(width: 30),
               ElevatedButton(
@@ -581,7 +598,8 @@ class IssueTrackerController extends GetxController with BaseController {
                   await takePhoto5(ImageSource.gallery);
                   Get.back();
                 },
-                child: const Text('Gallery', style: TextStyle(fontSize: 20.0, color: AppColors.primary)),
+                child: const Text('Gallery',
+                    style: TextStyle(fontSize: 20.0, color: AppColors.primary)),
               ),
             ],
           ),
@@ -662,7 +680,6 @@ class IssueTrackerController extends GetxController with BaseController {
     );
   }
 
-
   void showImagePreview4(String imagePath4, BuildContext context) {
     showDialog(
       context: context,
@@ -687,7 +704,6 @@ class IssueTrackerController extends GetxController with BaseController {
     );
   }
 
-
   void showImagePreview5(String imagePath5, BuildContext context) {
     showDialog(
       context: context,
@@ -711,6 +727,7 @@ class IssueTrackerController extends GetxController with BaseController {
       },
     );
   }
+
   bool _isLoading1 = true;
   bool get isLoading1 => _isLoading1; // Expose the loading state
 
@@ -753,6 +770,7 @@ class IssueTrackerController extends GetxController with BaseController {
       await _fetchFilteredStaffNames(5);
     }
   }
+
   final HomeController controller = Get.put(HomeController());
 
   Future<void> _fetchFilteredStaffNames(int category) async {
@@ -810,7 +828,8 @@ class IssueTrackerController extends GetxController with BaseController {
   Future<void> _loadStaffNamesOffline(int category) async {
     try {
       final dbController = SqfliteDatabaseHelper();
-      List<String> staffNames = await dbController.getStaffNamesByCategory(category);
+      List<String> staffNames =
+          await dbController.getStaffNamesByCategory(category);
 
       switch (category) {
         case 1:
@@ -837,7 +856,6 @@ class IssueTrackerController extends GetxController with BaseController {
       update(); // Notify listeners
     }
   }
-
 
   void clearFields() {
     selectedValue = '';
@@ -873,15 +891,14 @@ class IssueTrackerController extends GetxController with BaseController {
     isLoading = true;
 
     _issueTrackerList =
-    await LocalDbController().fetchLocalIssueTrackerRecords();
+        await LocalDbController().fetchLocalIssueTrackerRecords();
     _libIssueList = await LocalDbController().fetchLocalLibIssueRecords();
     _furnitureIssueList = await LocalDbController().fetchLocalFurnitureIssue();
     _playgroundIssueList =
-    await LocalDbController().fetchLocalPlaygroundIssue();
+        await LocalDbController().fetchLocalPlaygroundIssue();
     _digiLabIssueList = await LocalDbController().fetchLocalDigiLabIssue();
     _alexaIssueList = await LocalDbController().fetchLocalAlexaIssue();
 
-    isLoading = false;
     update();
   }
 }

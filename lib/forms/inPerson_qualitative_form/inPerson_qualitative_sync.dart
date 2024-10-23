@@ -39,20 +39,24 @@ class _InpersonQualitativeSync extends State<InpersonQualitativeSync> {
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
-      onWillPop:() async {
+      onWillPop: () async {
         IconData icon = Icons.check_circle;
-        bool shouldExit = await showDialog(
-            context: context,
-            builder: (_) => Confirmation(
-                iconname: icon,
-                title: 'Exit Confirmation',
-                yes: 'Yes',
-                no: 'no',
-                desc: 'Are you sure you want to leave this screen?',
-                onPressed: () async {
-                  Navigator.of(context).pop(true);
-                }));
-        return shouldExit;
+        bool? shouldExit = await showDialog<bool>(
+          context: context,
+          builder: (_) => Confirmation(
+            iconname: icon,
+            title: 'Exit Confirmation',
+            yes: 'Yes',
+            no: 'No',
+            desc: 'Are you sure you want to leave?',
+            onPressed: () {
+              Navigator.of(context).pop(true); // User confirms exit
+            },
+          ),
+        );
+
+        // If shouldExit is null, default to false
+        return shouldExit ?? false;
       },
       child: Scaffold(
         appBar: const CustomAppbar(title: 'In-Person Qualitative Sync'),

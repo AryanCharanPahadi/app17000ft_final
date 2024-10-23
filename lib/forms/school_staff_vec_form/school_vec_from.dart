@@ -135,18 +135,31 @@ class _SchoolStaffVecFormState extends State<SchoolStaffVecForm> {
     return WillPopScope(
       onWillPop: () async {
         IconData icon = Icons.check_circle;
-        bool shouldExit = await showDialog(
-            context: context,
-            builder: (_) => Confirmation(
-                iconname: icon,
-                title: 'Exit Confirmation',
-                yes: 'Yes',
-                no: 'no',
-                desc: 'Are you sure you want to leave exit?',
-                onPressed: () async {
-                  Navigator.of(context).pop(true);
-                }));
-        return shouldExit;
+        bool? shouldExit = await showDialog<bool>(
+          context: context,
+          builder: (_) => Confirmation(
+            iconname: icon,
+            title: 'Exit Confirmation',
+            yes: 'Yes',
+            no: 'No',
+            desc: 'Are you sure you want to leave?',
+            onPressed: () {
+              // Close the dialog and return true
+              Navigator.of(context).pop(true);
+            },
+          ),
+        );
+
+        // If the user confirmed exit, navigate to HomeScreen
+        if (shouldExit == true) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const HomeScreen()),
+          );
+        }
+
+        // Return false to prevent the default back navigation
+        return false;
       },
       child: Scaffold(
           appBar: const CustomAppbar(
@@ -1379,7 +1392,7 @@ class _SchoolStaffVecFormState extends State<SchoolStaffVecForm> {
                                                         context,
                                                         MaterialPageRoute(
                                                             builder: (context) =>
-                                                                const SchoolStaffVecSync()),
+                                                                const HomeScreen()),
                                                       );
                                                     } else {
                                                       customSnackbar(

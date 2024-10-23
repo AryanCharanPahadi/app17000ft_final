@@ -269,14 +269,14 @@ class SchoolFacilitiesController extends GetxController with BaseController {
     noOfEnrolledStudentAsOnDateController.clear();
     nameOfLibrarianController.clear();
     correctUdiseCodeController.clear();
-
   }
 
   Future<void> fetchData() async {
     isLoading = true;
-    update();
+    _schoolFacilitiesList = [];
+
     _schoolFacilitiesList = await LocalDbController().fetchLocalSchoolFacilitiesRecords();
-    isLoading = false;
+
     update();
   }
 }

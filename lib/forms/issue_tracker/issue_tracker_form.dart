@@ -27,6 +27,7 @@ import '../../components/custom_confirmation.dart';
 import '../../components/custom_drawer.dart';
 import '../../components/custom_snackbar.dart';
 import '../../helper/database_helper.dart';
+import '../../home/home_screen.dart';
 import '../select_tour_id/select_controller.dart';
 import 'alexa_issue.dart';
 import 'digilab_issue.dart';
@@ -764,18 +765,22 @@ class _IssueTrackerFormState extends State<IssueTrackerForm> {
     return WillPopScope(
       onWillPop: () async {
         IconData icon = Icons.check_circle;
-        bool shouldExit = await showDialog(
-            context: context,
-            builder: (_) => Confirmation(
-                iconname: icon,
-                title: 'Exit Confirmation',
-                yes: 'Yes',
-                no: 'no',
-                desc: 'Are you sure you want to leave this screen?',
-                onPressed: () async {
-                  Navigator.of(context).pop(true);
-                }));
-        return shouldExit;
+        bool? shouldExit = await showDialog<bool>(
+          context: context,
+          builder: (_) => Confirmation(
+            iconname: icon,
+            title: 'Exit Confirmation',
+            yes: 'Yes',
+            no: 'No',
+            desc: 'Are you sure you want to leave?',
+            onPressed: () {
+              Navigator.of(context).pop(true); // User confirms exit
+            },
+          ),
+        );
+
+        // If shouldExit is null, default to false
+        return shouldExit ?? false;
       },
       child: Scaffold(
         appBar: const CustomAppbar(
@@ -7123,13 +7128,13 @@ class _IssueTrackerFormState extends State<IssueTrackerForm> {
                                                         AppColors.onPrimary,
                                                         Icons.verified,
                                                       );
-                                                      // // Navigate to HomeScreen
-                                                      // Navigator.pushReplacement(
-                                                      //   context,
-                                                      //   MaterialPageRoute(
-                                                      //       builder: (context) =>
-                                                      //           CustomDrawer()),
-                                                      // );
+                                                      // Navigate to HomeScreen
+                                                      Navigator.pushReplacement(
+                                                        context,
+                                                        MaterialPageRoute(
+                                                            builder: (context) =>
+                                                                const HomeScreen()),
+                                                      );
                                                     } else {
                                                       customSnackbar(
                                                         'Error',

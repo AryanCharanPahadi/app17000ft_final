@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
+import 'package:app17000ft_new/home/home_screen.dart';
 import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -607,7 +608,7 @@ class _CabMeterTracingFormState extends State<CabMeterTracingForm> {
                                   Navigator.pushReplacement(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (context) => CabTracingSync(),
+                                      builder: (context) => const HomeScreen(),
                                     ),
                                   );
                                   customSnackbar(

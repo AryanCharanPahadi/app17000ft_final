@@ -10,8 +10,10 @@ import '../../components/custom_confirmation.dart';
 import '../../components/custom_dropdown.dart';
 import '../../components/custom_sizedBox.dart';
 import '../../helper/database_helper.dart';
+import '../../home/home_screen.dart';
 import '../../tourDetails/tour_controller.dart';
 import '../school_enrolment/school_enrolment.dart';
+import '../school_enrolment/school_enrolment_controller.dart';
 import '../school_facilities_&_mapping_form/SchoolFacilitiesForm.dart';
 import '../school_facilities_&_mapping_form/school_facilities_modals.dart';
 import '../school_staff_vec_form/school_vec_from.dart';
@@ -22,7 +24,9 @@ import 'package:dropdown_search/dropdown_search.dart';
 import '../../helper/responsive_helper.dart';
 import '../school_enrolment/school_enrolment_model.dart';
 class EditFormPage extends StatefulWidget {
+
   const EditFormPage({super.key});
+
   @override
   State<EditFormPage> createState() => _EditFormPageState();
 }
@@ -37,6 +41,9 @@ class _EditFormPageState extends State<EditFormPage> {
   late EditController editController;
   List<String> tourIds = []; // List to store available tour IDs
   bool isOfflineMode = false; // Track if the app is in offline mode
+  String? lockedTourId; // Store locked Tour ID if available
+  final schoolEnrolmentController =
+  Get.put(SchoolEnrolmentController());
   Future<bool> _isConnected() async {
     var connectivityResult = await Connectivity().checkConnectivity();
     return connectivityResult != ConnectivityResult.none;
@@ -46,46 +53,59 @@ class _EditFormPageState extends State<EditFormPage> {
   void initState() {
     super.initState();
     editController = Get.put(EditController());
-    _checkConnectivityAndShowPopup(); // Check connectivity and show pop-up if online
+    // _checkConnectivityAndShowPopup(); // Check connectivity and show pop-up if online
+    _loadLockedTourId(); // Load the locked Tour ID if available
     setState(() {
       selectedFormLabel = '';
     });
   }
 
-  Future<void> _checkConnectivityAndShowPopup() async {
-    bool isConnected = await _isConnected();
-    if (isConnected) {
-      _showOnlinePopup(); // Show pop-up only if online
-    } else {
+  // Load the locked Tour ID from shared preferences
+  Future<void> _loadLockedTourId() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? storedLockedTourId = prefs.getString('lockedTourId');
+
+    if (storedLockedTourId != null) {
       setState(() {
-        isOfflineMode = true;
+        lockedTourId = storedLockedTourId; // Set the locked Tour ID
+        editController.setTour(lockedTourId); // Set it in the EditController
+        fetchData(lockedTourId!); // Fetch data for the locked Tour ID
       });
-      _loadTourIdsFromLocal(); // Load only the stored Tour IDs in offline mode
     }
   }
 
-  void _showOnlinePopup() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return Confirmation(
-          desc:
-          'Select TourId. For edit the data in the offline mode!',
-          title: 'Notification',
-          iconname: Icons.info,
-          yes: 'OK',
-          onPressed: () {},
-        );
-      },
-    );
-  }
+  // Future<void> _checkConnectivityAndShowPopup() async {
+  //   bool isConnected = await _isConnected();
+  //   if (isConnected) {
+  //     _showOnlinePopup(); // Show pop-up only if online
+  //   } else {
+  //     setState(() {
+  //       isOfflineMode = true;
+  //     });
+  //     _loadTourIdsFromLocal(); // Load only the stored Tour IDs in offline mode
+  //   }
+  // }
+
+  // void _showOnlinePopup() {
+  //   showDialog(
+  //     context: context,
+  //     builder: (BuildContext context) {
+  //       return Confirmation(
+  //         desc: 'Select TourId. For edit the data in the offline mode!',
+  //         title: 'Notification',
+  //         iconname: Icons.info,
+  //         yes: 'OK',
+  //         onPressed: () {},
+  //       );
+  //     },
+  //   );
+  // }
 
   Future<void> fetchData(String tourId, [String? school]) async {
     bool isConnected = await _isConnected();
     if (isConnected) {
       // Fetch data from the API when online
-      final url =
-          'https://mis.17000ft.org/apis/fast_apis/pre-fill-data.php?id=$tourId';
+      final url = 'https://mis.17000ft.org/apis/fast_apis/pre-fill-data.php?id=$tourId';
       final response = await http.get(Uri.parse(url));
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
@@ -105,10 +125,8 @@ class _EditFormPageState extends State<EditFormPage> {
           }
 
           setState(() {
-            splitSchoolLists =
-                allSchools; // Update splitSchoolLists with all fetched schools
-            formData =
-            {}; // Clear formData as it's now irrelevant since we're showing all
+            splitSchoolLists = allSchools; // Update splitSchoolLists with all fetched schools
+            formData = {}; // Clear formData as it's now irrelevant since we're showing all
           });
 
           // Save the selected Tour ID locally for offline mode
@@ -134,8 +152,7 @@ class _EditFormPageState extends State<EditFormPage> {
     }
   }
 
-  Future<void> saveFormDataToLocalDB(String tourId, String school,
-      Map<String, dynamic> formData) async {
+  Future<void> saveFormDataToLocalDB(String tourId, String school, Map<String, dynamic> formData) async {
     try {
       await dbHelper.insertFormData(tourId, school, formData);
     } catch (e) {
@@ -143,17 +160,14 @@ class _EditFormPageState extends State<EditFormPage> {
     }
   }
 
-  Future<Map<String, dynamic>> getFormDataFromLocalDB(String tourId,
-      String school) async {
+  Future<Map<String, dynamic>> getFormDataFromLocalDB(String tourId, String school) async {
     return await SqfliteDatabaseHelper.instance.getFormData(tourId, school);
   }
 
   // Save the selected Tour ID to the local database (or shared preferences)
   Future<void> saveTourIdToLocal(String tourId) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    // Retrieve existing IDs
     List<String> existingIds = prefs.getStringList('selectedTourIds') ?? [];
-    // Add the new ID if not already present
     if (!existingIds.contains(tourId)) {
       existingIds.add(tourId);
       await prefs.setStringList('selectedTourIds', existingIds);
@@ -181,30 +195,34 @@ class _EditFormPageState extends State<EditFormPage> {
     final responsive = Responsive(context);
     return WillPopScope(
       onWillPop: () async {
-        bool shouldExit = await showDialog(
+        IconData icon = Icons.check_circle;
+        bool? shouldExit = await showDialog<bool>(
           context: context,
-          builder: (_) =>
-              Confirmation(
-                iconname: Icons.warning,
-                title: 'Exit Confirmation',
-                desc: 'Are you sure you want to leave exit?',
-                yes: 'Yes',
-                no: 'No',
-                onPressed: () {
-                  setState(() {
-                    formData = {}; // Reset form data
-
-                    selectedFormLabel = '';
-
-                    editController
-                        .clearFields();
-                  });
-                  Navigator.of(context).pop(true);
-                },
-              ),
+          builder: (_) => Confirmation(
+            iconname: icon,
+            title: 'Exit Confirmation',
+            yes: 'Yes',
+            no: 'No',
+            desc: 'Are you sure you want to leave?',
+            onPressed: () {
+              // Close the dialog and return true
+              Navigator.of(context).pop(true);
+            },
+          ),
         );
-        return shouldExit;
+
+        // If the user confirmed exit, navigate to HomeScreen
+        if (shouldExit == true) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const HomeScreen()),
+          );
+        }
+
+        // Return false to prevent the default back navigation
+        return false;
       },
+
       child: Scaffold(
         appBar: const CustomAppbar(
           title: 'Edit Form',
@@ -218,9 +236,8 @@ class _EditFormPageState extends State<EditFormPage> {
                 GetBuilder<TourController>(
                   init: TourController(),
                   builder: (tourController) {
-                    if (!isOfflineMode) {
-                      tourController
-                          .fetchTourDetails(); // Fetch online tour list if online
+                    if (!isOfflineMode && lockedTourId == null) {
+                      tourController.fetchTourDetails(); // Fetch online tour list if online
                     }
                     return Form(
                       key: _formKey,
@@ -228,22 +245,27 @@ class _EditFormPageState extends State<EditFormPage> {
                         children: [
                           LabelText(label: 'Select Tour ID'),
                           CustomSizedBox(value: 20, side: 'height'),
+                          // Dropdown to show locked Tour ID or all IDs
                           CustomDropdownFormField(
                             focusNode: editController.tourIdFocusNode,
-                            options: isOfflineMode
+                            options: lockedTourId != null
+                                ? [lockedTourId!] // If locked, show only the locked ID
+                                : isOfflineMode
                                 ? tourIds // Show all stored Tour IDs in offline mode
                                 : tourController.getLocalTourList
                                 .map((e) => e.tourId!)
                                 .toList(),
-                            selectedOption: editController.tourValue,
-                            onChanged: (value) {
+                            selectedOption: lockedTourId ?? editController.tourValue,
+                            onChanged: lockedTourId == null // Disable dropdown if tour is locked
+                                ? (value) {
                               if (value != null) {
                                 fetchData(value);
                                 setState(() {
                                   editController.setTour(value);
                                 });
                               }
-                            },
+                            }
+                                : null, // Disable if tour is locked
                             labelText: "Select Tour ID",
                           ),
                           CustomSizedBox(value: 20, side: 'height'),
@@ -448,14 +470,14 @@ class _EditFormPageState extends State<EditFormPage> {
                                                 Navigator.push(
                                                   context,
                                                   MaterialPageRoute(
+
                                                     builder: (context) => SchoolEnrollmentForm(
-                                                      userid: 'userid',
                                                       existingRecord: EnrolmentCollectionModel(
                                                         enrolmentData: jsonEncode(enrolmentDataMap),
                                                         remarks: enrollmentFetch['remarks']?.toString() ?? '',
                                                         tourId: editController.tourValue,
                                                         school: editController.schoolValue,
-                                                        submittedBy: editController.empId,
+                                                        submittedBy: schoolEnrolmentController.empId,
                                                       ),
                                                       tourId: editController.tourValue ?? 'Not Provided',
                                                       school: editController.schoolValue ?? 'Not provided',

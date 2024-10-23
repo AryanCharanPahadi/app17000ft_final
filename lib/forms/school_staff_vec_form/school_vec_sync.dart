@@ -46,18 +46,22 @@ class _SchoolStaffVecSyncState extends State<SchoolStaffVecSync> {
     return WillPopScope(
       onWillPop: () async {
         IconData icon = Icons.check_circle;
-        bool shouldExit = await showDialog(
-            context: context,
-            builder: (_) => Confirmation(
-                iconname: icon,
-                title: 'Confirm Exit',
-                yes: 'Exit',
-                no: 'Cancel',
-                desc: 'Are you sure you want to Exit?',
-                onPressed: () async {
-                  Navigator.of(context).pop(true);
-                }));
-        return shouldExit;
+        bool? shouldExit = await showDialog<bool>(
+          context: context,
+          builder: (_) => Confirmation(
+            iconname: icon,
+            title: 'Exit Confirmation',
+            yes: 'Yes',
+            no: 'No',
+            desc: 'Are you sure you want to leave?',
+            onPressed: () {
+              Navigator.of(context).pop(true); // User confirms exit
+            },
+          ),
+        );
+
+        // If shouldExit is null, default to false
+        return shouldExit ?? false;
       },
       child: Scaffold(
         appBar: const CustomAppbar(title: 'School Staff & SMC/VEC Details'),
@@ -109,13 +113,14 @@ class _SchoolStaffVecSyncState extends State<SchoolStaffVecSync> {
                       return ListTile(
                         title:   Text(
                           "${index + 1}. Tour ID: ${item.tourId}\n"
-                              "School.: ${item.school}\n",
+                              "School.: ${item.school}\n"
+                              "School.: ${item.createdBy}\n",
                           style: const TextStyle(
                               fontWeight: FontWeight.bold),
                           textAlign: TextAlign
                               .left, // Adjust text alignment if needed
                           maxLines:
-                          2, // Limit the lines, or remove this if you don't want a limit
+                          3, // Limit the lines, or remove this if you don't want a limit
                           overflow: TextOverflow
                               .ellipsis, // Handles overflow gracefully
                         ),

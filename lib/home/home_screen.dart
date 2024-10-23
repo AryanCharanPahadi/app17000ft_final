@@ -23,6 +23,7 @@ import '../forms/school_staff_vec_form/school_vec_from.dart';
 import '../forms/select_tour_id/select_controller.dart';
 import '../helper/shared_prefernce.dart';
 import '../login/login_screen.dart';
+import '../services/network_manager.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -104,36 +105,36 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
                 const SizedBox(width: 20), // Adjust spacing between connectivity and logout button
-                IconButton(
-                  icon: const Icon(Icons.logout, color: Colors.white),
-                  onPressed: () async {
-                    final UserController userController = Get.find<UserController>();
-                    final SelectController selectController = Get.put(SelectController());
+        IconButton(
+          icon: const Icon(Icons.logout, color: Colors.white),
+          onPressed: () async {
+            final UserController userController = Get.put(UserController());
 
-                    // Step 1: Clear user data from memory (controller)
-                    userController.clearUserData();
 
-                    // Step 2: Clear tour and school selections and reset UI
-                    await selectController.unlockTourAndSchools();  // Unlock any selected Tour ID and schools
-                    selectController.clearFields();  // Ensure tour and school fields are cleared
+            // Step 1: Clear user data from memory (controller)
+            userController.clearUserData();
 
-                    // Step 3: Clear user data from SharedPreferences
-                    await SharedPreferencesHelper.logout();  // Complete logout and clear session
 
-                    // Step 4: Clear previous navigation stack and navigate to LoginScreen
-                    Get.offAll(() => const LoginScreen());
 
-                    // Optional: Display confirmation snackbar
-                    customSnackbar(
-                      'Success',
-                      'You have been logged out successfully.',
-                      AppColors.secondary,
-                      AppColors.onSecondary,
-                      Icons.verified,
-                    );
-                  },
-                ),
-              ],
+
+            // Step 3: Clear user data from SharedPreferences
+            await SharedPreferencesHelper.logout();  // Complete logout and clear session
+
+            // Step 4: Clear previous navigation stack and navigate to LoginScreen
+            Get.offAll(() => const LoginScreen());
+
+            // Optional: Display confirmation snackbar
+            customSnackbar(
+              'Success',
+              'You have been logged out successfully.',
+              AppColors.secondary,
+              AppColors.onSecondary,
+              Icons.verified,
+            );
+          },
+        )
+
+        ],
             ),
           ],
           iconTheme: const IconThemeData(color: Colors.white),

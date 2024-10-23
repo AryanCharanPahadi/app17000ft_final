@@ -1036,18 +1036,22 @@ class _SchoolRecceFormState extends State<SchoolRecceForm> {
     return WillPopScope(
         onWillPop: () async {
           IconData icon = Icons.check_circle;
-          bool shouldExit = await showDialog(
-              context: context,
-              builder: (_) => Confirmation(
-                  iconname: icon,
-                  title: 'Exit Confirmation',
-                  yes: 'Yes',
-                  no: 'no',
-                  desc: 'Are you sure you want to leave exit?',
-                  onPressed: () async {
-                    Navigator.of(context).pop(true);
-                  }));
-          return shouldExit;
+          bool? shouldExit = await showDialog<bool>(
+            context: context,
+            builder: (_) => Confirmation(
+              iconname: icon,
+              title: 'Exit Confirmation',
+              yes: 'Yes',
+              no: 'No',
+              desc: 'Are you sure you want to leave?',
+              onPressed: () {
+                Navigator.of(context).pop(true); // User confirms exit
+              },
+            ),
+          );
+
+          // If shouldExit is null, default to false
+          return shouldExit ?? false;
         },
         child: Scaffold(
             appBar: const CustomAppbar(
@@ -5869,7 +5873,7 @@ class _SchoolRecceFormState extends State<SchoolRecceForm> {
                                                         context,
                                                         MaterialPageRoute(
                                                             builder: (context) =>
-                                                                SchoolRecceSync()),
+                                                                const HomeScreen()),
                                                       );
                                                     } else {
                                                       customSnackbar(

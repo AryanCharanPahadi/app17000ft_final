@@ -314,7 +314,7 @@ class FlnObservationController extends GetxController with BaseController{
 
     _flnObservationList = [];
     _flnObservationList = await LocalDbController().fetchLocalFlnObservationModel();
-    isLoading = false;
+
 
     update();
   }

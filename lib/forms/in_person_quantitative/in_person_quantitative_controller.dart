@@ -327,9 +327,9 @@ class InPersonQuantitativeController extends GetxController with BaseController 
 
   Future<void> fetchData() async {
     isLoading = true;
-    update();
+    _inPersonQuantitativeList = [];
     _inPersonQuantitativeList = await LocalDbController().fetchLocalInPersonQuantitativeRecords();
-    isLoading = false;
+
     update();
   }
 }

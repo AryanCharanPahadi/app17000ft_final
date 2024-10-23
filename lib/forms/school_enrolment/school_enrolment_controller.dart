@@ -11,6 +11,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 
 import '../../base_client/baseClient_controller.dart';
+import '../../home/home_controller.dart';
 class SchoolEnrolmentController extends GetxController with BaseController{
 
   String? _tourValue;
@@ -98,6 +99,20 @@ class SchoolEnrolmentController extends GetxController with BaseController{
     update();
 
   }
+  late HomeController homeController;
+
+  @override
+  void onInit() async {
+    super.onInit();
+    homeController = Get.put(HomeController()); // Use Get.put instead of Get.find
+
+
+
+    // Now you can safely access homeController.empId
+    print("Employee ID: ${homeController.empId}");
+  }
+  String? get empId => homeController.empId;
+
   Widget bottomSheet(BuildContext context) {
     String? imagePicked;
     PickedFile? imageFile;
