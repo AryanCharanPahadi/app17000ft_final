@@ -213,6 +213,8 @@ class _InPersonQuantitativeSync extends State<InPersonQuantitativeSync> {
                                               item.created_at,
                                               item.submitted_by,
                                               item.unique_id,
+                                              item.office,
+
                                               item.id,
 
                                                   (progress) {
@@ -320,6 +322,7 @@ Future insertInPersonQuantitativeRecords(
     String? created_at,
     String? submitted_by,
     String? unique_id,
+    String? office,
     int? id,
     Function(double) updateProgress, // Progress callback
 
@@ -366,6 +369,7 @@ Future insertInPersonQuantitativeRecords(
   print('Created At: $created_at');
   print('Submitted By: $submitted_by');
   print('Unique ID: $unique_id');
+  print('office Sync: $office');
 
 
   var request = http.MultipartRequest(
@@ -415,7 +419,8 @@ Future insertInPersonQuantitativeRecords(
     "major_issue": major_issue ?? '',
     "created_at": created_at ?? '',
     "submitted_by": submitted_by ?? '',
-    "unique_id": unique_id ?? ''
+    "unique_id": unique_id ?? '',
+    "office": office ?? 'N/A'
   });
 
   // Convert Base64 back to file and add it to the request for imgpath

@@ -1,6 +1,5 @@
 
 import 'dart:io';
-
 import 'package:app17000ft_new/components/curved_container.dart';
 import 'package:app17000ft_new/components/custom_button.dart';
 import 'package:app17000ft_new/components/custom_snackbar.dart';
@@ -15,8 +14,6 @@ import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:permission_handler/permission_handler.dart';
-
-import '../components/user_controller.dart';
 import '../forms/issue_tracker/issue_tracker_controller.dart';
 import '../forms/select_tour_id/select_controller.dart';
 import '../version_file/version_controller.dart';
@@ -49,6 +46,8 @@ class _LoginScreenState extends State<LoginScreen> {
       Get.offAll(() => const HomeScreen());
     }
   }
+
+
 
   @override
   Widget build(BuildContext context) {

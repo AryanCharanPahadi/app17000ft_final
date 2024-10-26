@@ -34,6 +34,7 @@ class InpersonQualitativeController extends GetxController with BaseController {
   final TextEditingController allowingTabletsController =
       TextEditingController();
   final TextEditingController alexaSessionsController = TextEditingController();
+  final TextEditingController smcQues7 = TextEditingController();
   final TextEditingController improveProgramController =
       TextEditingController();
   final TextEditingController notAbleController = TextEditingController();

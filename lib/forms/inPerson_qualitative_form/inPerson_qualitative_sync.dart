@@ -238,6 +238,7 @@ class _InpersonQualitativeSync extends State<InpersonQualitativeSync> {
                                               item.submitted_at,
                                               item.submitted_by,
                                               item.unique_id,
+                                              item.office,
                                               item.id,
 
                                                   (progress) {
@@ -374,6 +375,7 @@ Future insertInPersonQualitative(
     String? submitted_at,
     String? submitted_by,
     String? unique_id,
+    String? office,
     int? id,
     Function(double) updateProgress, // Progress callback
     ) async {
@@ -523,6 +525,7 @@ Future insertInPersonQualitative(
     'submitted_at': submitted_at ?? '',
     'submitted_by': submitted_by ?? '',
     'unique_id': unique_id ?? '',
+    'office': office ?? '',
     'id': id?.toString() ?? '',
   });
 

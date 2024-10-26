@@ -802,6 +802,7 @@ class IssueTrackerController extends GetxController with BaseController {
             break;
           case 2:
             _filteredStaffNames2 = filteredStaff;
+
             break;
           case 3:
             _filteredStaffNames3 = filteredStaff;

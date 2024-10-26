@@ -17,6 +17,8 @@ class EnrolmentCollectionModel {
     String? createdAt;
     String? submittedBy;
     String? submittedAt;
+    String? office;
+
 
     EnrolmentCollectionModel({
         this.id,
@@ -28,6 +30,7 @@ class EnrolmentCollectionModel {
          this.createdAt,
          this.submittedBy,
          this.submittedAt,
+         this.office,
     });
 
     factory EnrolmentCollectionModel.fromJson(Map<String, dynamic> json) => EnrolmentCollectionModel(
@@ -40,6 +43,7 @@ class EnrolmentCollectionModel {
         createdAt: json["createdAt"],
         submittedBy: json["submittedBy"],
         submittedAt: json["submittedAt"],
+        office: json["office"],
     );
 
     Map<String, dynamic> toJson() => {
@@ -52,5 +56,6 @@ class EnrolmentCollectionModel {
         "createdAt": createdAt,
         "submittedBy": submittedBy,
         "submittedAt": submittedAt,
+        "office": office,
     };
 }

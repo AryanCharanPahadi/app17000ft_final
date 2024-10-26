@@ -218,6 +218,7 @@ class _FlnObservationSync extends State<FlnObservationSync> {
                                                       item.created_by,
                                                       item.createdAt,
                                                       item.submittedAt,
+                                                      item.office,
                                                       item.id,
                                                       (progress) {
                                                         syncProgress.value =
@@ -226,7 +227,9 @@ class _FlnObservationSync extends State<FlnObservationSync> {
                                                     );
 
                                                     if (rsp['status'] == 1) {
-                                                      _flnObservationController.removeRecordFromList(item.id!);
+                                                      _flnObservationController
+                                                          .removeRecordFromList(
+                                                              item.id!);
 
                                                       customSnackbar(
                                                         'Successfully',
@@ -276,115 +279,114 @@ class _FlnObservationSync extends State<FlnObservationSync> {
 var baseurl = "https://mis.17000ft.org/apis/fast_apis/insert_fln.php";
 
 Future<Map<String, dynamic>> insertFlnObservation(
-String? tourId,
-String? school,
-String? udiseValue,
-String? correctUdise,
-String? noStaffTrained,
-String? imgNurTimeTable,
-String? imgLKGTimeTable,
-String? imgUKGTimeTable,
-String? lessonPlanValue,
-String? activityValue,
-String? imgActivity,
-String? imgTLM,
-String? baselineValue,
-String? baselineGradeReport,
-String? flnConductValue,
-String? flnGradeReport,
-String? imgFLN,
-String? refresherValue,
-String? numTrainedTeacher,
-String? imgTraining,
-String? readingValue,
-String? libGradeReport,
-String? imgLib,
-String? methodologyValue,
-String? imgClass,
-String? observation,
-String? created_by,
-String? createdAt,
-String? submittedAt,
-int? id,
-Function(double) updateProgress,
-    ) async {
-print('Inserting FLN Observation Data');
-print('tourId: $tourId');
-print('school: $school');
-print('No. of Staff Trained: $noStaffTrained');
+  String? tourId,
+  String? school,
+  String? udiseValue,
+  String? correctUdise,
+  String? noStaffTrained,
+  String? imgNurTimeTable,
+  String? imgLKGTimeTable,
+  String? imgUKGTimeTable,
+  String? lessonPlanValue,
+  String? activityValue,
+  String? imgActivity,
+  String? imgTLM,
+  String? baselineValue,
+  String? baselineGradeReport,
+  String? flnConductValue,
+  String? flnGradeReport,
+  String? imgFLN,
+  String? refresherValue,
+  String? numTrainedTeacher,
+  String? imgTraining,
+  String? readingValue,
+  String? libGradeReport,
+  String? imgLib,
+  String? methodologyValue,
+  String? imgClass,
+  String? observation,
+  String? created_by,
+  String? createdAt,
+  String? submittedAt,
+  String? office,
+  int? id,
+  Function(double) updateProgress,
+) async {
+  print('Inserting FLN Observation Data');
+  print('tourId: $tourId');
+  print('school: $school');
+  print('No. of Staff Trained: $noStaffTrained');
 
-
-var request = http.MultipartRequest('POST', Uri.parse(baseurl));
+  var request = http.MultipartRequest('POST', Uri.parse(baseurl));
   request.headers["Accept"] = "application/json";
 
   // Add fields
   request.fields.addAll({
-'tourId': tourId ?? '',
-'school': school ?? '',
-'udiseValue': udiseValue ?? '',
-'correctUdise': correctUdise ?? '',
-'noStaffTrained': noStaffTrained ?? '',
-'lessonPlanValue': lessonPlanValue ?? '',
-'activityValue': activityValue ?? '',
-'baselineValue': baselineValue ?? '',
-'baselineGradeReport': baselineGradeReport ?? '',
-'flnConductValue': flnConductValue ?? '',
-'flnGradeReport': flnGradeReport ?? '',
-'refresherValue': refresherValue ?? '',
-'numTrainedTeacher': numTrainedTeacher ?? '',
-'readingValue': readingValue ?? '',
-'libGradeReport': libGradeReport ?? '',
-'methodologyValue': methodologyValue ?? '',
-'observation': observation ?? '',
-'created_by': created_by ?? '',
-'createdAt': createdAt ?? '',
-'submittedAt': submittedAt ?? '',
-
-});
+    'tourId': tourId ?? '',
+    'school': school ?? '',
+    'udiseValue': udiseValue ?? '',
+    'correctUdise': correctUdise ?? '',
+    'noStaffTrained': noStaffTrained ?? '',
+    'lessonPlanValue': lessonPlanValue ?? '',
+    'activityValue': activityValue ?? '',
+    'baselineValue': baselineValue ?? '',
+    'baselineGradeReport': baselineGradeReport ?? '',
+    'flnConductValue': flnConductValue ?? '',
+    'flnGradeReport': flnGradeReport ?? '',
+    'refresherValue': refresherValue ?? '',
+    'numTrainedTeacher': numTrainedTeacher ?? '',
+    'readingValue': readingValue ?? '',
+    'libGradeReport': libGradeReport ?? '',
+    'methodologyValue': methodologyValue ?? '',
+    'observation': observation ?? '',
+    'created_by': created_by ?? '',
+    'createdAt': createdAt ?? '',
+    'submittedAt': submittedAt ?? '',
+    'office': office ?? '',
+  });
 
 // Function to handle image uploads
-Future<void> _attachImages(String? imagePaths, String fieldName) async {
-if (imagePaths != null && imagePaths.isNotEmpty) {
-List<String> images = imagePaths.split(',');
-for (String path in images) {
-print('Processing image for field $fieldName: $path'); // Debug log
+  Future<void> _attachImages(String? imagePaths, String fieldName) async {
+    if (imagePaths != null && imagePaths.isNotEmpty) {
+      List<String> images = imagePaths.split(',');
+      for (String path in images) {
+        print('Processing image for field $fieldName: $path'); // Debug log
 
-File imageFile = File(path.trim());
-if (imageFile.existsSync()) {
-request.files.add(
-await http.MultipartFile.fromPath(
-'$fieldName[]', // Use array-like name for multiple images
-imageFile.path,
-contentType: MediaType('image', 'jpeg'),
-),
-);
-print("Image file $path attached successfully for $fieldName.");
-} else {
-print('Image file does not exist at the path: $path for $fieldName');
-throw Exception("Image file not found at $path for $fieldName.");
-}
-}
-} else {
-print('No image file path provided for $fieldName');
-}
-}
+        File imageFile = File(path.trim());
+        if (imageFile.existsSync()) {
+          request.files.add(
+            await http.MultipartFile.fromPath(
+              '$fieldName[]', // Use array-like name for multiple images
+              imageFile.path,
+              contentType: MediaType('image', 'jpeg'),
+            ),
+          );
+          print("Image file $path attached successfully for $fieldName.");
+        } else {
+          print('Image file does not exist at the path: $path for $fieldName');
+          throw Exception("Image file not found at $path for $fieldName.");
+        }
+      }
+    } else {
+      print('No image file path provided for $fieldName');
+    }
+  }
 
 // Attach all image files and handle missing ones
-try {
-await _attachImages(imgNurTimeTable, 'imgNurTimeTable');
-await _attachImages(imgLKGTimeTable, 'imgLKGTimeTable');
-await _attachImages(imgUKGTimeTable, 'imgUKGTimeTable');
-await _attachImages(imgActivity, 'imgActivity');
-await _attachImages(imgTLM, 'imgTLM');
-await _attachImages(imgFLN, 'imgFLN');
-await _attachImages(imgTraining, 'imgTraining');
-await _attachImages(imgLib, 'imgLib');
-await _attachImages(imgClass, 'imgClass');
-} catch (e) {
-print('Error attaching images: $e');
-return {"status": 0, "message": e.toString()};
-}
-
+  try {
+    await _attachImages(imgNurTimeTable, 'imgNurTimeTable');
+    await _attachImages(imgLKGTimeTable, 'imgLKGTimeTable');
+    await _attachImages(imgUKGTimeTable, 'imgUKGTimeTable');
+    await _attachImages(imgActivity, 'imgActivity');
+    await _attachImages(imgTLM, 'imgTLM');
+    await _attachImages(imgFLN, 'imgFLN');
+    await _attachImages(imgTraining, 'imgTraining');
+    await _attachImages(imgLib, 'imgLib');
+    await _attachImages(imgClass, 'imgClass');
+  } catch (e) {
+    print('Error attaching images: $e');
+    return {"status": 0, "message": e.toString()};
+  }
 
 // Send the request to the server
   var response = await request.send();
@@ -409,7 +411,10 @@ return {"status": 0, "message": e.toString()};
         return parsedResponse;
       } else {
         print('Error: ${parsedResponse['message']}');
-        return {"status": 0, "message": parsedResponse['message'] ?? 'Failed to insert data'};
+        return {
+          "status": 0,
+          "message": parsedResponse['message'] ?? 'Failed to insert data'
+        };
       }
     } catch (e) {
       print('Error parsing response: $e');

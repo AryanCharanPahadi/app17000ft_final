@@ -18,6 +18,7 @@ import '../components/user_controller.dart';
 import '../forms/alfa_observation_form/alfa_observation_form.dart';
 import '../forms/cab_meter_tracking_form/cab_meter.dart';
 import '../forms/issue_tracker/issue_tracker_form.dart';
+import '../forms/leave_application/leave_form.dart';
 import '../forms/school_facilities_&_mapping_form/SchoolFacilitiesForm.dart';
 import '../forms/school_staff_vec_form/school_vec_from.dart';
 import '../forms/select_tour_id/select_controller.dart';
@@ -110,17 +111,16 @@ class _HomeScreenState extends State<HomeScreen> {
           onPressed: () async {
             final UserController userController = Get.put(UserController());
 
-
-            // Step 1: Clear user data from memory (controller)
+            // Clear user data
             userController.clearUserData();
 
 
 
+            // Clear user data from SharedPreferences
+            await SharedPreferencesHelper
+                .logout(); // Complete logout and clear session
 
-            // Step 3: Clear user data from SharedPreferences
-            await SharedPreferencesHelper.logout();  // Complete logout and clear session
-
-            // Step 4: Clear previous navigation stack and navigate to LoginScreen
+            // Clear previous navigation stack and navigate to LoginScreen
             Get.offAll(() => const LoginScreen());
 
             // Optional: Display confirmation snackbar
@@ -256,7 +256,7 @@ class _HomeScreenState extends State<HomeScreen> {
   void _navigateToForm(String task, HomeController homeController) {
     switch (task) {
       case 'School Enrollment Form':
-        Get.to(() => SchoolEnrollmentForm(userid: homeController.empId));
+        Get.to(() => SchoolEnrollmentForm(userid: homeController.empId, office: homeController.office));
         break;
       case 'Cab Meter Tracing Form':
         Get.to(() => CabMeterTracingForm(userid: homeController.empId, office: homeController.office));
@@ -284,6 +284,9 @@ class _HomeScreenState extends State<HomeScreen> {
         break;
       case 'School Recce Form':
         Get.to(() => SchoolRecceForm(userid: homeController.empId, office: homeController.office));
+        break;
+      case 'Alexa Baseline Assessment':
+        Get.to(() =>  LeaveForm(userid: homeController.empId,));
         break;
       default:
         Get.snackbar('Error', 'Unknown task: $task');

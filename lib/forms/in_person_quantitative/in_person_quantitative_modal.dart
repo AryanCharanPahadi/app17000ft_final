@@ -51,6 +51,7 @@ class InPersonQuantitativeRecords {
     this.created_at,
     this.submitted_by,
     this.unique_id,
+    this.office,
   });
 
   int? id;
@@ -100,6 +101,7 @@ class InPersonQuantitativeRecords {
   String? submitted_by;
 
   String? unique_id;
+  String? office;
 
   factory InPersonQuantitativeRecords.fromJson(Map<String, dynamic> json) => InPersonQuantitativeRecords(
     id: json["id"],
@@ -148,6 +150,7 @@ class InPersonQuantitativeRecords {
     submitted_by: json["submitted_by"],
 
     unique_id: json["unique_id"],
+    office: json["office"],
   );
 
   Map<String, dynamic> toJson() => {
@@ -197,5 +200,6 @@ class InPersonQuantitativeRecords {
     "submitted_by": submitted_by,
 
     "unique_id": unique_id,
+    "office": office,
   };
 }

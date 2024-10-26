@@ -13,7 +13,6 @@ import 'package:app17000ft_new/components/custom_textField.dart';
 import 'package:app17000ft_new/components/error_text.dart';
 import 'package:app17000ft_new/constants/color_const.dart';
 import 'package:app17000ft_new/forms/alfa_observation_form/alfa_obervation_modal.dart';
-import 'package:app17000ft_new/forms/school_enrolment/school_enrolment_model.dart';
 import 'package:app17000ft_new/helper/database_helper.dart';
 import 'package:app17000ft_new/helper/responsive_helper.dart';
 import 'package:app17000ft_new/tourDetails/tour_controller.dart';
@@ -32,15 +31,13 @@ import 'package:app17000ft_new/home/home_screen.dart';
 import '../../components/custom_confirmation.dart';
 import '../select_tour_id/select_controller.dart';
 import 'alfa_observation_controller.dart';
-import 'alfa_observation_sync.dart';
+
 
 class AlfaObservationForm extends StatefulWidget {
   String? userid;
   String? office;
   AlfaObservationForm({
-    super.key,
-    this.userid,
-    this.office,
+    super.key, this.userid, this.office
   });
 
   @override
@@ -150,11 +147,13 @@ class _AlfaObservationFormState extends State<AlfaObservationForm> {
   @override
   void initState() {
     super.initState();
-
+widget.office.toString();
+print(widget.office.toString()
+);
     // Initialize controllers and notifiers for Staff Details
     for (int i = 0; i < staffRoles.length; i++) {
-      final teachingStaffController = TextEditingController();
-      final nonTeachingStaffController = TextEditingController();
+      final teachingStaffController = TextEditingController(text: '0');
+      final nonTeachingStaffController = TextEditingController(text: '0');
       final totalNotifier = ValueNotifier<int>(0);
 
       teachingStaffController.addListener(() {
@@ -173,8 +172,8 @@ class _AlfaObservationFormState extends State<AlfaObservationForm> {
 
     // Initialize controllers, notifiers, and add listeners
     for (int i = 0; i < grades.length; i++) {
-      final boysController = TextEditingController();
-      final girlsController = TextEditingController();
+      final boysController = TextEditingController(text: '0');
+      final girlsController = TextEditingController(text: '0');
       final totalNotifier = ValueNotifier<int>(0);
 
       boysController.addListener(() {
@@ -1192,6 +1191,17 @@ class _AlfaObservationFormState extends State<AlfaObservationForm> {
                                                   max:
                                                       80), // Custom input formatter for range
                                             ],
+                                            validator: (value) {
+                                              if (value == null ||
+                                                  value.isEmpty) {
+                                                return 'Please fill this field';
+                                              }
+                                              if (!RegExp(r'^[0-9]+$')
+                                                  .hasMatch(value)) {
+                                                return 'Please enter a valid number';
+                                              }
+                                              return null;
+                                            },
                                             showCharacterCount: true,
                                           ),
 
@@ -2882,6 +2892,8 @@ class _AlfaObservationFormState extends State<AlfaObservationForm> {
                                                             .validate() &&
                                                         isRadioValid7 &&
                                                         !validateTlmKit) {
+
+
                                                       List<File>
                                                           nurTimeTableFiles =
                                                           [];
@@ -3029,7 +3041,6 @@ class _AlfaObservationFormState extends State<AlfaObservationForm> {
                                                                     _chars
                                                                         .length))));
                                                       }
-
                                                       String uniqueId =
                                                       generateUniqueId(6);
 
@@ -3088,7 +3099,13 @@ class _AlfaObservationFormState extends State<AlfaObservationForm> {
                                                               classObservation: alfaObservationController.remarksController.text,
                                                               createdAt: formattedDate.toString(),
                                                               submittedAt: formattedDate.toString(),
+                                                              office: widget.office ?? 'Default Office',
+
                                                               createdBy: widget.userid.toString());
+                                                      print('Office value: ${widget.office}'); // Debugging line
+
+
+
                                                       int result =
                                                           await LocalDbController()
                                                               .addData(

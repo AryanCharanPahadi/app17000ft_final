@@ -60,6 +60,7 @@ class SchoolRecceModal {
   String? observationPoint;
   String? submittedBy;
   String? createdAt;
+  String? office;
 
   SchoolRecceModal({
     this.id,
@@ -115,6 +116,7 @@ class SchoolRecceModal {
     required this.observationPoint,
     required this.submittedBy,
     required this.createdAt,
+  this.office,
   });
 
   factory SchoolRecceModal.fromJson(Map<String, dynamic> json) =>
@@ -172,6 +174,7 @@ class SchoolRecceModal {
         observationPoint: json["observationPoint"],
         submittedBy: json["submittedBy"],
         createdAt: json["createdAt"],
+        office: json["office"],
       );
 
   Map<String, dynamic> toJson() => {
@@ -228,5 +231,6 @@ class SchoolRecceModal {
         "observationPoint": observationPoint,
         "submittedBy": submittedBy,
         "createdAt": createdAt,
+        "office": office,
       };
 }

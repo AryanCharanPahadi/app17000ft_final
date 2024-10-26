@@ -38,6 +38,7 @@ class AlfaObservationModel{
   String? createdAt;
   String? submittedAt;
   String? createdBy;
+  String? office;
 
 
   AlfaObservationModel({
@@ -70,6 +71,7 @@ class AlfaObservationModel{
     required this.createdAt,
     required this.submittedAt,
     required this.createdBy,
+    required this.office,
 
   });
 
@@ -103,6 +105,7 @@ class AlfaObservationModel{
     createdAt: json["createdAt"],
     submittedAt: json["submittedAt"],
     createdBy: json["createdBy"],
+    office: json["office"],
   );
 
   Map<String, dynamic> toJson() => {
@@ -135,5 +138,6 @@ class AlfaObservationModel{
     "createdAt": createdAt,
     "submittedAt": submittedAt,
     "createdBy": createdBy,
+    "office": office,
   };
 }

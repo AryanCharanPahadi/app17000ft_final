@@ -32,6 +32,7 @@ class SchoolStaffVecRecords {
     this.createdAt,
     this.other,
     this.otherQual,
+    this.office,
 
 
   });
@@ -61,6 +62,7 @@ class SchoolStaffVecRecords {
   String? createdAt;
   String? other;       // Added field
   String? otherQual;   // Added field
+  String? office;   // Added field
 
 
 
@@ -92,6 +94,7 @@ class SchoolStaffVecRecords {
     createdAt: json["createdAt"],
     other: json["other"],  // Added field
     otherQual: json["otherQual"],  // Added field
+    office: json["office"],  // Added field
 
 
   );
@@ -123,6 +126,7 @@ class SchoolStaffVecRecords {
     "createdAt": createdAt,
     "other": other,
     "otherQual": otherQual,
+    "office": office,
 
 
 

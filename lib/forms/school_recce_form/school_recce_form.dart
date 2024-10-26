@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
-import 'package:app17000ft_new/forms/school_recce_form/school_recce_sync.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/services.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -13,10 +12,8 @@ import 'package:app17000ft_new/components/custom_snackbar.dart';
 import 'package:app17000ft_new/components/custom_textField.dart';
 import 'package:app17000ft_new/components/error_text.dart';
 import 'package:app17000ft_new/constants/color_const.dart';
-
 import 'package:app17000ft_new/forms/school_recce_form/school_recce_controller.dart';
 import 'package:app17000ft_new/forms/school_recce_form/school_recce_modal.dart';
-
 import 'package:app17000ft_new/helper/responsive_helper.dart';
 import 'package:app17000ft_new/tourDetails/tour_controller.dart';
 import 'package:flutter/material.dart';
@@ -24,11 +21,9 @@ import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
 import 'package:get/get.dart';
 import 'package:dropdown_search/dropdown_search.dart';
-import 'package:app17000ft_new/base_client/base_client.dart';
 import 'package:app17000ft_new/components/custom_dropdown.dart';
 import 'package:app17000ft_new/components/custom_labeltext.dart';
 import 'package:app17000ft_new/components/custom_sizedBox.dart';
-
 import '../../components/custom_confirmation.dart';
 import '../../helper/database_helper.dart';
 import '../../home/home_screen.dart';
@@ -90,125 +85,129 @@ class _SchoolRecceFormState extends State<SchoolRecceForm> {
       builder: (BuildContext context) {
         return StatefulBuilder(
           builder: (BuildContext context, StateSetter setState) {
-            return Padding(
-              padding: EdgeInsets.only(
-                left: 16.0,
-                right: 16.0,
-                bottom: MediaQuery.of(context).viewInsets.bottom,
-              ),
-              child: SingleChildScrollView(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    if (!submittedData
-                        .containsKey('Previous academic year')) ...[
-                      CheckboxListTile(
-                        title: Text('Previous academic Year'),
-                        activeColor: Colors.green,
-                        value: _previousAcademicYear,
-                        onChanged: (bool? value) {
+            return FractionallySizedBox(
+              heightFactor: 0.6, // Set the height as 60% of the screen
+              child: Padding(
+                padding: EdgeInsets.only(
+                  left: 16.0,
+                  right: 16.0,
+                  bottom: MediaQuery.of(context).viewInsets.bottom,
+                ),
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          IconButton(
+                            icon: Icon(Icons.close),
+                            onPressed: () {
+                              Navigator.pop(context); // Close the bottom sheet
+                            },
+                          ),
+                        ],
+                      ),
+                      if (!submittedData.containsKey('Previous academic year')) ...[
+                        CheckboxListTile(
+                          title: Text('Previous academic Year'),
+                          activeColor: Colors.green,
+                          value: _previousAcademicYear,
+                          onChanged: (bool? value) {
+                            setState(() {
+                              _previousAcademicYear = value ?? false;
+                            });
+                          },
+                        ),
+                        if (_previousAcademicYear)
+                          _buildTable(
+                            staffRoles,
+                            teachingStaffControllers,
+                            nonTeachingStaffControllers,
+                            staffTotalNotifiers,
+                            grandTotalTeachingStaff,
+                            grandTotalNonTeachingStaff,
+                            grandTotalStaff,
+                          ),
+                      ],
+                      if (!submittedData.containsKey('Two years previously')) ...[
+                        CheckboxListTile(
+                          title: Text('Two years previously'),
+                          activeColor: Colors.green,
+                          value: _twoYearsPreviously,
+                          onChanged: (bool? value) {
+                            setState(() {
+                              _twoYearsPreviously = value ?? false;
+                            });
+                          },
+                        ),
+                        if (_twoYearsPreviously)
+                          _buildTable(
+                            grades2,
+                            boysControllers2,
+                            girlsControllers2,
+                            totalNotifiers2,
+                            grandTotalBoys2,
+                            grandTotalGirls2,
+                            grandTotal2,
+                          ),
+                      ],
+                      if (!submittedData.containsKey('Three years previously')) ...[
+                        CheckboxListTile(
+                          title: Text('Three years previously'),
+                          activeColor: Colors.green,
+                          value: _threeYearsPreviously,
+                          onChanged: (bool? value) {
+                            setState(() {
+                              _threeYearsPreviously = value ?? false;
+                            });
+                          },
+                        ),
+                        if (_threeYearsPreviously)
+                          _buildTable(
+                            grades3,
+                            boysControllers3,
+                            girlsControllers3,
+                            totalNotifiers3,
+                            grandTotalBoys3,
+                            grandTotalGirls3,
+                            grandTotal3,
+                          ),
+                      ],
+                      CustomButton(
+                        title: 'Add',
+                        onPressedButton: () {
                           setState(() {
-                            _previousAcademicYear = value ?? false;
+                            if (_previousAcademicYear) {
+                              submittedData['Previous academic year'] = {
+                                'boys': grandTotalTeachingStaff.value,
+                                'girls': grandTotalNonTeachingStaff.value,
+                                'total': grandTotalStaff.value,
+                              };
+                              _previousAcademicYear = false;
+                            }
+                            if (_twoYearsPreviously) {
+                              submittedData['Two years previously'] = {
+                                'boys': grandTotalBoys2.value,
+                                'girls': grandTotalGirls2.value,
+                                'total': grandTotal2.value,
+                              };
+                              _twoYearsPreviously = false;
+                            }
+                            if (_threeYearsPreviously) {
+                              submittedData['Three years previously'] = {
+                                'boys': grandTotalBoys3.value,
+                                'girls': grandTotalGirls3.value,
+                                'total': grandTotal3.value,
+                              };
+                              _threeYearsPreviously = false;
+                            }
                           });
+                          Navigator.pop(context);
                         },
                       ),
-                      if (_previousAcademicYear)
-                        _buildTable(
-                          staffRoles,
-                          teachingStaffControllers,
-                          nonTeachingStaffControllers,
-                          staffTotalNotifiers,
-                          grandTotalTeachingStaff,
-                          grandTotalNonTeachingStaff,
-                          grandTotalStaff,
-                        ),
-                      // ErrorText(
-                      //   isVisible: validateStaffData,
-                      //   message:
-                      //   'Atleast one enrolment record is required',
-                      // ),
-
                     ],
-                    if (!submittedData.containsKey('Two years previously')) ...[
-                      CheckboxListTile(
-                        title: Text('Two years previously'),
-                        activeColor: Colors.green,
-                        value: _twoYearsPreviously,
-                        onChanged: (bool? value) {
-                          setState(() {
-                            _twoYearsPreviously = value ?? false;
-                          });
-                        },
-                      ),
-                      if (_twoYearsPreviously)
-                        _buildTable(
-                          grades2,
-                          boysControllers2,
-                          girlsControllers2,
-                          totalNotifiers2,
-                          grandTotalBoys2,
-                          grandTotalGirls2,
-                          grandTotal2,
-                        ),
-                    ],
-                    if (!submittedData
-                        .containsKey('Three years previously')) ...[
-                      CheckboxListTile(
-                        title: Text('Three years previously'),
-                        activeColor: Colors.green,
-                        value: _threeYearsPreviously,
-                        onChanged: (bool? value) {
-                          setState(() {
-                            _threeYearsPreviously = value ?? false;
-                          });
-                        },
-                      ),
-                      if (_threeYearsPreviously)
-                        _buildTable(
-                          grades3,
-                          boysControllers3,
-                          girlsControllers3,
-                          totalNotifiers3,
-                          grandTotalBoys3,
-                          grandTotalGirls3,
-                          grandTotal3,
-                        ),
-                    ],
-                    CustomButton(
-                      title: 'Add',
-                      onPressedButton: () {
-                        // Simulate saving data for the selected year
-                        setState(() {
-                          if (_previousAcademicYear) {
-                            submittedData['Previous academic year'] = {
-                              'boys': grandTotalTeachingStaff.value,
-                              'girls': grandTotalNonTeachingStaff.value,
-                              'total': grandTotalStaff.value,
-                            };
-                            _previousAcademicYear = false;
-                          }
-                          if (_twoYearsPreviously) {
-                            submittedData['Two years previously'] = {
-                              'boys': grandTotalBoys2.value,
-                              'girls': grandTotalGirls2.value,
-                              'total': grandTotal2.value,
-                            };
-                            _twoYearsPreviously = false;
-                          }
-                          if (_threeYearsPreviously) {
-                            submittedData['Three years previously'] = {
-                              'boys': grandTotalBoys3.value,
-                              'girls': grandTotalGirls3.value,
-                              'total': grandTotal3.value,
-                            };
-                            _threeYearsPreviously = false;
-                          }
-                        });
-                        Navigator.pop(context);
-                      },
-                    ),
-
-                  ],
+                  ),
                 ),
               ),
             );
@@ -217,6 +216,7 @@ class _SchoolRecceFormState extends State<SchoolRecceForm> {
       },
     );
   }
+
 
   // Helper method to build the dynamic table
   Widget _buildTable(
@@ -408,10 +408,10 @@ class _SchoolRecceFormState extends State<SchoolRecceForm> {
   void initState() {
     super.initState();
 
-    // Initialize controllers, notifiers, and add listeners
     for (int i = 0; i < grades.length; i++) {
-      final boysController = TextEditingController();
-      final girlsController = TextEditingController();
+      // Initialize the controllers with "0"
+      final boysController = TextEditingController(text: '0');
+      final girlsController = TextEditingController(text: '0');
       final totalNotifier = ValueNotifier<int>(0);
 
       boysController.addListener(() {
@@ -430,8 +430,8 @@ class _SchoolRecceFormState extends State<SchoolRecceForm> {
 
     // Initialize controllers and notifiers for Staff Details
     for (int i = 0; i < staffRoles.length; i++) {
-      final teachingStaffController = TextEditingController();
-      final nonTeachingStaffController = TextEditingController();
+      final teachingStaffController = TextEditingController(text: '0');
+      final nonTeachingStaffController = TextEditingController(text: '0');
       final totalNotifier = ValueNotifier<int>(0);
 
       teachingStaffController.addListener(() {
@@ -450,8 +450,8 @@ class _SchoolRecceFormState extends State<SchoolRecceForm> {
 
     // Initialize controllers, notifiers, and add listeners
     for (int i = 0; i < grades2.length; i++) {
-      final boysController2 = TextEditingController();
-      final girlsController2 = TextEditingController();
+      final boysController2 = TextEditingController(text: '0');
+      final girlsController2 = TextEditingController(text: '0');
       final totalNotifier2 = ValueNotifier<int>(0);
 
       boysController2.addListener(() {
@@ -470,8 +470,8 @@ class _SchoolRecceFormState extends State<SchoolRecceForm> {
 
     // Initialize controllers, notifiers, and add listeners
     for (int i = 0; i < grades3.length; i++) {
-      final boysController3 = TextEditingController();
-      final girlsController3 = TextEditingController();
+      final boysController3 = TextEditingController(text: '0');
+      final girlsController3 = TextEditingController(text: '0');
       final totalNotifier3 = ValueNotifier<int>(0);
 
       boysController3.addListener(() {
@@ -2053,14 +2053,13 @@ class _SchoolRecceFormState extends State<SchoolRecceForm> {
                                             side: 'height',
                                           ),
                                           DropdownButtonFormField<String>(
-                                            value: schoolRecceController
-                                                .selectedYear,
+                                            value: schoolRecceController.selectedYear,
                                             decoration: InputDecoration(
                                               labelText: 'Select an option',
                                               border: OutlineInputBorder(),
                                             ),
                                             items: List.generate(
-                                              2024 - 1990 + 1,
+                                              DateTime.now().year - 1990 + 1, // Dynamically calculate the range
                                                   (index) {
                                                 int year = 1990 + index;
                                                 return DropdownMenuItem(
@@ -2071,19 +2070,18 @@ class _SchoolRecceFormState extends State<SchoolRecceForm> {
                                             ).toList(),
                                             onChanged: (newValue) {
                                               setState(() {
-                                                schoolRecceController
-                                                    .selectedYear = newValue;
+                                                schoolRecceController.selectedYear = newValue;
                                               });
                                             },
                                             isExpanded: true,
                                             validator: (value) {
-                                              if (value == null ||
-                                                  value.isEmpty) {
+                                              if (value == null || value.isEmpty) {
                                                 return 'Please select a year';
                                               }
                                               return null;
                                             },
                                           ),
+
                                           CustomSizedBox(
                                             value: 20,
                                             side: 'height',
@@ -5758,6 +5756,8 @@ class _SchoolRecceFormState extends State<SchoolRecceForm> {
                                                           .toString(),
                                                       createdAt: formattedDate
                                                           .toString(),
+                                                      office: widget.office ?? '',
+
                                                     );
 
                                                     int result =

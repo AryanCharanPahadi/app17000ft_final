@@ -6,19 +6,19 @@ class TourController extends GetxController {
   List<TourDetails> localTourList = [];
   List<TourDetails> get getLocalTourList => localTourList;
 
-
-  void initState() {
+  @override
+  void onInit() {
     super.onInit();
-
+    fetchTourDetails(); // Automatically fetch tour details when the controller is initialized
   }
 
   fetchTourDetails() async {
-
-
     localTourList = await LocalDbController().fetchLocalTourDetails();
-    // print('this is localtour list $localTourList');
-
-
-    update();
+    update(); // Notify listeners that the list has been updated
+  }
+  Future<void> clearTourDetailsOnLogout() async {
+    await SqfliteDatabaseHelper().delete('tour_details');  // Clear from local DB
+    localTourList.clear();  // Clear in-memory list
+    update();  // Update UI or state
   }
 }

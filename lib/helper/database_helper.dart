@@ -55,7 +55,7 @@ class SqfliteDatabaseHelper {
   static const inPerson_qualitative = 'inPerson_qualitative';
   static const schoolRecce = 'schoolRecce';
   static const _dbName = "app17000ft_new.db";
-  static const _dbVersion = 60; // Increment this when you make schema changes
+  static const _dbVersion = 61; // Increment this when you make schema changes
 
   static Database? _db;
 
@@ -98,7 +98,7 @@ class SqfliteDatabaseHelper {
   void _onUpgrade(Database db, int oldVersion, int newVersion) async {
     print('onUpgrade is called from $oldVersion to $newVersion');
     if (oldVersion < newVersion) {
-      if (oldVersion == 59 && newVersion == 60) {
+      if (oldVersion == 60 && newVersion == 61) {
         print("upgrading database schema");
         await _createTables(db);
       }
@@ -117,7 +117,8 @@ class SqfliteDatabaseHelper {
         remarks TEXT,
         createdAt TEXT,
         submittedBy TEXT,
-        submittedAt TEXT
+        submittedAt TEXT,
+        office TEXT
       );
     ''');
     try {
@@ -174,6 +175,8 @@ class SqfliteDatabaseHelper {
     office TEXT,
     uniqueId TEXT,
     version TEXT
+
+
     );
 ''');
     await db.execute('''
@@ -219,7 +222,9 @@ participant_name TEXT,
 major_issue TEXT,
 created_at TEXT,
 submitted_by TEXT,
-unique_id TEXT
+unique_id TEXT,
+office TEXT
+
 
    
     
@@ -250,10 +255,11 @@ libLocation TEXT,
 librarianName TEXT,
 librarianTraining TEXT,
 libRegisterValue TEXT,
-
 imgRegister TEXT,
 created_by TEXT,
-created_at TEXT
+created_at TEXT,
+office TEXT
+
 
 
     );
@@ -284,7 +290,9 @@ meetingDuration TEXT,
 createdBy TEXT,
 createdAt TEXT,
 other TEXT,
-otherQual TEXT
+otherQual TEXT,
+office TEXT
+
     );
 ''');
 
@@ -420,7 +428,9 @@ otherQual TEXT
       classObservation TEXT,
       createdAt TEXT,
       submittedAt TEXT,
-      createdBy TEXT
+      createdBy TEXT,
+      office TEXT
+
     );
   ''');
 
@@ -455,7 +465,9 @@ otherQual TEXT
       observation TEXT,
       created_by TEXT,
       createdAt TEXT,
-      submittedAt TEXT
+      submittedAt TEXT,
+      office TEXT
+
     );
   ''');
 
@@ -529,7 +541,9 @@ otherQual TEXT
       created_at TEXT,
       submitted_at TEXT,
       submitted_by TEXT,
-      unique_id TEXT
+      unique_id TEXT,
+      office TEXT
+
      
     );
   ''');
@@ -588,7 +602,9 @@ otherQual TEXT
   otherNgo TEXT,
   observationPoint TEXT,
   submittedBy TEXT,
-  createdAt TEXT
+  createdAt TEXT,
+  office TEXT
+
      
     );
   ''');

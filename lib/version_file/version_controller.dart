@@ -9,7 +9,7 @@ import 'package:connectivity_plus/connectivity_plus.dart'; // For checking netwo
 class VersionController extends GetxController {
   var version = ''.obs;
   var isLoading = false.obs;
-  var currentVersion = 4.0;
+  var currentVersion = 3.4;
 
   @override
   void onInit() {

@@ -203,6 +203,7 @@ class _AlfaObservationSync extends State<AlfaObservationSync> {
                                                           item.createdAt,
                                                           item.submittedAt,
                                                           item.createdBy,
+                                                          item.office,
                                                           item.id,
                                                           (progress) {
                                                             syncProgress.value =
@@ -294,6 +295,7 @@ Future<Map<String, dynamic>> insertAlfaObservation(
   String? createdAt,
   String? submittedAt,
   String? createdBy,
+  String? office,
   int? id,
   Function(double) updateProgress, // Progress callback
 ) async {
@@ -328,6 +330,7 @@ Future<Map<String, dynamic>> insertAlfaObservation(
     print('createdAt: $createdAt');
     print('submittedAt: $submittedAt');
     print('createdBy: $createdBy');
+    print('office: $office');
   }
 
   var request = http.MultipartRequest(
@@ -363,6 +366,7 @@ Future<Map<String, dynamic>> insertAlfaObservation(
     'createdAt': createdAt ?? '',
     'submittedAt': submittedAt ?? '',
     'createdBy': createdBy ?? '',
+    'office': office ?? 'N/A',
     'id': id?.toString() ?? '',
   });
 

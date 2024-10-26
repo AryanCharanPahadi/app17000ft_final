@@ -225,6 +225,7 @@ class _SchoolRecceSyncState extends State<SchoolRecceSync> {
                                               item.observationPoint,
                                               item.submittedBy,
                                               item.createdAt,
+                                              item.office,
                                               item.id,
 
                                               (progress) {
@@ -342,6 +343,7 @@ Future insertSchoolRecce(
   String? observationPoint,
   String? submittedBy,
   String? createdAt,
+  String? office,
   int? id,
   Function(double) updateProgress, // Progress callback
 ) async {
@@ -457,6 +459,7 @@ Future insertSchoolRecce(
     'observationPoint': observationPoint ?? '',
     'submittedBy': submittedBy ?? '',
     'createdAt': createdAt ?? '',
+    'office': office ?? '',
   });
 
   try {

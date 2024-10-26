@@ -39,7 +39,7 @@ class SchoolStaffVecForm extends StatefulWidget {
   SchoolStaffVecForm({
     super.key,
     this.userid,
-    String? office,
+   this.office,
     this.existingRecord,
     this.school,
     this.tourId,
@@ -55,7 +55,7 @@ class _SchoolStaffVecFormState extends State<SchoolStaffVecForm> {
   @override
   void initState() {
     super.initState();
-
+print('Office init ${widget.office}');
     // Ensure the controller is registered
     if (!Get.isRegistered<SchoolStaffVecController>()) {
       Get.put(SchoolStaffVecController());
@@ -87,6 +87,10 @@ class _SchoolStaffVecFormState extends State<SchoolStaffVecForm> {
           existingRecord.vecEmail ?? '';
       schoolStaffVecController.totalVecStaffController.text =
           existingRecord.vecTotal ?? '';
+      schoolStaffVecController.QualSpecify2Controller.text =
+          existingRecord.other ?? '';
+      schoolStaffVecController.QualSpecifyController.text =
+          existingRecord.otherQual ?? '';
       schoolStaffVecController.chairPhoneNumberController.text =
           existingRecord.vecMobile ?? '';
       schoolStaffVecController.totalTeachingStaffController.text =
@@ -1212,6 +1216,8 @@ class _SchoolStaffVecFormState extends State<SchoolStaffVecForm> {
                                                       !schoolStaffVecController
                                                           .radioFieldError3) {
                                                     print('Submit Vec Details');
+                                                    print('Office on pressed ${widget.office} ');
+
                                                     String generateUniqueId(
                                                         int length) {
                                                       const _chars =
@@ -1286,7 +1292,10 @@ class _SchoolStaffVecFormState extends State<SchoolStaffVecForm> {
                                                         meetingDuration: schoolStaffVecController.selected3Designation!,
                                                         vecQualification: schoolStaffVecController.selected2Designation!,
                                                         createdAt: formattedDate.toString(),
+                                                        office: widget.office ?? 'Default Office',
+
                                                         createdBy: widget.userid.toString());
+                                                    print('Office value: ${widget.office}'); // Debugging line
 
                                                     int result =
                                                         await LocalDbController()

@@ -97,14 +97,13 @@ class _EnrolmentSyncState extends State<EnrolmentSync> {
                       return ListTile(
                         title:  Text(
                           "${index + 1}. Tour ID: ${item.tourId}\n"
-                              "School.: ${item.school}\n"
-                              "School.: ${item.submittedBy}\n",
+                              "School.: ${item.school}\n",
                           style: const TextStyle(
                               fontWeight: FontWeight.bold),
                           textAlign: TextAlign
                               .left, // Adjust text alignment if needed
                           maxLines:
-                          3, // Limit the lines, or remove this if you don't want a limit
+                          2, // Limit the lines, or remove this if you don't want a limit
                           overflow: TextOverflow
                               .ellipsis, // Handles overflow gracefully
                         ),
@@ -149,6 +148,7 @@ class _EnrolmentSyncState extends State<EnrolmentSync> {
                                       item.remarks,
                                       item.createdAt,
                                       item.submittedBy,
+                                      item.office,
                                       item.id,
                                           (progress) {
                                         syncProgress.value = progress; // Update sync progress
@@ -210,12 +210,16 @@ Future<Map<String, dynamic>> insertEnrolment(
     String? remarks,
     String? createdAt,
     String? submittedBy,
+    String? office,
     int? id,
     Function(double) updateProgress, // Progress callback
     ) async {
   print('Starting School Enrollment Data Insertion');
   print('Tour ID: $tourId');
   print('School: $school');
+  print('Office: $office');
+  print('submittedBy: $submittedBy');
+  print('enrolmentData: $enrolmentData');
 
   var request = http.MultipartRequest('POST', Uri.parse(baseUrl));
   request.headers["Accept"] = "application/json";
@@ -229,6 +233,7 @@ Future<Map<String, dynamic>> insertEnrolment(
     'remarks': remarks ?? '',
     'createdAt': createdAt ?? '',
     'submittedBy': submittedBy ?? '',
+    'office': office ?? '',
   });
 
   // Attach multiple image files

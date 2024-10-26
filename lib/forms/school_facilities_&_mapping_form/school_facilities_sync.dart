@@ -169,6 +169,7 @@ class _SchoolFacilitiesSyncState extends State<SchoolFacilitiesSync> {
                                       item.libRegisterValue,
                                       item.created_by,
                                       item.created_at,
+                                      item.office,
                                       item.id,
                                           (progress) {
                                         syncProgress.value = progress;
@@ -251,6 +252,7 @@ Future insertSchoolFacilities(
   String? libRegisterValue,
   String? created_by,
   String? created_at,
+  String? office,
 
 
   int? id,
@@ -277,6 +279,7 @@ Future insertSchoolFacilities(
   print('Image Register: $imgRegister');
   print('Created By: $created_by');
   print('Created At: $created_at');
+  print('office sync: $office');
   print(id);
 
   var request = http.MultipartRequest(
@@ -305,6 +308,7 @@ Future insertSchoolFacilities(
     'libRegisterValue': libRegisterValue ?? '',
     'created_by': created_by ?? '',
     'created_at': created_at ?? '',
+    'office': office ?? 'N/A',
   });
 
 

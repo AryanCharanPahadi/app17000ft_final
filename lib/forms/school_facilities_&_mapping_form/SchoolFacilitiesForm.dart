@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
-import 'package:app17000ft_new/forms/school_facilities_&_mapping_form/school_facilities_sync.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:permission_handler/permission_handler.dart';
 
@@ -42,7 +41,7 @@ class SchoolFacilitiesForm extends StatefulWidget {
   SchoolFacilitiesForm({
     super.key,
     this.userid,
-    String? office,
+    this.office,
     this.existingRecord,
     this.school,
     this.tourId,
@@ -61,7 +60,8 @@ class _SchoolFacilitiesFormState extends State<SchoolFacilitiesForm> {
   @override
   void initState() {
     super.initState();
-
+    widget.office.toString();
+    print('Office init ${widget.office.toString()}');
     if (!Get.isRegistered<SchoolFacilitiesController>()) {
       Get.put(SchoolFacilitiesController());
     }
@@ -1717,6 +1717,9 @@ class _SchoolFacilitiesFormState extends State<SchoolFacilitiesForm> {
                                                 CustomButton(
                                                     title: 'Submit',
                                                     onPressedButton: () async {
+                                                      print('office on pressed');
+                                                      print(widget.office);
+
                                                       print('userid');
                                                       print(widget.userid);
                                                       setState(() {
@@ -1885,7 +1888,11 @@ class _SchoolFacilitiesFormState extends State<SchoolFacilitiesForm> {
                                                             librarianTraining: schoolFacilitiesController.selectedValue9,
                                                             libRegisterValue: schoolFacilitiesController.selectedValue10,
                                                             created_at: formattedDate.toString(),
-                                                            created_by: widget.userid.toString());
+                                                            created_by: widget.userid.toString(),
+                                                          office: widget.office ?? 'Default Office',
+
+                                                        );
+                                                        print('Office value: ${widget.office}'); // Debugging line
 
                                                         int result =
                                                             await LocalDbController()

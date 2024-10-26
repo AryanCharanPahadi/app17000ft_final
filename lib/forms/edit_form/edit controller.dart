@@ -3,50 +3,47 @@ import 'package:get/get.dart';
 import '../../base_client/baseClient_controller.dart';
 import '../../home/home_controller.dart';
 import 'edit_modal.dart';
+
 class EditController extends GetxController with BaseController {
   var counterText = ''.obs;
 
-  List<FormDataModel> localFormData = [];
-  List<FormDataModel> get getLocalFormData => localFormData;
-
+  // Tour and school values
   String? _tourValue;
   String? get tourValue => _tourValue;
 
   String? _schoolValue;
   String? get schoolValue => _schoolValue;
 
+  // User and office details
+  String? _userId;
+  String? get userId => _userId;
+
+  String? _office;
+  String? get office => _office;
+
+  // Focus nodes
   final FocusNode _tourIdFocusNode = FocusNode();
   FocusNode get tourIdFocusNode => _tourIdFocusNode;
 
   final FocusNode _schoolFocusNode = FocusNode();
   FocusNode get schoolFocusNode => _schoolFocusNode;
 
-  late HomeController homeController;
-
-  @override
-  void onInit() async {
-    super.onInit();
-    homeController = Get.put(HomeController()); // Use Get.put instead of Get.find
-
-
-
-    // Now you can safely access homeController.empId
-    print("Employee ID: ${homeController.empId}");
-  }
-
+  // Method to set school value
   void setSchool(String? value) {
     _schoolValue = value;
+    update();
   }
 
+  // Method to set tour value
   void setTour(String? value) {
     _tourValue = value;
+    update();
   }
 
-  // Getter for empId
-  String? get empId => homeController.empId;
-
-  fetchTourDetails() async {
-    // Your existing logic for fetching tour details
+  // Method to set userId and office
+  void setUserDetails(String? userId, String? office) {
+    _userId = userId;
+    _office = office;
     update();
   }
 
@@ -54,6 +51,8 @@ class EditController extends GetxController with BaseController {
   void clearFields() {
     _tourValue = null;
     _schoolValue = null;
+    _userId = null;
+    _office = null;
     update();
   }
 }

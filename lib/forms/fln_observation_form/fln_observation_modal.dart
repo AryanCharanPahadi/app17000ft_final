@@ -39,6 +39,7 @@ class FlnObservationModel{
   String? created_by;
   String? createdAt;
   String? submittedAt;
+  String? office;
 
 
   FlnObservationModel({
@@ -72,6 +73,7 @@ class FlnObservationModel{
     required this.created_by,
     required this.createdAt,
     required this.submittedAt,
+ this.office,
 
   });
 
@@ -106,6 +108,7 @@ class FlnObservationModel{
     created_by: json["created_by"],
     createdAt: json["createdAt"],
     submittedAt: json["submittedAt"],
+    office: json["office"],
 
   );
 
@@ -140,6 +143,7 @@ class FlnObservationModel{
     "created_by": created_by,
     "createdAt": createdAt,
     "submittedAt": submittedAt,
+    "office": office,
 
   };
 }

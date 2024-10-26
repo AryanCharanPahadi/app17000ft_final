@@ -28,6 +28,7 @@ class SchoolFacilitiesRecords {
     this.imgRegister,
     this.created_by,
     this.created_at,
+    this.office,
 
 
   });
@@ -53,6 +54,7 @@ class SchoolFacilitiesRecords {
   String? imgRegister;
   String? created_by;
   String? created_at;
+  String? office;
 
 
 
@@ -79,6 +81,7 @@ class SchoolFacilitiesRecords {
     imgRegister: json["imgRegister"],
     created_by: json["created_by"],
     created_at: json["created_at"],
+    office: json["office"],
 
 
   );
@@ -105,6 +108,7 @@ class SchoolFacilitiesRecords {
     "imgRegister": imgRegister,
     "created_by": created_by,
     "created_at": created_at,
+    "office": office,
 
 
   };

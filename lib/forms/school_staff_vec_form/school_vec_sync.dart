@@ -113,14 +113,13 @@ class _SchoolStaffVecSyncState extends State<SchoolStaffVecSync> {
                       return ListTile(
                         title:   Text(
                           "${index + 1}. Tour ID: ${item.tourId}\n"
-                              "School.: ${item.school}\n"
-                              "School.: ${item.createdBy}\n",
+                              "School.: ${item.school}\n",
                           style: const TextStyle(
                               fontWeight: FontWeight.bold),
                           textAlign: TextAlign
                               .left, // Adjust text alignment if needed
                           maxLines:
-                          3, // Limit the lines, or remove this if you don't want a limit
+                          2, // Limit the lines, or remove this if you don't want a limit
                           overflow: TextOverflow
                               .ellipsis, // Handles overflow gracefully
                         ),
@@ -202,6 +201,7 @@ class _SchoolStaffVecSyncState extends State<SchoolStaffVecSync> {
                                               item.createdAt,
                                               item.other,
                                               item.otherQual,
+                                              item.office,
                                               item.id,
 
                                                   (progress) {
@@ -301,6 +301,7 @@ Future insertSchoolStaffVec(
     String? createdAt,
     String? other,
     String? otherQual,
+    String? office,
     int? id,
     Function(double) updateProgress, // Progress callback
     ) async {
@@ -328,6 +329,7 @@ Future insertSchoolStaffVec(
   print('createdAt: $createdAt');
   print('other: $other');
   print('otherQual: $otherQual');
+  print('Office Sync: $office');
   print('id: $id');
 
   var request = http.MultipartRequest(
@@ -363,6 +365,7 @@ Future insertSchoolStaffVec(
     'createdAt': createdAt ?? '',
     'other': other ?? '',
     'otherQual': otherQual ?? '',
+    'office': office ?? 'N/A',
     'id': id?.toString() ?? '', // Convert the integer ID to a string
   });
 

@@ -3,9 +3,17 @@ import 'package:app17000ft_new/helper/shared_prefernce.dart';
 import 'package:app17000ft_new/tourDetails/tour_model.dart';
 import 'package:get/get.dart';
 
+
 class HomeController extends GetxController {
   List<String> _offlineTaskList = [];
   List<String> get offlineTaskList => _offlineTaskList;
+
+
+  bool isLoading = true; // For loading state
+
+
+
+
 
   final List<String> _onlineTaskList = [];
   List<String> get onlineTaskList => _onlineTaskList;
@@ -26,7 +34,6 @@ class HomeController extends GetxController {
   List<TourDetails> _onlineTourList =[];
   List<TourDetails> get onlineTourList => _onlineTourList;
 
-  bool isLoading = true; // Added loading state
 
   @override
   void onInit() {
@@ -58,7 +65,6 @@ class HomeController extends GetxController {
 
 
       _empId = user['emp_id'] as String?;
-
 
 
       _offlineTaskList = offlineTask.isNotEmpty ? offlineTask.split(',') : [];

@@ -3202,7 +3202,7 @@ class _InPersonQualitativeFormState extends State<InPersonQualitativeForm> {
                                                       inpersonQualitativeController.guidanceController.clear();
                                                       inpersonQualitativeController.feedbackDigiLabController.clear();
                                                       inpersonQualitativeController.effectiveDigiLabController.clear();
-                                                      inpersonQualitativeController.suggestionsProgramController.clear();
+                                                      inpersonQualitativeController.smcQues7.clear();
 
                                                       inpersonQualitativeController.clearRadioValue('communityResistance');
                                                       inpersonQualitativeController.clearRadioValue('digiLabSessions');
@@ -3652,7 +3652,7 @@ class _InPersonQualitativeFormState extends State<InPersonQualitativeForm> {
                                             CustomTextFormField(
                                               textController:
                                                   inpersonQualitativeController
-                                                      .suggestionsProgramController,
+                                                      .smcQues7,
                                               maxlines: 2,
                                               labelText: 'Write here...',
                                               validator: (value) {
@@ -4070,7 +4070,7 @@ class _InPersonQualitativeFormState extends State<InPersonQualitativeForm> {
                                                                 .text,
                                                         smcques_7:
                                                             inpersonQualitativeController
-                                                                .suggestionsProgramController
+                                                                .smcQues7
                                                                 .text,
                                                         created_at:
                                                             formattedDate
@@ -4082,7 +4082,9 @@ class _InPersonQualitativeFormState extends State<InPersonQualitativeForm> {
                                                             .userid
                                                             .toString(),
                                                         unique_id: uniqueId,
-                                                      );
+                                                            office: widget.office ?? '',
+
+                                                          );
 
                                                       int result =
                                                           await LocalDbController()

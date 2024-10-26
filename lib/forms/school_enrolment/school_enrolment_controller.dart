@@ -99,19 +99,9 @@ class SchoolEnrolmentController extends GetxController with BaseController{
     update();
 
   }
-  late HomeController homeController;
-
-  @override
-  void onInit() async {
-    super.onInit();
-    homeController = Get.put(HomeController()); // Use Get.put instead of Get.find
 
 
 
-    // Now you can safely access homeController.empId
-    print("Employee ID: ${homeController.empId}");
-  }
-  String? get empId => homeController.empId;
 
   Widget bottomSheet(BuildContext context) {
     String? imagePicked;

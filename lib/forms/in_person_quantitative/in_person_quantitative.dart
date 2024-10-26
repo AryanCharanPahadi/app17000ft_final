@@ -42,7 +42,7 @@ class InPersonQuantitative extends StatefulWidget {
   InPersonQuantitative({
     super.key,
     this.userid,
-    String? office,
+    this.office,
     // this.existingRecord,
   });
 
@@ -53,6 +53,12 @@ class InPersonQuantitative extends StatefulWidget {
 class _InPersonQuantitativeState extends State<InPersonQuantitative> {
   final ScrollController _scrollController = ScrollController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
+  @override
+  void initState() {
+    super.initState();
+    print('Office init ${widget.office}');
+  }
 
   // For managing issues and resolutions
   List<Issue> issues = [];
@@ -349,7 +355,7 @@ class _InPersonQuantitativeState extends State<InPersonQuantitative> {
 
                                   // Get locked tour ID from SelectController
                                   final selectController =
-                                  Get.put(SelectController());
+                                      Get.put(SelectController());
                                   String? lockedTourId =
                                       selectController.lockedTourId;
 
@@ -359,115 +365,123 @@ class _InPersonQuantitativeState extends State<InPersonQuantitative> {
 
                                   // Fetch the corresponding schools if lockedTourId or selectedTourId is present
                                   if (selectedTourId != null) {
-                                    inPersonQuantitativeController.splitSchoolLists = tourController
-                                        .getLocalTourList
-                                        .where((e) => e.tourId == selectedTourId)
-                                        .map((e) => e.allSchool!
-                                        .split(',')
-                                        .map((s) => s.trim())
-                                        .toList())
-                                        .expand((x) => x)
-                                        .toList();
+                                    inPersonQuantitativeController
+                                            .splitSchoolLists =
+                                        tourController.getLocalTourList
+                                            .where((e) =>
+                                                e.tourId == selectedTourId)
+                                            .map((e) => e.allSchool!
+                                                .split(',')
+                                                .map((s) => s.trim())
+                                                .toList())
+                                            .expand((x) => x)
+                                            .toList();
                                   }
 
-                                  return Column(
-                                      children: [
-                                        if (inPersonQuantitativeController.showBasicDetails) ...[
-                                          LabelText(
-                                            label: 'Basic Details',
-                                          ),
-                                          LabelText(
-                                            label: 'Tour ID',
-                                            astrick: true,
-                                          ),
-                                          CustomSizedBox(
-                                            value: 20,
-                                            side: 'height',
-                                          ),
-                                          CustomDropdownFormField(
-                                            focusNode: inPersonQuantitativeController
+                                  return Column(children: [
+                                    if (inPersonQuantitativeController
+                                        .showBasicDetails) ...[
+                                      LabelText(
+                                        label: 'Basic Details',
+                                      ),
+                                      LabelText(
+                                        label: 'Tour ID',
+                                        astrick: true,
+                                      ),
+                                      CustomSizedBox(
+                                        value: 20,
+                                        side: 'height',
+                                      ),
+                                      CustomDropdownFormField(
+                                        focusNode:
+                                            inPersonQuantitativeController
                                                 .tourIdFocusNode,
-                                            // Show the locked tour ID directly, and disable dropdown interaction if locked
-                                            options: lockedTourId != null
-                                                ? [
-                                              lockedTourId
-                                            ] // Show only the locked tour ID
-                                                : tourController.getLocalTourList
+                                        // Show the locked tour ID directly, and disable dropdown interaction if locked
+                                        options: lockedTourId != null
+                                            ? [
+                                                lockedTourId
+                                              ] // Show only the locked tour ID
+                                            : tourController.getLocalTourList
                                                 .map((e) => e
-                                                .tourId!) // Ensure tourId is non-nullable
+                                                    .tourId!) // Ensure tourId is non-nullable
                                                 .toList(),
-                                            selectedOption: selectedTourId,
-                                            onChanged: lockedTourId ==
+                                        selectedOption: selectedTourId,
+                                        onChanged: lockedTourId ==
                                                 null // Disable changing when tour ID is locked
-                                                ? (value) {
-                                              // Fetch and set the schools for the selected tour
-                                              inPersonQuantitativeController.splitSchoolLists = tourController
-                                                  .getLocalTourList
-                                                  .where(
-                                                      (e) => e.tourId == value)
-                                                  .map((e) => e.allSchool!
-                                                  .split(',')
-                                                  .map((s) => s.trim())
-                                                  .toList())
-                                                  .expand((x) => x)
-                                                  .toList();
+                                            ? (value) {
+                                                // Fetch and set the schools for the selected tour
+                                                inPersonQuantitativeController
+                                                        .splitSchoolLists =
+                                                    tourController
+                                                        .getLocalTourList
+                                                        .where((e) =>
+                                                            e.tourId == value)
+                                                        .map((e) => e.allSchool!
+                                                            .split(',')
+                                                            .map(
+                                                                (s) => s.trim())
+                                                            .toList())
+                                                        .expand((x) => x)
+                                                        .toList();
 
-                                              // Single setState call for efficiency
-                                              setState(() {
-                                                inPersonQuantitativeController
-                                                    .setSchool(null);
-                                                inPersonQuantitativeController
-                                                    .setTour(value);
-                                              });
-                                            }
-                                                : null, // Disable dropdown if lockedTourId is present
-                                            labelText: "Select Tour ID",
-                                          ),
-                                          CustomSizedBox(
-                                            value: 20,
-                                            side: 'height',
-                                          ),
-                                          LabelText(
-                                            label: 'School',
-                                            astrick: true,
-                                          ),
-                                          CustomSizedBox(
-                                            value: 20,
-                                            side: 'height',
-                                          ),
-                                          DropdownSearch<String>(
-                                            validator: (value) {
-                                              if (value == null || value.isEmpty) {
-                                                return "Please Select School";
+                                                // Single setState call for efficiency
+                                                setState(() {
+                                                  inPersonQuantitativeController
+                                                      .setSchool(null);
+                                                  inPersonQuantitativeController
+                                                      .setTour(value);
+                                                });
                                               }
-                                              return null;
-                                            },
-                                            popupProps: PopupProps.menu(
-                                              showSelectedItems: true,
-                                              showSearchBox: true,
-                                              disabledItemFn: (String s) => s.startsWith(
+                                            : null, // Disable dropdown if lockedTourId is present
+                                        labelText: "Select Tour ID",
+                                      ),
+                                      CustomSizedBox(
+                                        value: 20,
+                                        side: 'height',
+                                      ),
+                                      LabelText(
+                                        label: 'School',
+                                        astrick: true,
+                                      ),
+                                      CustomSizedBox(
+                                        value: 20,
+                                        side: 'height',
+                                      ),
+                                      DropdownSearch<String>(
+                                        validator: (value) {
+                                          if (value == null || value.isEmpty) {
+                                            return "Please Select School";
+                                          }
+                                          return null;
+                                        },
+                                        popupProps: PopupProps.menu(
+                                          showSelectedItems: true,
+                                          showSearchBox: true,
+                                          disabledItemFn: (String s) =>
+                                              s.startsWith(
                                                   'I'), // Disable based on condition
-                                            ),
-                                            items:
-                                            inPersonQuantitativeController.splitSchoolLists, // Show schools based on selected or locked tour ID
-                                            dropdownDecoratorProps:
+                                        ),
+                                        items: inPersonQuantitativeController
+                                            .splitSchoolLists, // Show schools based on selected or locked tour ID
+                                        dropdownDecoratorProps:
                                             const DropDownDecoratorProps(
-                                              dropdownSearchDecoration:
+                                          dropdownSearchDecoration:
                                               InputDecoration(
-                                                labelText: "Select School",
-                                                hintText: "Select School",
-                                              ),
-                                            ),
-                                            onChanged: (value) {
-                                              // Set the selected school
-                                              setState(() {
-                                                inPersonQuantitativeController
-                                                    .setSchool(value);
-                                              });
-                                            },
-                                            selectedItem:
-                                            inPersonQuantitativeController.schoolValue,
+                                            labelText: "Select School",
+                                            hintText: "Select School",
                                           ),
+                                        ),
+                                        onChanged: (value) {
+                                          // Set the selected school
+                                          setState(() {
+                                            inPersonQuantitativeController
+                                                .setSchool(value);
+                                          });
+                                        },
+                                        selectedItem:
+                                            inPersonQuantitativeController
+                                                .schoolValue,
+                                      ),
                                       CustomSizedBox(
                                         value: 20,
                                         side: 'height',
@@ -2135,6 +2149,7 @@ class _InPersonQuantitativeState extends State<InPersonQuantitative> {
                                             }
                                             return null;
                                           },
+                                          maxlines: 2,
                                           showCharacterCount: true,
                                         ),
                                       ],
@@ -3483,9 +3498,11 @@ class _InPersonQuantitativeState extends State<InPersonQuantitative> {
                                                     };
                                                   }).toList());
                                                   final selectController =
-                                                  Get.put(SelectController());
+                                                      Get.put(
+                                                          SelectController());
                                                   String? lockedTourId =
-                                                      selectController.lockedTourId;
+                                                      selectController
+                                                          .lockedTourId;
 
                                                   // Use lockedTourId if it is available, otherwise use the selected tour ID from schoolEnrolmentController
                                                   String tourIdToInsert =
@@ -3508,6 +3525,7 @@ class _InPersonQuantitativeState extends State<InPersonQuantitative> {
                                                               : "No",
                                                     };
                                                   }).toList());
+                                                  print('Office on pressed ${widget.office} ');
 
                                                   DateTime now = DateTime.now();
                                                   String formattedDate =
@@ -3589,8 +3607,7 @@ class _InPersonQuantitativeState extends State<InPersonQuantitative> {
                                                   InPersonQuantitativeRecords
                                                       enrolmentCollectionObj =
                                                       InPersonQuantitativeRecords(
-                                                    tourId:
-                                                    tourIdToInsert,
+                                                    tourId: tourIdToInsert,
                                                     school:
                                                         inPersonQuantitativeController
                                                                 .schoolValue ??
@@ -3751,7 +3768,9 @@ class _InPersonQuantitativeState extends State<InPersonQuantitative> {
                                                     created_at: formattedDate
                                                         .toString(),
                                                     unique_id: uniqueId,
+                                                        office: widget.office ?? 'Default Office',
                                                   );
+                                                  print('Office value: ${widget.office}'); // Debugging line
 
                                                   // Save data to local database
                                                   int result = await LocalDbController()
@@ -4158,12 +4177,11 @@ class _AddParticipantsBottomSheetState
 class JsonFileDownloader {
   // Method to download JSON data to the Downloads directory
   Future<String?> downloadJsonFile(
-      String jsonData,
-      String uniqueId,
-      List<File> imgPathFiles,
-      List<File> trainingPicFiles,) async {
-
-
+    String jsonData,
+    String uniqueId,
+    List<File> imgPathFiles,
+    List<File> trainingPicFiles,
+  ) async {
     Directory? downloadsDirectory;
 
     if (Platform.isAndroid) {
@@ -4182,8 +4200,10 @@ class JsonFileDownloader {
 
       // Convert images to Base64 for each image list
       Map<String, dynamic> jsonObject = jsonDecode(jsonData);
-      jsonObject['base64_imagePathFiles'] = await _convertImagesToBase64(imgPathFiles);
-      jsonObject['base64_trainingPicFiles'] = await _convertImagesToBase64(trainingPicFiles);
+      jsonObject['base64_imagePathFiles'] =
+          await _convertImagesToBase64(imgPathFiles);
+      jsonObject['base64_trainingPicFiles'] =
+          await _convertImagesToBase64(trainingPicFiles);
 
       // Write the updated JSON data to the file
       await file.writeAsString(jsonEncode(jsonObject));
@@ -4210,9 +4230,6 @@ class JsonFileDownloader {
     // Return Base64-encoded images as a comma-separated string
     return base64Images.join(',');
   }
-
-
-
 
   // Method to get the correct directory for Android based on version
   Future<Directory?> _getAndroidDirectory() async {

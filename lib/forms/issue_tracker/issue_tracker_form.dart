@@ -751,6 +751,11 @@ class _IssueTrackerFormState extends State<IssueTrackerForm> {
     issueTrackerController.selectedValue21 = '';
     _selectedStaff5 = null;
     issueTrackerController.alexaDescriptionController.clear();
+    issueTrackerController.otherSolarDescriptionController.clear();
+    issueTrackerController.dotDeviceMissingController.clear();
+    issueTrackerController.dotDeviceMissingController.clear();
+    issueTrackerController.dotDeviceNotConnectingController.clear();
+    issueTrackerController.dotDeviceNotChargingController.clear();
     issueTrackerController.multipleImage5.clear();
     issueTrackerController.dateController9.clear();
     issueTrackerController.dateController10.clear();
@@ -7267,10 +7272,9 @@ class IssuesFloatingButton extends StatelessWidget {
                       final issue = issuesList[index];
                       return ListTile(
                         title: Text(
-                          '2) Description: ${issue['lib_desc'] ?? "No description"}\n'
-                          '3) Reported by: ${issue['reported_by'] ?? "Unknown"}\n'
-                          '4) Resolved By: ${issue['resolved_by'] ?? "Not resolved"}\n'
-                          '5) uniqueId: ${issue['unique_id'] ?? "No date"}',
+                          '1) Issue: ${issue['lib_issue_value'] ?? "N/A"}\n'
+                          '2) Description: ${issue['lib_desc'] ?? "N/A"}\n'
+
                         ),
                         trailing: IconButton(
                           icon: Icon(Icons.delete, color: Colors.red),
@@ -7347,10 +7351,8 @@ class IssuesFloatingButton2 extends StatelessWidget {
                       final issue = issuesList2[index];
                       return ListTile(
                         title: Text(
+                          '1) Issue: ${issue['play_issue_value']}\n'
                           '2) Description: ${issue['play_desc']}\n'
-                          '3) Reported by: ${issue['reported_by']}\n'
-                          '4) Resolved by: ${issue['resolved_by']}\n'
-                          '5) uniqueId: ${issue['unique_id']}',
                         ),
                         trailing: IconButton(
                           icon: Icon(Icons.delete, color: Colors.red),
@@ -7427,11 +7429,9 @@ class IssuesFloatingButton3 extends StatelessWidget {
                       final issue = issuesList3[index];
                       return ListTile(
                         title: Text(
-                          '2) Issue: ${issue['part']}\n'
-                          '3) Reported by: ${issue['reportedBy']}\n'
-                          '3) Resolved by: ${issue['resolvedBy']}\n'
-                          '3) Tablet Number: ${issue['tabletNumber']}\n'
-                          '4) uniqueId: ${issue['unique_id']}',
+                            '1) Issue: ${issue['part']}\n'
+                            '2) Description: ${issue['description']}\n'
+
                         ),
                         trailing: IconButton(
                           icon: Icon(Icons.delete, color: Colors.red),
@@ -7508,10 +7508,9 @@ class IssuesFloatingButton4 extends StatelessWidget {
                       final issue = issuesList4[index];
                       return ListTile(
                         title: Text(
-                          '2) Description: ${issue['description']}\n'
-                          '3) Reported by: ${issue['reportedBy']}\n'
-                          '4) Resolved By: ${issue['resolvedBy']}\n'
-                          '5) UniqueId: ${issue['unique_id']}',
+                            '1) Issue: ${issue['part']}\n'
+                            '2) Description: ${issue['description']}\n'
+
                         ),
                         trailing: IconButton(
                           icon: Icon(Icons.delete, color: Colors.red),
@@ -7588,11 +7587,9 @@ class IssuesFloatingButton5 extends StatelessWidget {
                       final issue = issuesList5[index];
                       return ListTile(
                         title: Text(
-                          '2) Description: ${issue['description']}\n'
-                          '3) Reported by: ${issue['reportedBy']}\n'
-                          '4) Resolved By: ${issue['resolvedBy']}\n'
-                          '4) notConfiguredDot: ${issue['notConfiguredDot']}\n'
-                          '5) Unique: ${issue['unique_id']}',
+                            '1) Issue: ${issue['part']}\n'
+                            '2) Description: ${issue['description']}\n'
+
                         ),
                         trailing: IconButton(
                           icon: Icon(Icons.delete, color: Colors.red),

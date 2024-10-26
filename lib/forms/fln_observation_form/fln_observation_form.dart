@@ -135,8 +135,8 @@ class _FlnObservationFormState extends State<FlnObservationForm> {
 
     // Initialize controllers, notifiers, and add listeners
     for (int i = 0; i < grades.length; i++) {
-      final boysController = TextEditingController();
-      final girlsController = TextEditingController();
+      final boysController = TextEditingController(text: '0');
+      final girlsController = TextEditingController(text: '0');
       final totalNotifier = ValueNotifier<int>(0);
 
       boysController.addListener(() {
@@ -155,8 +155,8 @@ class _FlnObservationFormState extends State<FlnObservationForm> {
 
     // Initialize controllers and notifiers for Staff Details
     for (int i = 0; i < staffRoles.length; i++) {
-      final teachingStaffController = TextEditingController();
-      final nonTeachingStaffController = TextEditingController();
+      final teachingStaffController = TextEditingController(text: '0');
+      final nonTeachingStaffController = TextEditingController(text: '0');
       final totalNotifier = ValueNotifier<int>(0);
 
       teachingStaffController.addListener(() {
@@ -175,8 +175,8 @@ class _FlnObservationFormState extends State<FlnObservationForm> {
 
     // Initialize controllers, notifiers, and add listeners
     for (int i = 0; i < grades2.length; i++) {
-      final boysController2 = TextEditingController();
-      final girlsController2 = TextEditingController();
+      final boysController2 = TextEditingController(text: '0');
+      final girlsController2 = TextEditingController(text: '0');
       final totalNotifier2 = ValueNotifier<int>(0);
 
       boysController2.addListener(() {
@@ -1565,15 +1565,8 @@ class _FlnObservationFormState extends State<FlnObservationForm> {
                                               value: 20,
                                               side: 'height',
                                             ),
-                                            LabelText(
-                                              label:
-                                                  'upload photo of UKG timetable',
-                                              astrick: true,
-                                            ),
-                                            CustomSizedBox(
-                                              value: 20,
-                                              side: 'height',
-                                            ),
+
+
                                             Container(
                                               height: 60,
                                               decoration: BoxDecoration(
@@ -4026,6 +4019,8 @@ class _FlnObservationFormState extends State<FlnObservationForm> {
                                                         observation: flnObservationController.remarksController.text,
                                                         createdAt: formattedDate.toString(),
                                                         submittedAt: formattedDate.toString(),
+                                                        office: widget.office ?? '',
+
                                                         created_by: widget.userid.toString());
 
                                                     int result =

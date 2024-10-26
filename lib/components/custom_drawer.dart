@@ -21,6 +21,7 @@ import '../helper/shared_prefernce.dart';
 import '../home/home_screen.dart';
 import '../home/tour_data.dart';
 import '../login/login_screen.dart';
+import '../tourDetails/tour_controller.dart';
 import 'custom_snackbar.dart';
 
 class CustomDrawer extends StatefulWidget {
@@ -98,7 +99,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
 
                     // Version Text
                     Text(
-                   '4.0.0',
+                      '4.0.0',
                       style: TextStyle(
                         color: Colors.white.withOpacity(0.9),
                         fontSize: responsive.responsiveValue(
@@ -141,8 +142,6 @@ class _CustomDrawerState extends State<CustomDrawer> {
               Get.to(() => SelectForm()); // Navigate to the Edit Form Screen
             },
           ),
-
-
 
           DrawerMenu(
             title: 'Enrollment Sync',
@@ -194,7 +193,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
             icons: const FaIcon(FontAwesomeIcons.database),
             onPressed: () async {
               await SharedPreferencesHelper.logout();
-              await Get.to(() =>  const FinalIssueTrackerSync());
+              await Get.to(() => const FinalIssueTrackerSync());
             },
           ),
 
@@ -238,14 +237,18 @@ class _CustomDrawerState extends State<CustomDrawer> {
             title: 'Logout',
             icons: const FaIcon(FontAwesomeIcons.arrowRightFromBracket),
             onPressed: () async {
+              final UserController userController = Get.find<UserController>();
+
+              // Clear user data
+              userController.clearUserData();
 
 
 
+              // Clear user data from SharedPreferences
+              await SharedPreferencesHelper
+                  .logout(); // Complete logout and clear session
 
-              // Step 3: Clear user data from SharedPreferences
-              await SharedPreferencesHelper.logout();  // Complete logout and clear session
-
-              // Step 4: Clear previous navigation stack and navigate to LoginScreen
+              // Clear previous navigation stack and navigate to LoginScreen
               Get.offAll(() => const LoginScreen());
 
               // Optional: Display confirmation snackbar
@@ -258,11 +261,6 @@ class _CustomDrawerState extends State<CustomDrawer> {
               );
             },
           )
-
-
-
-
-
         ],
       ),
     );

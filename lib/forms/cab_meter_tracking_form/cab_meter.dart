@@ -478,12 +478,8 @@ class _CabMeterTracingFormState extends State<CabMeterTracingForm> {
                             textController:
                                 cabMeterController.remarksController,
                             labelText: 'Remarks Here',
-                            validator: (value) {
-                              if (value != null && value.length > 30) {
-                                return 'Text must not be more than 30 characters';
-                              }
-                              return null;
-                            },
+                            maxlines: 2,
+
                           ),
                           CustomSizedBox(
                             value: 20,
@@ -562,6 +558,7 @@ class _CabMeterTracingFormState extends State<CabMeterTracingForm> {
                                   created_at: formattedDate,
                                   uniqueId: uniqueId,
                                 );
+                                print("Office: ${widget.office ?? 'N/A'}");
 
                                 // Save data to local database
                                 int result = await LocalDbController().addData(

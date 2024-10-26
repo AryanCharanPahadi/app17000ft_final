@@ -215,425 +215,425 @@ class _FinalIssueTrackerSyncState extends State<FinalIssueTrackerSync> {
                                                         filterdByUniqueId![i].createdAt!,
                                                         filterdByUniqueId![i].created_by!,
                                                         filterdByUniqueId![i].id);
-    if (rsp !=
-    null &&
-    rsp['status'] ==
-    1) {
-    print(
-    'TABLE of Library ${libIssueList?.length ?? 0}');
+                                                    if (rsp !=
+                                                        null &&
+                                                        rsp['status'] ==
+                                                            1) {
+                                                      print(
+                                                          'TABLE of Library ${libIssueList?.length ?? 0}');
 
-    if (libIssueList !=
-    null &&
-    libIssueList!
-        .isNotEmpty) {
-    for (int i =
-    0;
-    i < libIssueList!.length;
-    i++) {
-    print(
-    'library records of num row $i');
+                                                      if (libIssueList !=
+                                                          null &&
+                                                          libIssueList!
+                                                              .isNotEmpty) {
+                                                        for (int i =
+                                                        0;
+                                                        i < libIssueList!.length;
+                                                        i++) {
+                                                          print(
+                                                              'library records of num row $i');
 
-    var rsplib =
-    await insertIssueRecords(
-    libIssueList![i]
-        .uniqueId,
-    libIssueList![i]
-        .issueExist!,
-    libIssueList![i]
-        .issueName,
-    libIssueList![i]
-        .lib_issue_img,
-    libIssueList![i]
-        .issueDescription!,
-    libIssueList![i]
-        .issueReportOn!,
-    libIssueList![i]
-        .issueReportBy!,
-    libIssueList![i]
-        .issueResolvedOn!,
-    libIssueList![i]
-        .issueResolvedBy!,
-    libIssueList![i]
-        .issueStatus!,
-    libIssueList![i]
-        .id,
-    );
+                                                          var rsplib =
+                                                          await insertIssueRecords(
+                                                            libIssueList![i]
+                                                                .uniqueId,
+                                                            libIssueList![i]
+                                                                .issueExist!,
+                                                            libIssueList![i]
+                                                                .issueName,
+                                                            libIssueList![i]
+                                                                .lib_issue_img,
+                                                            libIssueList![i]
+                                                                .issueDescription!,
+                                                            libIssueList![i]
+                                                                .issueReportOn!,
+                                                            libIssueList![i]
+                                                                .issueReportBy!,
+                                                            libIssueList![i]
+                                                                .issueResolvedOn!,
+                                                            libIssueList![i]
+                                                                .issueResolvedBy!,
+                                                            libIssueList![i]
+                                                                .issueStatus!,
+                                                            libIssueList![i]
+                                                                .id,
+                                                          );
 
-    // Debug print statements to track the value of rsplib
-    print(
-    'rsplib response: $rsplib');
+                                                          // Debug print statements to track the value of rsplib
+                                                          print(
+                                                              'rsplib response: $rsplib');
 
-    if (rsplib !=
-    null &&
-    rsplib.containsKey(
-    'status') &&
-    rsplib['status'] ==
-    1) {
-    customSnackbar(
-    'Successfully',
-    "${rsp['message']}",
-    AppColors.secondary,
-    AppColors.onSecondary,
-    Icons.check,
-    );
-    } else {
-    customSnackbar(
-    'Error',
-    rsplib != null
-    ? rsplib['message'] ?? 'Unknown error occurred'
-        : 'Failed to upload issue record',
-    AppColors.errorContainer,
-    AppColors.onBackground,
-    Icons.warning,
-    );
-    }
-    }
-    }
+                                                          if (rsplib !=
+                                                              null &&
+                                                              rsplib.containsKey(
+                                                                  'status') &&
+                                                              rsplib['status'] ==
+                                                                  1) {
+                                                            customSnackbar(
+                                                              'Successfully',
+                                                              "${rsp['message']}",
+                                                              AppColors.secondary,
+                                                              AppColors.onSecondary,
+                                                              Icons.check,
+                                                            );
+                                                          } else {
+                                                            customSnackbar(
+                                                              'Error',
+                                                              rsplib != null
+                                                                  ? rsplib['message'] ?? 'Unknown error occurred'
+                                                                  : 'Failed to upload issue record',
+                                                              AppColors.errorContainer,
+                                                              AppColors.onBackground,
+                                                              Icons.warning,
+                                                            );
+                                                          }
+                                                        }
+                                                      }
 
-    print(
-    'TABLE of Playground ${playgroundIssueList?.length ?? 0}');
+                                                      print(
+                                                          'TABLE of Playground ${playgroundIssueList?.length ?? 0}');
 
-    if (playgroundIssueList !=
-    null &&
-    playgroundIssueList!
-        .isNotEmpty) {
-    for (int i =
-    0;
-    i < playgroundIssueList!.length;
-    i++) {
-    print(
-    'Playground records of num row $i');
+                                                      if (playgroundIssueList !=
+                                                          null &&
+                                                          playgroundIssueList!
+                                                              .isNotEmpty) {
+                                                        for (int i =
+                                                        0;
+                                                        i < playgroundIssueList!.length;
+                                                        i++) {
+                                                          print(
+                                                              'Playground records of num row $i');
 
-    var rspPlay =
-    await insertPlayRecords(
-    playgroundIssueList![i]
-        .uniqueId,
-    playgroundIssueList![i]
-        .issueExist!,
-    playgroundIssueList![i]
-        .issueName,
-    playgroundIssueList![i]
-        .play_issue_img,
-    playgroundIssueList![i]
-        .issueDescription!,
-    playgroundIssueList![i]
-        .issueReportOn!,
-    playgroundIssueList![i]
-        .issueReportBy!,
-    playgroundIssueList![i]
-        .issueResolvedOn!,
-    playgroundIssueList![i]
-        .issueResolvedBy!,
-    playgroundIssueList![i]
-        .issueStatus!,
-    playgroundIssueList![i]
-        .id,
-    );
+                                                          var rspPlay =
+                                                          await insertPlayRecords(
+                                                            playgroundIssueList![i]
+                                                                .uniqueId,
+                                                            playgroundIssueList![i]
+                                                                .issueExist!,
+                                                            playgroundIssueList![i]
+                                                                .issueName,
+                                                            playgroundIssueList![i]
+                                                                .play_issue_img,
+                                                            playgroundIssueList![i]
+                                                                .issueDescription!,
+                                                            playgroundIssueList![i]
+                                                                .issueReportOn!,
+                                                            playgroundIssueList![i]
+                                                                .issueReportBy!,
+                                                            playgroundIssueList![i]
+                                                                .issueResolvedOn!,
+                                                            playgroundIssueList![i]
+                                                                .issueResolvedBy!,
+                                                            playgroundIssueList![i]
+                                                                .issueStatus!,
+                                                            playgroundIssueList![i]
+                                                                .id,
+                                                          );
 
-    // Debug print statements to track the value of rsplib
-    print(
-    'rspPlay response: $rspPlay');
+                                                          // Debug print statements to track the value of rsplib
+                                                          print(
+                                                              'rspPlay response: $rspPlay');
 
-    if (rspPlay !=
-    null &&
-    rspPlay.containsKey(
-    'status') &&
-    rspPlay['status'] ==
-    1) {
-    customSnackbar(
-    'Successfully',
-    "${rsp['message']}",
-    AppColors.secondary,
-    AppColors.onSecondary,
-    Icons.check,
-    );
-    } else {
-    customSnackbar(
-    'Error',
-    rspPlay != null
-    ? rspPlay['message'] ?? 'Unknown error occurred'
-        : 'Failed to upload issue record',
-    AppColors.errorContainer,
-    AppColors.onBackground,
-    Icons.warning,
-    );
-    }
-    }
-    }
+                                                          if (rspPlay !=
+                                                              null &&
+                                                              rspPlay.containsKey(
+                                                                  'status') &&
+                                                              rspPlay['status'] ==
+                                                                  1) {
+                                                            customSnackbar(
+                                                              'Successfully',
+                                                              "${rsp['message']}",
+                                                              AppColors.secondary,
+                                                              AppColors.onSecondary,
+                                                              Icons.check,
+                                                            );
+                                                          } else {
+                                                            customSnackbar(
+                                                              'Error',
+                                                              rspPlay != null
+                                                                  ? rspPlay['message'] ?? 'Unknown error occurred'
+                                                                  : 'Failed to upload issue record',
+                                                              AppColors.errorContainer,
+                                                              AppColors.onBackground,
+                                                              Icons.warning,
+                                                            );
+                                                          }
+                                                        }
+                                                      }
 
-    print(
-    'TABLE of Furniture ${furnitureIssueList?.length ?? 0}');
+                                                      print(
+                                                          'TABLE of Furniture ${furnitureIssueList?.length ?? 0}');
 
-    if (furnitureIssueList !=
-    null &&
-    furnitureIssueList!
-        .isNotEmpty) {
-    for (int i =
-    0;
-    i < furnitureIssueList!.length;
-    i++) {
-    print(
-    'Furniture records of num row $i');
+                                                      if (furnitureIssueList !=
+                                                          null &&
+                                                          furnitureIssueList!
+                                                              .isNotEmpty) {
+                                                        for (int i =
+                                                        0;
+                                                        i < furnitureIssueList!.length;
+                                                        i++) {
+                                                          print(
+                                                              'Furniture records of num row $i');
 
-    var rspFurn =
-    await insertFurnRecords(
-    furnitureIssueList![i]
-        .uniqueId,
-    furnitureIssueList![i]
-        .issueExist!,
-    furnitureIssueList![i]
-        .issueName,
-    furnitureIssueList![i]
-        .furn_issue_img,
-    furnitureIssueList![i]
-        .issueDescription!,
-    furnitureIssueList![i]
-        .issueReportOn!,
-    furnitureIssueList![i]
-        .issueReportBy!,
-    furnitureIssueList![i]
-        .issueResolvedOn!,
-    furnitureIssueList![i]
-        .issueResolvedBy!,
-    furnitureIssueList![i]
-        .issueStatus!,
-    furnitureIssueList![i]
-        .id,
-    );
+                                                          var rspFurn =
+                                                          await insertFurnRecords(
+                                                            furnitureIssueList![i]
+                                                                .uniqueId,
+                                                            furnitureIssueList![i]
+                                                                .issueExist!,
+                                                            furnitureIssueList![i]
+                                                                .issueName,
+                                                            furnitureIssueList![i]
+                                                                .furn_issue_img,
+                                                            furnitureIssueList![i]
+                                                                .issueDescription!,
+                                                            furnitureIssueList![i]
+                                                                .issueReportOn!,
+                                                            furnitureIssueList![i]
+                                                                .issueReportBy!,
+                                                            furnitureIssueList![i]
+                                                                .issueResolvedOn!,
+                                                            furnitureIssueList![i]
+                                                                .issueResolvedBy!,
+                                                            furnitureIssueList![i]
+                                                                .issueStatus!,
+                                                            furnitureIssueList![i]
+                                                                .id,
+                                                          );
 
-    // Debug print statements to track the value of rsplib
-    print(
-    'rspFurn response: $rspFurn');
+                                                          // Debug print statements to track the value of rsplib
+                                                          print(
+                                                              'rspFurn response: $rspFurn');
 
-    if (rspFurn !=
-    null &&
-    rspFurn.containsKey(
-    'status') &&
-    rspFurn['status'] ==
-    1) {
-    customSnackbar(
-    'Successfully',
-    "${rsp['message']}",
-    AppColors.secondary,
-    AppColors.onSecondary,
-    Icons.check,
-    );
-    } else {
-    customSnackbar(
-    'Error',
-    rspFurn != null
-    ? rspFurn['message'] ?? 'Unknown error occurred'
-        : 'Failed to upload issue record',
-    AppColors.errorContainer,
-    AppColors.onBackground,
-    Icons.warning,
-    );
-    }
-    }
-    }
+                                                          if (rspFurn !=
+                                                              null &&
+                                                              rspFurn.containsKey(
+                                                                  'status') &&
+                                                              rspFurn['status'] ==
+                                                                  1) {
+                                                            customSnackbar(
+                                                              'Successfully',
+                                                              "${rsp['message']}",
+                                                              AppColors.secondary,
+                                                              AppColors.onSecondary,
+                                                              Icons.check,
+                                                            );
+                                                          } else {
+                                                            customSnackbar(
+                                                              'Error',
+                                                              rspFurn != null
+                                                                  ? rspFurn['message'] ?? 'Unknown error occurred'
+                                                                  : 'Failed to upload issue record',
+                                                              AppColors.errorContainer,
+                                                              AppColors.onBackground,
+                                                              Icons.warning,
+                                                            );
+                                                          }
+                                                        }
+                                                      }
 
-    print(
-    'TABLE of DigiLab ${digiLabIssueList?.length ?? 0}');
+                                                      print(
+                                                          'TABLE of DigiLab ${digiLabIssueList?.length ?? 0}');
 
-    if (digiLabIssueList !=
-    null &&
-    digiLabIssueList!
-        .isNotEmpty) {
-    for (int i =
-    0;
-    i < digiLabIssueList!.length;
-    i++) {
-    print(
-    'DigiLab records of num row $i');
+                                                      if (digiLabIssueList !=
+                                                          null &&
+                                                          digiLabIssueList!
+                                                              .isNotEmpty) {
+                                                        for (int i =
+                                                        0;
+                                                        i < digiLabIssueList!.length;
+                                                        i++) {
+                                                          print(
+                                                              'DigiLab records of num row $i');
 
-    var rspDig =
-    await insertDigRecords(
-    digiLabIssueList![i]
-        .uniqueId,
-    digiLabIssueList![i]
-        .issueExist!,
-    digiLabIssueList![i]
-        .issueName,
-    digiLabIssueList![i]
-        .dig_issue_img,
-    digiLabIssueList![i]
-        .issueDescription!,
-    digiLabIssueList![i]
-        .issueReportOn,
-    digiLabIssueList![i]
-        .issueReportBy,
-    digiLabIssueList![i].issueResolvedOn?.toString() ??
-    'Not Resolved Yet',
-    digiLabIssueList![i].issueResolvedBy?.toString() ??
-    'Not Resolved Yet',
-    digiLabIssueList![i]
-        .issueStatus!,
-    digiLabIssueList![i].tabletNumber?.toString() ??
-    'N/A',
-    digiLabIssueList![i]
-        .id,
-    );
+                                                          var rspDig =
+                                                          await insertDigRecords(
+                                                            digiLabIssueList![i]
+                                                                .uniqueId,
+                                                            digiLabIssueList![i]
+                                                                .issueExist!,
+                                                            digiLabIssueList![i]
+                                                                .issueName,
+                                                            digiLabIssueList![i]
+                                                                .dig_issue_img,
+                                                            digiLabIssueList![i]
+                                                                .issueDescription!,
+                                                            digiLabIssueList![i]
+                                                                .issueReportOn,
+                                                            digiLabIssueList![i]
+                                                                .issueReportBy,
+                                                            digiLabIssueList![i].issueResolvedOn?.toString() ??
+                                                                'Not Resolved Yet',
+                                                            digiLabIssueList![i].issueResolvedBy?.toString() ??
+                                                                'Not Resolved Yet',
+                                                            digiLabIssueList![i]
+                                                                .issueStatus!,
+                                                            digiLabIssueList![i].tabletNumber?.toString() ??
+                                                                'N/A',
+                                                            digiLabIssueList![i]
+                                                                .id,
+                                                          );
 
-    // Debug print statements to track the value of rsplib
-    print(
-    'rspDig response: $rspDig');
+                                                          // Debug print statements to track the value of rsplib
+                                                          print(
+                                                              'rspDig response: $rspDig');
 
-    if (rspDig !=
-    null &&
-    rspDig.containsKey(
-    'status') &&
-    rspDig['status'] ==
-    1) {
-    customSnackbar(
-    'Successfully',
-    "${rsp['message']}",
-    AppColors.secondary,
-    AppColors.onSecondary,
-    Icons.check,
-    );
-    } else {
-    customSnackbar(
-    'Error',
-    rspDig != null
-    ? rspDig['message'] ?? 'Unknown error occurred'
-        : 'Failed to upload issue record',
-    AppColors.errorContainer,
-    AppColors.onBackground,
-    Icons.warning,
-    );
-    }
-    }
-    }
+                                                          if (rspDig !=
+                                                              null &&
+                                                              rspDig.containsKey(
+                                                                  'status') &&
+                                                              rspDig['status'] ==
+                                                                  1) {
+                                                            customSnackbar(
+                                                              'Successfully',
+                                                              "${rsp['message']}",
+                                                              AppColors.secondary,
+                                                              AppColors.onSecondary,
+                                                              Icons.check,
+                                                            );
+                                                          } else {
+                                                            customSnackbar(
+                                                              'Error',
+                                                              rspDig != null
+                                                                  ? rspDig['message'] ?? 'Unknown error occurred'
+                                                                  : 'Failed to upload issue record',
+                                                              AppColors.errorContainer,
+                                                              AppColors.onBackground,
+                                                              Icons.warning,
+                                                            );
+                                                          }
+                                                        }
+                                                      }
 
-    print(
-    'TABLE of Alexa ${alexaIssueList?.length ?? 0}');
+                                                      print(
+                                                          'TABLE of Alexa ${alexaIssueList?.length ?? 0}');
 
-    if (alexaIssueList !=
-    null &&
-    alexaIssueList!
-        .isNotEmpty) {
-    for (int i =
-    0;
-    i < alexaIssueList!.length;
-    i++) {
-    print(
-    'Alexa records of num row $i');
+                                                      if (alexaIssueList !=
+                                                          null &&
+                                                          alexaIssueList!
+                                                              .isNotEmpty) {
+                                                        for (int i =
+                                                        0;
+                                                        i < alexaIssueList!.length;
+                                                        i++) {
+                                                          print(
+                                                              'Alexa records of num row $i');
 
-    var rspAlexa =
-    await insertAlexaRecords(
-    alexaIssueList![i]
-        .uniqueId,
-    alexaIssueList![i]
-        .issueExist!,
-    alexaIssueList![i]
-        .issueName,
-    alexaIssueList![i]
-        .alexa_issue_img,
-    alexaIssueList![i]
-        .issueDescription!,
-    alexaIssueList![i]
-        .issueReportOn!,
-    alexaIssueList![i]
-        .issueReportBy!,
-    alexaIssueList![i]
-        .issueResolvedOn!,
-    alexaIssueList![i]
-        .issueResolvedBy!,
-    alexaIssueList![i]
-        .issueStatus!,
-    alexaIssueList![i].other?.toString() ??
-    'N/A',
-    alexaIssueList![i].missingDot?.toString() ??
-    'N/A',
-    alexaIssueList![i].notConfiguredDot?.toString() ??
-    'N/A',
-    alexaIssueList![i].notConnectingDot?.toString() ??
-    'N/A',
-    alexaIssueList![i].notChargingDot?.toString() ??
-    'N/A',
-    alexaIssueList![i]
-        .id,
-    );
+                                                          var rspAlexa =
+                                                          await insertAlexaRecords(
+                                                            alexaIssueList![i]
+                                                                .uniqueId,
+                                                            alexaIssueList![i]
+                                                                .issueExist!,
+                                                            alexaIssueList![i]
+                                                                .issueName,
+                                                            alexaIssueList![i]
+                                                                .alexa_issue_img,
+                                                            alexaIssueList![i]
+                                                                .issueDescription!,
+                                                            alexaIssueList![i]
+                                                                .issueReportOn!,
+                                                            alexaIssueList![i]
+                                                                .issueReportBy!,
+                                                            alexaIssueList![i]
+                                                                .issueResolvedOn!,
+                                                            alexaIssueList![i]
+                                                                .issueResolvedBy!,
+                                                            alexaIssueList![i]
+                                                                .issueStatus!,
+                                                            alexaIssueList![i].other?.toString() ??
+                                                                'N/A',
+                                                            alexaIssueList![i].missingDot?.toString() ??
+                                                                'N/A',
+                                                            alexaIssueList![i].notConfiguredDot?.toString() ??
+                                                                'N/A',
+                                                            alexaIssueList![i].notConnectingDot?.toString() ??
+                                                                'N/A',
+                                                            alexaIssueList![i].notChargingDot?.toString() ??
+                                                                'N/A',
+                                                            alexaIssueList![i]
+                                                                .id,
+                                                          );
 
-    // Debug print statements to track the value of rsplib
-    print(
-    'rspAlexa response: $rspAlexa');
+                                                          // Debug print statements to track the value of rsplib
+                                                          print(
+                                                              'rspAlexa response: $rspAlexa');
 
-    if (rspAlexa !=
-    null &&
-    rspAlexa.containsKey(
-    'status') &&
-    rspAlexa['status'] ==
-    1) {
-    customSnackbar(
-    'Successfully',
-    "${rsp['message']}",
-    AppColors.secondary,
-    AppColors.onSecondary,
-    Icons.check,
-    );
-    } else {
-    customSnackbar(
-    'Error',
-    rspAlexa != null
-    ? rspAlexa['message'] ?? 'Unknown error occurred'
-        : 'Failed to upload issue record',
-    AppColors.errorContainer,
-    AppColors.onBackground,
-    Icons.warning,
-    );
-    }
-    }
-    }
-                                                    // Update the percentage after each sync operation
-                                                    setState(() {
-                                                      _percent =
-                                                          ((i + 1) /
-                                                              filterdByUniqueId!
-                                                                  .length) *
-                                                              100;
+                                                          if (rspAlexa !=
+                                                              null &&
+                                                              rspAlexa.containsKey(
+                                                                  'status') &&
+                                                              rspAlexa['status'] ==
+                                                                  1) {
+                                                            customSnackbar(
+                                                              'Successfully',
+                                                              "${rsp['message']}",
+                                                              AppColors.secondary,
+                                                              AppColors.onSecondary,
+                                                              Icons.check,
+                                                            );
+                                                          } else {
+                                                            customSnackbar(
+                                                              'Error',
+                                                              rspAlexa != null
+                                                                  ? rspAlexa['message'] ?? 'Unknown error occurred'
+                                                                  : 'Failed to upload issue record',
+                                                              AppColors.errorContainer,
+                                                              AppColors.onBackground,
+                                                              Icons.warning,
+                                                            );
+                                                          }
+                                                        }
+                                                      }
+                                                      // Update the percentage after each sync operation
+                                                      setState(() {
+                                                        _percent =
+                                                            ((i + 1) /
+                                                                filterdByUniqueId!
+                                                                    .length) *
+                                                                100;
 
-                                                      // Remove the synced record from the list
-                                                      finalList.removeAt(_selectedIndex!);
-                                                      _selectedIndex = null; // Reset selected index
-                                                    });
+                                                        // Remove the synced record from the list
+                                                        finalList.removeAt(_selectedIndex!);
+                                                        _selectedIndex = null; // Reset selected index
+                                                      });
 
-                                                    // Introduce a delay to simulate processing time
-                                                    await Future.delayed(Duration(milliseconds: 500));
+                                                      // Introduce a delay to simulate processing time
+                                                      await Future.delayed(Duration(milliseconds: 500));
 
-                                                    if (i == (filterdByUniqueId!.length - 1)) {
-                                                      customSnackbar(
-                                                          'Synced Successfully',
-                                                          "${rsp['message']}",
-                                                          AppColors.secondary,
-                                                          AppColors.onSecondary,
-                                                          Icons.check);
-                                                    } else {
-                                                      customSnackbar(
-                                                        'Error',
-                                                        rsp['message'],
-                                                        AppColors.errorContainer,
-                                                        AppColors.onBackground,
-                                                        Icons.warning,
-                                                      );
+                                                      if (i == (filterdByUniqueId!.length - 1)) {
+                                                        customSnackbar(
+                                                            'Synced Successfully',
+                                                            "${rsp['message']}",
+                                                            AppColors.secondary,
+                                                            AppColors.onSecondary,
+                                                            Icons.check);
+                                                      } else {
+                                                        customSnackbar(
+                                                          'Error',
+                                                          rsp['message'],
+                                                          AppColors.errorContainer,
+                                                          AppColors.onBackground,
+                                                          Icons.warning,
+                                                        );
+                                                      }
+
+                                                      print('ALL data is removed from tables');
+
+                                                      issueTrackerController.libIssueList.clear();
+                                                      issueTrackerController.digiLabIssueList.clear();
+                                                      issueTrackerController.furnitureIssueList.clear();
+                                                      issueTrackerController.playgroundIssueList.clear();
+                                                      issueTrackerController.issueTrackerList.clear();
+                                                      issueTrackerController.alexaIssueList.clear();
                                                     }
 
-                                                    print('ALL data is removed from tables');
-
-                                                    issueTrackerController.libIssueList.clear();
-                                                    issueTrackerController.digiLabIssueList.clear();
-                                                    issueTrackerController.furnitureIssueList.clear();
-                                                    issueTrackerController.playgroundIssueList.clear();
-                                                    issueTrackerController.issueTrackerList.clear();
-                                                    issueTrackerController.alexaIssueList.clear();
-                                                  }
-
-                                                  // Stop the loading
-                                                  setState(() {
-                                                    _isSubmitting = false; // Stop spinner
-                                                    _percent = 0.0; // Reset percentage
-                                                  });
-                                                }}));
+                                                    // Stop the loading
+                                                    setState(() {
+                                                      _isSubmitting = false; // Stop spinner
+                                                      _percent = 0.0; // Reset percentage
+                                                    });
+                                                  }}));
                                       } else {
                                         customSnackbar(
                                             'No Selection',
@@ -684,18 +684,18 @@ class _FinalIssueTrackerSyncState extends State<FinalIssueTrackerSync> {
 
 var baseurl = "https://mis.17000ft.org/17000ft_apis/";
 Future insertIssueRecords(
-  String? uniqueId,
-  String? issueExist,
-  String? issueValue,
-  String? lib_issue_img,
-  String? issueDescription,
-  String? reportedOn,
-  String? reportedBy,
-  String? resolvedOn,
-  String? resolvedBy,
-  String? issueStatus,
-  int? id,
-) async {
+    String? uniqueId,
+    String? issueExist,
+    String? issueValue,
+    String? lib_issue_img,
+    String? issueDescription,
+    String? reportedOn,
+    String? reportedBy,
+    String? resolvedOn,
+    String? resolvedBy,
+    String? issueStatus,
+    int? id,
+    ) async {
   if (uniqueId == null || issueExist == null) {
     print('Missing critical data: uniqueId or issueExist is null.');
     return null;
@@ -783,16 +783,16 @@ Future insertIssueRecords(
 }
 
 Future insertBasicRecords(
-  String? tourId,
-  String? school,
-  String? udiseCode,
-  String? correctUdise,
-  String? uniqueId,
-  String? office,
-  String? createdAt,
-  String? created_by,
-  int? id,
-) async {
+    String? tourId,
+    String? school,
+    String? udiseCode,
+    String? correctUdise,
+    String? uniqueId,
+    String? office,
+    String? createdAt,
+    String? created_by,
+    int? id,
+    ) async {
   var request = http.MultipartRequest(
     'POST',
     Uri.parse('${baseurl}IssueTracker/issueTrackerSave_new.php'),
@@ -886,18 +886,18 @@ Future insertBasicRecords(
 }
 
 Future insertPlayRecords(
-  String? uniqueId,
-  String? issueExist,
-  String? issueValue,
-  String? play_issue_img,
-  String? issueDescription,
-  String? reportedOn,
-  String? reportedBy,
-  String? resolvedOn,
-  String? resolvedBy,
-  String? issueStatus,
-  int? id,
-) async {
+    String? uniqueId,
+    String? issueExist,
+    String? issueValue,
+    String? play_issue_img,
+    String? issueDescription,
+    String? reportedOn,
+    String? reportedBy,
+    String? resolvedOn,
+    String? resolvedBy,
+    String? issueStatus,
+    int? id,
+    ) async {
   if (uniqueId == null || issueExist == null) {
     print('Missing critical data: uniqueId or issueExist is null.');
     return null;
@@ -985,18 +985,18 @@ Future insertPlayRecords(
 }
 
 Future insertFurnRecords(
-  String? uniqueId,
-  String? issueExist,
-  String? issueValue,
-  String? furn_issue_img,
-  String? issueDescription,
-  String? reportedOn,
-  String? reportedBy,
-  String? resolvedOn,
-  String? resolvedBy,
-  String? issueStatus,
-  int? id,
-) async {
+    String? uniqueId,
+    String? issueExist,
+    String? issueValue,
+    String? furn_issue_img,
+    String? issueDescription,
+    String? reportedOn,
+    String? reportedBy,
+    String? resolvedOn,
+    String? resolvedBy,
+    String? issueStatus,
+    int? id,
+    ) async {
   if (uniqueId == null || issueExist == null) {
     print('Missing critical data: uniqueId or issueExist is null.');
     return null;
@@ -1084,19 +1084,19 @@ Future insertFurnRecords(
 }
 
 Future insertDigRecords(
-  String? uniqueId,
-  String? issueExist,
-  String? issueValue,
-  String? dig_issue_img,
-  String? issueDescription,
-  String? reportedOn,
-  String? reportedBy,
-  String? resolvedOn,
-  String? resolvedBy,
-  String? issueStatus,
-  String? tabletNumber,
-  int? id,
-) async {
+    String? uniqueId,
+    String? issueExist,
+    String? issueValue,
+    String? dig_issue_img,
+    String? issueDescription,
+    String? reportedOn,
+    String? reportedBy,
+    String? resolvedOn,
+    String? resolvedBy,
+    String? issueStatus,
+    String? tabletNumber,
+    int? id,
+    ) async {
   // Validate mandatory fields
   if (uniqueId == null || issueExist == null) {
     print('Missing critical data: uniqueId or issueExist is null.');
@@ -1212,23 +1212,23 @@ Future insertDigRecords(
 
 //insert Alexa Issues
 Future insertAlexaRecords(
-  String? uniqueId,
-  String? issueExist,
-  String? issueValue,
-  String? alexa_issue_img,
-  String? issueDescription,
-  String? reportedOn,
-  String? reportedBy,
-  String? resolvedOn,
-  String? resolvedBy,
-  String? issueStatus,
-  String? other,
-  String? missing,
-  String? notConfigured,
-  String? notConnecting,
-  String? notCharging,
-  int? id,
-) async {
+    String? uniqueId,
+    String? issueExist,
+    String? issueValue,
+    String? alexa_issue_img,
+    String? issueDescription,
+    String? reportedOn,
+    String? reportedBy,
+    String? resolvedOn,
+    String? resolvedBy,
+    String? issueStatus,
+    String? other,
+    String? missing,
+    String? notConfigured,
+    String? notConnecting,
+    String? notCharging,
+    int? id,
+    ) async {
   if (uniqueId == null || issueExist == null) {
     print('Missing critical data: uniqueId or issueExist is null.');
     return null;
